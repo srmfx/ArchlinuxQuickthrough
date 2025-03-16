@@ -5134,6 +5134,7 @@ git reflog example:
  * GIT OAUTH TOKEN | VERY IMPORTANT 2023:
  *		1) Go to Your Personal Account Settings on github
  *		2) Go to Developer Settings > Personal Access Tokens
+			https://github.com/settings/personal-access-tokens
  *		3) Generate a token accordingly 
  *		4) Copy it to clipboard & save it somewhere
  *		5) If not done yet, create a repo by Following A)
