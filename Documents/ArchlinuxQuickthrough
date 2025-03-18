@@ -18896,7 +18896,7 @@ Mounting and using storage devices are split into 2 categories,
 		# cp /etc/fstab /etc/fstab-backup-1
 
 	4.2 - Generate a new fstab file:
-		# genfstab -U > /etc/fstab
+		# genfstab -U / >> /etc/fstab
 	
 	4.3 - Compare new file with backup file
 		# diff /etc/fstab /etc/fstab-backup-1
