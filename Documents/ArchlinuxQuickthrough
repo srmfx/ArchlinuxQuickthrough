@@ -18335,6 +18335,7 @@ RESTORING A BROKEN ARCHLINUX INSTALLATION
 
 		5.6.3 - Gstreamer Packages | Audio and Video Plugins:
 			gstreamer gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly gst-plugin-libde265
+
 		5.6.4 - Xorg Screen Locker
 			xlockmore
 		
@@ -18345,16 +18346,17 @@ RESTORING A BROKEN ARCHLINUX INSTALLATION
 			fscrypt
 
 	6.0 - Backup current fstab:
-		"cp /etc/fstab /etc/fstab-backup-1"
+		# cp /etc/fstab /etc/fstab\ backup\ 1
 
 	6.1 - Generate a new fstab: 
-		"genfstab -U /mnt >> /mnt/etc/fstab"
+		# genfstab -U /mnt > /mnt/etc/fstab
 
 	6.2 - MISC:
 		linux-tools
 
 7. Arch-chroot into your broken operating system:
-	7.1 - Type: "arch-chroot /mnt"
+	7.1 - Type: 
+		# arch-chroot /mnt
 
 8. Rebuild your OS's initramfs:
 	8.1(for NVIDIA DKMS Users Only) - Make sure the modules have been added to your /etc/mkinitcpio.conf:
@@ -18896,7 +18898,7 @@ Mounting and using storage devices are split into 2 categories,
 		# cp /etc/fstab /etc/fstab-backup-1
 
 	4.2 - Generate a new fstab file:
-		# genfstab -U / >> /etc/fstab
+		# genfstab -U / > /etc/fstab
 	
 	4.3 - Compare new file with backup file
 		# diff /etc/fstab /etc/fstab-backup-1
@@ -18945,7 +18947,7 @@ MOUNTING HARD DISKS
 	
 	4 - (OPTIONAL) Adding disks to system auto-mount is as easy as this:
 	genfstab generates a new fstab configuration file, containning all of the current mounted devices in the system:
-		# genfstab -U / >> /etc/fstab
+		# genfstab -U / > /etc/fstab
 		
 	5 - Once you're finished using the hard disk, you can finally umount it:
 		# umount /mnt/disk\ X
