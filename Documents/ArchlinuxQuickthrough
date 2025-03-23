@@ -14454,28 +14454,28 @@ if you ever use a partition for ZFS, make sure to create only one pool for each 
 
 1. Install ZFS DKMS Modules and ZFS Utils
 	1.1 - Install ZFS DKMS Modules and ZFS Utils
-		#yay -Sy zfs-dkms zfs-utils
+		# yay -Sy zfs-dkms zfs-utils
 
 	1.2 - (Optional) ZFS Zpool Scrub
-		#yay -Sy systemd-zpool-scrub
+		# yay -Sy systemd-zpool-scrub
 
 	1.3 - (Optional) ZFS Boot Environment manager.
-		#yay -Sy zectl
+		# yay -Sy zectl
 
 	1.4 - (Optional) GRUB ZFS Libraries
-		#yay -Sy grub-libzfs 
+		# yay -Sy grub-libzfs 
 
 		1.4.1 - (Optional) Utility to manage ZFS Boot Environments
-			#yay -Sy zedenv
+			# yay -Sy zedenv
 
 	1.5 - (Optional) Storage load analysis tool for OpenZFS
-		#yay -Sy ioztat
+		# yay -Sy ioztat
 
 2. Make sure to add a zfs reference on file /etc/mkinitcpio.conf on line MODULES=():
 	ex.: MODULES=(nvidia, nvidia_modeset nvidia_drm, nvidia_uvm zfs)
 
 	2.1 - Build Initial ram filesystem:
-		#mkinitcpio -P
+		# mkinitcpio -P
 
 3. (Optional) - Add a modules-load configuration file in /etc/modules-load.d/zfs.conf:
 	[content]
@@ -14497,13 +14497,13 @@ if you ever use a partition for ZFS, make sure to create only one pool for each 
 		^ the latter disables all zfs modules.
 
 4. type in: 
-	sudo zpool create -f ZFS_PARTITION /dev/sdd2
+	# zpool create -f ZFS_PARTITION /dev/sdd2
 
 5. finally test to see if it's all running:
-	sudo zpool status
+	# zpool status
 
 5.1 - alternativefor checking:
-	sudo df -h			#ZFS_PARTITION should be listed here
+	# df -h			#ZFS_PARTITION should be listed here
 
 6 - Use ZFS Create(man zfs-create) to manage & set ZFS datasets within a ZFS storage pool:
 	sudo zfs create -o mountpoint=/mnt/ZFS_PARTITION/ -o compression=on ZFS_PARTITION/spamus
@@ -14513,13 +14513,13 @@ if you ever use a partition for ZFS, make sure to create only one pool for each 
 
 ---- COMPRESSING:
 
-1. sudo zfs set recordsize=256k atime=off ZFS_PARTITION
-2. sudo zfs set compression=zstd-3 ZFS_PARTITION
-3. sudo zfs inherit recordsize ZFS_PARTITION/spamus
-4. sudo zfs set compression=zstd-3 ZFS_PARTITION/spamus
+1. # zfs set recordsize=256k atime=off ZFS_PARTITION
+2. # zfs set compression=zstd-3 ZFS_PARTITION
+3. # zfs inherit recordsize ZFS_PARTITION/spamus
+4. # zfs set compression=zstd-3 ZFS_PARTITION/spamus
 
 5. check if changes have been applied:
-	zfs get all property ZFS_PARTITION/spamus
+	# zfs get all property ZFS_PARTITION/spamus
 
 
 note.: atime=off was optional, can be turn on again.
@@ -14527,24 +14527,24 @@ VERY IMPORTANT: do not use zstd compression rate higher than 4 or 5! - EXPLAIN L
 
 
 ---- CHANGING MOUNTING POINTS:
-sudo zfs set mountpoint=/mnt/ZFS_PARTITION_POOL ZFS_PARTITION
+# zfs set mountpoint=/mnt/ZFS_PARTITION_POOL ZFS_PARTITION
 
 note/very important: DO NOT MOUNT THE POOL/PARTITION ON TOP OF OTHER PARTITIONS!
 
 ---- CHECKING ON ARC SIZE:
 This will give you a summary of all ZFS Arc Stats:
-	$arc_summary -s arc
+	$ arc_summary -s arc
 
 		or
 	
-	$arcstat
+	$ arcstat
 		AND
-	$arc_summary -s archits
+	$ arc_summary -s archits
 
 ---- CHECKING ZPOOL SETTINGS:
 
 Checking property/features of a pool:
-	$zpool get all property ZFS_PART
+	$ zpool get all property ZFS_PART
 
 
 ---- SETTING MAXIMUM SIZE OF ARC:
@@ -14586,45 +14586,45 @@ Rebalance helps when there's a change on compression method on the given pool/pa
        Tasks) that have been enabled for the corresponding zevent class.(MAN ZED)
 
 ---- OTHER COMMANDS:
-#zpool destroy mypool							#Destroys/Deletes ZFS Partition
-#zpool create -f mypool raidz sdb sdc sdd sde sdf			#Creates a Raidz VFS Partition 
+# zpool destroy mypool							#Destroys/Deletes ZFS Partition
+# zpool create -f mypool raidz sdb sdc sdd sde sdf			#Creates a Raidz VFS Partition 
 									 ^ Raidz is a variaton of Raid5
-#zpool create -f mypool mirror sdb sdc mirror sdd sde			#Creates a mirrored vpool!
+# zpool create -f mypool mirror sdb sdc mirror sdd sde			#Creates a mirrored vpool!
 									sdd and sde will mirror at sdb and sdc
 
-#zpool export mypool							#Exports/Imports zpools
-#zpool import mypool							Useful for transferring pools between systems
+# zpool export mypool							#Exports/Imports zpools
+# zpool import mypool							Useful for transferring pools between systems
 
-#zpool iostat -v mypool							#Views zpool I/O Statistics
+# zpool iostat -v mypool							#Views zpool I/O Statistics
 
-#zpool replace mypool sde sdf						#Replaces a corrupted Disk in ZFS Pool
+# zpool replace mypool sde sdf						#Replaces a corrupted Disk in ZFS Pool
 
-#zpool add -f mypool spare sde						#Adds a spare disk, the spare disk will
+# zpool add -f mypool spare sde						#Adds a spare disk, the spare disk will
 									automatically replace the failed one(s)
 
-#zfs list								#Lists ZFS Pools/Partitions
-#zfs destroy mypool/home						#Destroys ZFS partition
-#zfs -o compression=on mypool/home					#Creates ZFS partition from given pool with 
+# zfs list								#Lists ZFS Pools/Partitions
+# zfs destroy mypool/home						#Destroys ZFS partition
+# zfs -o compression=on mypool/home					#Creates ZFS partition from given pool with 
 									 ^ compression on.
-#zfs create -o mountpoint=/mnt/zfs_part mypool/home			#Creates ZFS Partition from given pool and
+# zfs create -o mountpoint=/mnt/zfs_part mypool/home			#Creates ZFS Partition from given pool and
 									 ^ mounts it on /mnt/zfspart
 
-#zfs create -o mountpount=/mnt/zfs_part -o compression=on mypool/home   #Does the same thing above twice
+# zfs create -o mountpount=/mnt/zfs_part -o compression=on mypool/home   #Does the same thing above twice
 
-#zfs set quota=10G tank/home/bonwick 					#Assigns quota to a previously created user 
+# zfs set quota=10G tank/home/bonwick 					#Assigns quota to a previously created user 
 									pool called bonwick!
 
 full ex. of zfs create: 
-#zfs create -o mountpoint=/export/zfs -o sharenfs=on -o compression=on my_zpool/home
+# zfs create -o mountpoint=/export/zfs -o sharenfs=on -o compression=on my_zpool/home
 
-#zfs set compression=zstd-19 ZFS_PART/spamus				#Sets compression rate of zstd-19 to
+# zfs set compression=zstd-19 ZFS_PART/spamus				#Sets compression rate of zstd-19 to
 									ZFS_PART/spamus
 
-#zfs get compression ZFS_PART/spamus					#Gets compression rate on pool ZFS_PART/spamus
+# zfs get compression ZFS_PART/spamus					#Gets compression rate on pool ZFS_PART/spamus
 
 
 ----PLUS:
-$zfs get all property ZFS_PART/spamus 					#Lists all attributes available within ZFS 
+$ zfs get all property ZFS_PART/spamus 					#Lists all attributes available within ZFS 
 									System
 
 source:
@@ -14727,7 +14727,7 @@ This feature allows notebooks/laptops to save battery by turning on & mounting 1
 Disabling it should boost your boot up time significantly(Explanation Below):
 
 	1 - Check if you have it enabled:
-			#dmesg | grep 'SSS'
+			# dmesg | grep 'SSS'
 
 	2 - Add this to your OS kernelentry parameters on /boot/grub/grub.cfg:
 			libahci.ignore_sss=1
@@ -14790,19 +14790,19 @@ on SDDM this doesn't occurs(according to few users), however Nvidia GPUs don't w
 ================================================================================
 HOW TO USE MANUAL PAGES
 
-man --path						#Displays the location of the manpages
-man -a <command>					#Displays all manual sections for that manpage, sequentially.
+$ man --path						#Displays the location of the manpages
+$ man -a <command>					#Displays all manual sections for that manpage, sequentially.
 
-man <command>						#Shows the 1st manual page for that command.
+$ man <command>						#Shows the 1st manual page for that command.
 
-man <command>. 7					#Shows 7th section for a given manual page. - DEPRECATED?
-man 7 man						 ^ Same as above - WORKS?
-man man(7)						 ^ Same as above - WORKS?
+$ man <command>. 7					#Shows 7th section for a given manual page. - DEPRECATED?
+$ man 7 man						 ^ Same as above - WORKS?
+$ man man(7)						 ^ Same as above - WORKS?
 
-man -w man						#Displays the location of a manpage rather than the manpage
+$ man -w man						#Displays the location of a manpage rather than the manpage
 							itself
 
-man -k "search_string"					#Searches manpages containing a search string.
+$ man -k "search_string"				#Searches manpages containing a search string.
 							 ^ VERY USEFUL
 
 For more help, type in: man man
@@ -14810,22 +14810,22 @@ For more help, type in: man man
 HOW TO USE TLDR
 	This requires TLDR installed on the system.
 
-$tldr <command> 			#Print the tldr page for a specific command (hint: this is how you got here!).
+$ tldr <command> 			#Print the tldr page for a specific command (hint: this is how you got here!).
 
-tldr <command> <subcommand> 		#Print the tldr page for a specific subcommand.
+$ tldr <command> <subcommand> 		#Print the tldr page for a specific subcommand.
 
-tldr --language <language_code> <command> 	#Print the tldr page for a command in the given 
+$ tldr --language <language_code> <command> 	#Print the tldr page for a command in the given 
 						[L]anguage (if available, otherwise fall back to English).
 
-tldr --platform <android|common|freebsd|linux|windows> <command> #Print the tldr page for a command 
-								 for a specific [p]latform.
+$ tldr --platform <android|common|freebsd|linux|windows> <command> 	#Print the tldr page for a command 
+								 	for a specific [p]latform.
 
-tldr --update 				#[u]pdate the local cache of tldr pages.
+$ tldr --update 				#[u]pdate the local cache of tldr pages.
 
-tldr --list 				#List all pages for the current platform and `common`.
+$ tldr --list 				#List all pages for the current platform and `common`.
 ----------------------------------------
 HOW TO USE INFO PAGES
-info <program>						#Displays info documents for given program, if available
+$ info <program>						#Displays info documents for given program, if available
 
 Example:
 info make
@@ -14851,16 +14851,16 @@ HOW TO CHECK GNOME SETTINGS:
 ----------------------------------------
 ================================================================================
 HOW TO SYSTEMCTL:
-sudo systemctl status --all			#This will show all status data to the current system
+# systemctl status --all			#This will show all status data to the current system
 						 ^ including failed services and succesfull ones
-sudo systemctl --failed				#Shows systems that failed.
+# systemctl --failed				#Shows systems that failed.
 
 
 Personal Note.: State - Degraded just means some of your services failed to start.
 
 	HINT:
-		#systemctl <tab-key press>			##Lists available commands
-		#systemctl --<tab-key press>			##Lists available commands that start with --
+		# systemctl <tab-key press>			##Lists available commands
+		# systemctl --<tab-key press>			##Lists available commands that start with --
 
 		Service Files located in /usr/lib/systemd (/lib/systemd).
 
@@ -14870,42 +14870,42 @@ Personal Note.: State - Degraded just means some of your services failed to star
 
 	ADVANCED SYSTEMCTL:
 
-		#systemctl --all			##Lists all available service units in the system
-		#systemctl --failed			##Show all failed units
-		#systemctl --firmware-setup		##Tells the firmware to display setup menu
+		# systemctl --all			##Lists all available service units in the system
+		# systemctl --failed			##Show all failed units
+		# systemctl --firmware-setup		##Tells the firmware to display setup menu
 							(SHOW BIOS ON RESTART/STARTUP)
 		
-		$systemctl --user status <service_name> #Display status of the service for current user only.
-		#systemctl status <service_name> 	#Display status of the service, system-wide.
+		$ systemctl --user status <service_name> #Display status of the service for current user only.
+		# systemctl status <service_name> 	#Display status of the service, system-wide.
 
-		$systemctl --user show <service_name>	#Show details about a given service name
+		$ systemctl --user show <service_name>	#Show details about a given service name
 							^ User-only, not system wide.
-		#systemctl show <service_name>		#Same as above, system-wide
+		# systemctl show <service_name>		#Same as above, system-wide
 
-		#systemtl list-machines
-		#systemctl list-unit-files		#(Very Useful) Lists available(enabled/disabled) system wide services
-		$systemctl --user list-unit-files	#(Very Useful) Lists available(enabled/disabled) user-only services
+		# systemtl list-machines
+		# systemctl list-unit-files		#(Very Useful) Lists available(enabled/disabled) system wide services
+		$ systemctl --user list-unit-files	#(Very Useful) Lists available(enabled/disabled) user-only services
 							^ Always current runnning user.
 
-		#systemctl list-jobs			#
-		#systemctl list-timers			#
-		#systemctl list-automount		#
+		# systemctl list-jobs			#
+		# systemctl list-timers			#
+		# systemctl list-automount		#
 
-		#systemctl --all list-dependencies 	#Lists enabled/disables/unloaded services
-		#systemctl list-dependencies		#(Useful) Lists service dependencies
+		# systemctl --all list-dependencies 	#Lists enabled/disables/unloaded services
+		# systemctl list-dependencies		#(Useful) Lists service dependencies
 							^ Lists only active services and it's dependencies
-		$systemctl --user list-dependencies	#(Useful) Lists service dependencies for current user
+		$ systemctl --user list-dependencies	#(Useful) Lists service dependencies for current user
 							^ Lists only active services
-		#systemctl --user --all list-dependencies 	#Lists enabled/disables/unloaded services for current user
+		# systemctl --user --all list-dependencies 	#Lists enabled/disables/unloaded services for current user
 
-		#systemctl rescue			##Enters system rescue mode
+		# systemctl rescue			##Enters system rescue mode
 							^WARNING:Log-off all users, shutdowns every running program/service.
 
-		#systemctl emergency			##Enters system emergency mode
+		# systemctl emergency			##Enters system emergency mode
 							^WARNING: Same as above
 
-		#systemctl daemon-reload		##Reload systemd manager configuration 
-		#systemctl daemon-reexec		##Reexecute systemd manager
+		# systemctl daemon-reload		##Reload systemd manager configuration 
+		# systemctl daemon-reexec		##Reexecute systemd manager
 
 
 HOW TO CREATE A USER SERVICE
@@ -14932,20 +14932,20 @@ HOW TO CREATE A USER SERVICE
 ----------------------------------------
 ================================================================================
 USING PS, DBUS-MONITOR, TOP, PKILL, PGREP TO HANDLE SYSTEM & USER PROCESSES:
-ps ax						#Lists all system/user processes
+# ps ax						#Lists all system/user processes
 						 ^ reports a snapshot of the current processes
 
-top						#Persistently does what ps ax does as snapshots
+# top						#Persistently does what ps ax does as snapshots
 						 ^ keeps running showing current system processes only
 
-pgrep -a <name>					#Shows id, path, arguments of a given system service/program 
+# pgrep -a <name>					#Shows id, path, arguments of a given system service/program 
 						 ^ by it's name
 
-pgrep -u root sshd				#Displays all running processes owned by user root group sshd
+# pgrep -u root sshd				#Displays all running processes owned by user root group sshd
 
-pgrep -a dbus 					#Shows all services ran by dbus at some point
+# pgrep -a dbus 					#Shows all services ran by dbus at some point
 
-pgrep -au spamus				#Shows all services ran by spamus
+# pgrep -au <username> 				#Shows all services ran by username
 
 dbus-monitor | dbus-cleanup-socket | dbus-launch  
 
@@ -14995,15 +14995,15 @@ Check if it's on by default with:
 
 1 - cat sys/block/{DEVICE-NAME}/queue/scheduler 
 
-Turn I/O Scheduler OFF:
-1 - sudo -iu root
-2 - sudo echo "none" > /sys/block/{DEVICE-NAME}/queue/scheduler
+Turn I/O Scheduler OFF (OLD):
+	1 - sudo -iu root
+	2 - echo "none" > /sys/block/{DEVICE-NAME}/queue/scheduler
 
-Make it Permanent:
+Make it Permanent (OLD):
 vim /etc/default/grub
 GRUB_CMDLINE_LINUX_DEFAULT="quiet elevator=noop"		#DEPRECATED
-
-^ done on unbuntu
+VERY IMPORTANT: this requires generating a new grub configuration file:
+	# grub-mkconfig -O /boot/grub/grub.cfg
 
 ex.:
 archlinx% cat /sys/block/sdb/queue/scheduler
@@ -15123,7 +15123,7 @@ Output should be 2 if sleep mode is enabled.
 
 ----------------------------------------
 ================================================================================
-PRELOADING PROGRAMS INTO MEMORY (AVOID THIS):
+PRELOADING PROGRAMS INTO MEMORY (AVOID THIS, USE ZICRORAM INSTEAD, LOOK ON GITHUB):
 Preloading is the action of putting and keeping target files into the RAM. The benefit is that preloaded applications start more quickly because reading from the RAM is always quicker than from the hard drive. However, part of your RAM will be dedicated to this task, but no more than if you kept the application open. Therefore preloading is best used with large and often-used applications like Firefox and LibreOffice.
 
 
@@ -15144,7 +15144,7 @@ This will add a list of files needed by the program in /usr/share/gopreload/enab
 4 - To disable the loading of a program, remove the appropriate list in /usr/share/gopreload/enabled or move it to /usr/share/gopreload/disabled
 
 5 - It is advised to run gopreload-prepare after system upgrades to refresh the file lists. For the task, the following batch tool come handy: 
-	#gopreload-batch-refresh.sh
+	# gopreload-batch-refresh.sh
 
 6 - Further configurations are found on: /etc/gopreload.conf
 
@@ -15157,13 +15157,16 @@ https://www.youtube.com/watch?v=afUdR6c8ikY
 ----------------------------------------
 ================================================================================
 CHECKING WHICH KERNEL MODULES ARE LOADED FOR WHICH DEVICES:
-lscpi -k				#VERY IMPORTANT
+$ lscpi -k				#VERY IMPORTANT
 
-glxinfo -B				#SHOWS GPU FEATURES
+$ glxinfo -B				#SHOWS GPU FEATURES
 
-sensors					#CHECKS CPU TEMPERATURE
-sensors-detect				#HELPS YOU DETERMINE WHICH KERNEL MODULES YOU NEED
+$ sensors					#CHECKS CPU TEMPERATURE
+# sensors-detect				#HELPS YOU DETERMINE WHICH KERNEL MODULES YOU NEED
 					mines.: coretemp, it87
+
+					note: capable of displaying cpu fan speed / cpu fan rotation
+
 
 ----------------------------------------
 ================================================================================
@@ -15187,7 +15190,7 @@ then follow the below steps:
 	outputs: 9592 3643 3642 3641 3640 3638 3637 1780
 
 	2 - type: 
-		cputool --cpu-limit <percent> -P <process_id>
+		# cputool --cpu-limit <percent> -P <process_id>
 
 	note.: Use capital -P instead of -p
 
@@ -15199,42 +15202,42 @@ OBS2.: Usually a good value would be around 250 or 200 depending on the task.
 ================================================================================
 SETTING CPU SCALING GOVERNOR TO MAXIMUM PERFORMANCE:
 ---Showing your current scale governor settings:
-	#cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+	# cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 
 ---Setting your current scale governor to PERFORMANCE:
-	$echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+	$ echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 
 ---Setting your current scale governor to POWERSAVING:
-	$echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+	$ echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 ----------------------------------------
 ================================================================================
 AVOIDING HEATING UP YOUR CPU TOO MUCH:
 
 ---Showing your current max_perf_pct settings:
-	$cat /sys/devices/system/cpu/intel_pstate/max_perf_pct
+	$ cat /sys/devices/system/cpu/intel_pstate/max_perf_pct
 
 ---Setting your current max_perf_pct settings:
-	$echo 70 | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct
+	$ echo 70 | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct
 
 
 THERMALD:
 Advice: Enable thermald, to control maximum CPU frequency automatically, thereby not universally limiting the upper 
 bound. 
 
-#systemctl enable thermald
-#systemctl start thermald
+# systemctl enable thermald
+# systemctl start thermald
 
 NOTE: Thermald will only work after restarting your computer! VERY IMPORTANT
 	1 - Install thermald
 	2 - Enable thermald
-		#systemctl enable thermald
-		#systemctl start thermald
+		# systemctl enable thermald
+		# systemctl start thermald
 	3 - Restart computer!
 
 Successfully restarting after enabling termald will display this:
 
 	[OUTPUT]
-		#systemctl status thermald
+		# systemctl status thermald
 
 		[sudo] password for spamtla:
 		● thermald.service - Thermal Daemon Service
@@ -15260,7 +15263,7 @@ Successfully restarting after enabling termald will display this:
 	[/OUTPUT]
 ----------------------------------------
 ================================================================================
-MY BOOTUP COMMANDS:
+MY BOOTUP COMMANDS ( VERY OLD, NOT USING ANYLONGER) :
 echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor;
 echo 70 | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct;
 echo -1 | sudo tee /sys/modules/usbcore/parameters/autosuspend;
@@ -15378,8 +15381,8 @@ WHAT'S VIM EX MODE?
 ----------------------------------------
 ================================================================================
 GREPPING DEVICES FROM DMESG(KERNEL):
-sudo dmesg | grep -i scsi                                #Greps all SCSI devices from kernel
-sudo journalctl -k					 ^ Same as above
+# dmesg | grep -i scsi                                #Greps all SCSI devices from kernel
+# journalctl -k					 ^ Same as above
 
 ----------------------------------------
 ================================================================================
@@ -15397,8 +15400,8 @@ vivaldi-bin[1517]: segfault at c ip 00007fb94fae1f2d sp 00007ffe884d0c68 error 6
 NOTE: Thermald will only work after restarting your computer! VERY IMPORTANT
 	1 - Install thermald
 	2 - Enable thermald
-		#systemctl enable thermald
-		#systemctl start thermald
+		# systemctl enable thermald
+		# systemctl start thermald
 	3 - Restart computer!
 
 Successfully running termald will display this:
@@ -15433,7 +15436,7 @@ Successfully running termald will display this:
 ENABLING NOHZ FOR PERFORMANCE
 
 1 - Check if you have HZ enabled first
-	$getconf CLK_TCK
+	$ getconf CLK_TCK
 
 2 - If you have it enabled, disable it at boot time with: nohz=on
 	on your grub.cfg @ /etc/boot/grub/grub.cfg as an actual kernel parameter
@@ -15444,7 +15447,7 @@ ENABLING NOHZ FOR PERFORMANCE
 Enabling NOHZ will actually Disable HZ!
 
 ---Checking if HZ is at Regular Normal Mode:
-1 - #cat /proc/interrupts | grep -i time; sleep 10; cat /proc/interrupts | grep time
+1 - # cat /proc/interrupts | grep -i time; sleep 10; cat /proc/interrupts | grep time
 
 This above will output the following data on a single core system:
  16:   10404858      INTC  68 Level     gp_timer
@@ -15458,9 +15461,9 @@ On a multi-core system this might get confusing, it'll be a per core listing.
 That means HZ is set to Mode 10000HZ
 
 3 - Alternatively, you can check the actual options by unpacking the file /proc/config.gz or by doing:
-	$zcat /proc/config.gz | grep CONFIG_HZ
+	$ zcat /proc/config.gz | grep CONFIG_HZ
 		or
-	$zgrep CONFIG_HZ /proc/config.gz
+	$ zgrep CONFIG_HZ /proc/config.gz
 
 4 - Finally, Check for parts that look like this:
 
@@ -15588,9 +15591,9 @@ correlated to other problems.
 Pre-requisites: HPET is only available on intel
 
 1 - Finding out if you have HPET Enabled:
-	$zcat /proc/config.gz | grep HPET
+	$ zcat /proc/config.gz | grep HPET
 		or
-	$zgrep HPET /proc/config.gz 
+	$ zgrep HPET /proc/config.gz 
 
 2 - Add: nohpet
 	or
@@ -15612,20 +15615,20 @@ cat /proc/cpuinfo | grep -E "vmx|svm" --color  	#Shows if you have a vmx or svm 
 
 ---CHECKING LISTING IF KERNEL FEATURE(S) ARE ENABLED AND WHAT ARE THEIR SETTINGS:
 
-1 - $zcat /proc/config.gz | grep <KERNEL_FEATURE_NAME>
+1 - $ zcat /proc/config.gz | grep <KERNEL_FEATURE_NAME>
 		or
-    $zgrep <KERNEL_FEATURE> /proc/config.gz
+    $ zgrep <KERNEL_FEATURE> /proc/config.gz
 
 ----------------------------------------
 ================================================================================
 LOADING PROGRAM COMMANDS AS SOON AS POSSIBLE AT BOOT TIME
 
 1 - Create a .service file at /usr/lib/systemd/system/ as follows
-	ex.: sudo touch /usr/lib/systemd/system/<service_name>.service
+	ex.: # touch /usr/lib/systemd/system/<service_name>.service
 
 	^ file should have -rw-r--r-- as permissions:
-	ex.: sudo chmod u=rw-,g=r--,o=r-- /usr/lib/systemd/system/<service_name>.service
-	     sudo chown root:root /usr/lib/systemd/system/<service_name>.service
+	ex.: # chmod u=rw-,g=r--,o=r-- /usr/lib/systemd/system/<service_name>.service
+	     # chown root:root /usr/lib/systemd/system/<service_name>.service
 
 2 -  Create a symlink to that service at: /etc/systemd/system/<service_name>.service
 
@@ -17564,31 +17567,31 @@ dd is part of the GNU coreutils. For other utilities in the package, please refe
 CLONING A PARTITION
 
 1) From physical disk /dev/sda, partition 1, to physical disk /dev/sdb, partition 1:
-	#dd if=/dev/sda1 of=/dev/sdb1 bs=64K conv=noerror,sync status=progress
+	# dd if=/dev/sda1 of=/dev/sdb1 bs=64K conv=noerror,sync status=progress
 
 Note: Be careful that if the output partition of= (sdb1 in the example) does not exist, dd will create a file 
 with this name and will start filling up your root file system.
 ----------------------
 CLONING AN ENTIRE HARD DISK
 1) From physical disk /dev/sda to physical disk /dev/sdb:
-	#dd if=/dev/sda of=/dev/sdb bs=64K conv=noerror,sync status=progress
+	# dd if=/dev/sda of=/dev/sdb bs=64K conv=noerror,sync status=progress
 
 --------------------------------
 CREATE DISK IMAGE:
 Boot from a live medium and make sure no partitions are mounted from the source hard drive.
 
 1) Then mount the external hard drive and backup the drive:
-	#dd if=/dev/sda conv=sync,noerror bs=64K | gzip -c  > /path/to/backup.img.gz
+	# dd if=/dev/sda conv=sync,noerror bs=64K | gzip -c  > /path/to/backup.img.gz
 
 2) If necessary (e.g. when the resulting files will be stored on a FAT32 file system) split the disk image into multiple parts (see also split(1)):
-	#dd if=/dev/sda conv=sync,noerror bs=64K | gzip -c | split -a3 -b2G - /path/to/backup.img.gz
+	# dd if=/dev/sda conv=sync,noerror bs=64K | gzip -c | split -a3 -b2G - /path/to/backup.img.gz
 
 3) If there is not enough disk space locally, you may send the image through ssh:
-	#dd if=/dev/sda conv=sync,noerror bs=64K | gzip -c | ssh user@local dd of=backup.img.gz
+	# dd if=/dev/sda conv=sync,noerror bs=64K | gzip -c | ssh user@local dd of=backup.img.gz
 
 4) Finally, save extra information about the drive geometry necessary in order to interpret the partition table stored within the image. 
 The most important of which is the cylinder size.
-	#fdisk -l /dev/sda > /path/to/list_fdisk.info
+	# fdisk -l /dev/sda > /path/to/list_fdisk.info
 --------------------------------
 BINARY FILE PATCHING
 If one wants to replace offset 0x123AB of a file with the FF C0 14 hexadecimal sequence, this can be done with the command line:
@@ -17597,14 +17600,16 @@ If one wants to replace offset 0x123AB of a file with the FF C0 14 hexadecimal s
 
 --------------------------------
 BENCHMARKING TMPFS | RAMFS:
-dd if=/dev/zero of=/mram/tmp.file bs=1M count=1  				#Benchmarks MRAM 	
-dd if=/dev/zero of=/home/teamuser/test_folder/tmp.file bs=1G count=1		#Benchmarks DISK
+# dd if=/dev/zero of=/tmp/tmp.file bs=1M count=1  			#Benchmarks MRAM 	
+# dd if=/dev/zero of=/home/<username>/tmp.file bs=1G count=1		#Benchmarks DISK
 
-sudo hdparm -Ttv /dev/sdc1				#Does ONLY work for disks not TMPFS/RAMFS
+sudo hdparm -Ttv /dev/sdc1						#Does ONLY work for disks not TMPFS/RAMFS
 
-dd if=/dev/zero of=/mram/tmp.file bs=1G count=3					#Benchmarks MRAM
-dd if=/dev/zero of=/home/teamuser/test_folder/tmp.file bs=1G count=3		#Benchmarks DISK
+# dd if=/dev/zero of=/tmp/tmp.file bs=1G count=3			#Benchmarks MRAM
+# dd if=/dev/zero of=/home/<username>/tmp.file bs=1G count=3		#Benchmarks DISK
 
+NOTE: Make sure to erase tmp.file on both cases!
+	# rm /tmp/tmp.file && rm /home/<username>/tmp.file
 ----------------------------------------
 BACKUP AND RESTORE MBR:
 Before making changes to a disk, you may want to backup the partition table and partition scheme of the drive. You can also use a backup to copy the same partition layout to numerous drives.
@@ -17618,23 +17623,22 @@ The last 2 bytes contain a boot signature.
 
 
 1) To save the MBR as mbr_file.img:
-	#dd if=/dev/sdX of=/path/to/mbr_file.img bs=512 count=1
+	# dd if=/dev/sdX of=/path/to/mbr_file.img bs=512 count=1
 
 2) You can also extract the MBR from a full dd disk image:
-	#dd if=/path/to/disk.img of=/path/to/mbr_file.img bs=512 count=1
+	# dd if=/path/to/disk.img of=/path/to/mbr_file.img bs=512 count=1
 
 3)To restore (be careful, this destroys the existing partition table and with it access to all data on the disk):
-	#dd if=/path/to/mbr_file.img of=/dev/sdX bs=512 count=1
-
+	# dd if=/path/to/mbr_file.img of=/dev/sdX bs=512 count=1
 
 4)If you only want to restore the boot loader, but not the primary partition table entries, just restore the first 440 bytes of the MBR:
-	#dd if=/path/to/mbr_file.img of=/dev/sdX bs=440 count=1
+	# dd if=/path/to/mbr_file.img of=/dev/sdX bs=440 count=1
 
 5)To restore only the partition table, one must use:
-	#dd if=/path/to/mbr_file.img of=/dev/sdX bs=1 skip=446 count=64
+	# dd if=/path/to/mbr_file.img of=/dev/sdX bs=1 skip=446 count=64
 
 6)To erase the MBR bootstrap code (may be useful if you have to do a full reinstall of another operating system) only the first 440 bytes need to be zeroed:
-	#dd if=/dev/zero of=/dev/sdX bs=440 count=1
+	# dd if=/dev/zero of=/dev/sdX bs=440 count=1
 
 SOURCE: https://wiki.archlinux.org/title/Dd
 
@@ -17642,10 +17646,10 @@ SOURCE: https://wiki.archlinux.org/title/Dd
 ------------------
 RESTORE SYSTEM
 1) To restore your system:
-	#gunzip -c /path/to/backup.img.gz | dd of=/dev/sda
+	# gunzip -c /path/to/backup.img.gz | dd of=/dev/sda
 
 2) When the image has been split, use the following instead:
-	#cat /path/to/backup.img.gz* | gunzip -c | dd of=/dev/sda
+	# cat /path/to/backup.img.gz* | gunzip -c | dd of=/dev/sda
 ----------------------------------------
 ================================================================================
 OBS STUDIO SETTINGS:
@@ -18156,16 +18160,16 @@ IMPORTANT ENVIRONMENT VARIABLES AND OPTIONS:
 
 1 - The history command can save the date and time of executed commands,
 however it's required to do as followed:
-	$export HISTTIMEFORMAT='%F %T'
-	$history
+	$ export HISTTIMEFORMAT='%F %T'
+	$ history
 
 2 - Permanently setting a Environment Variable value:
-	$export HISTTIMEFORMAT='%F %t' >> ~/.bash_profile
+	$ export HISTTIMEFORMAT='%F %t' >> ~/.bash_profile
 
 3 - Misc Commands:
-$echo $HISTFILE			#Displays Hist. File path and name
-$echo $HISTFILESIZE		#Displays Current Hist. File size
-$echo $HISTSIZE			#Displays maximum size of hist
+$ echo $HISTFILE			#Displays Hist. File path and name
+$ echo $HISTFILESIZE		#Displays Current Hist. File size
+$ echo $HISTSIZE			#Displays maximum size of hist
 ----------------------------------------
 ================================================================================
 WHAT DOES THE 2>&1 MEANS IN BASH SCRIPTING
@@ -18244,7 +18248,7 @@ SETTING UP INVIDUAL WINEPREFIXES
 
 USING A WINE PREFIX
 	If you want to use a different wine prefix, just type:
-		$WINEPREFIX=~/.wine-wow wine $HOME'/.wine-wow/drive_c/Program Files (x86)/World of Warcraft/Wow-64.exe'
+		$ WINEPREFIX=~/.wine-wow wine $HOME'/.wine-wow/drive_c/Program Files (x86)/World of Warcraft/Wow-64.exe'
 	
 	The above command would select the .wine-wow prefix and run the World of Warcraft executable located in the prefix using WINE.
 
@@ -18488,54 +18492,54 @@ CREATING AND MOUNTING LOOP DEVICES
 0. note: the letter '(A)' describes the easy way to create a loop-device.
 
 1. Create a file to be used as loop-device, size 1GB (A)
-	$dd if=/dev/zero of=<filename> bs=1G count=5
+	$ dd if=/dev/zero of=<filename> bs=1G count=5
 		or
-	$dd if=/dev/zero of=<filename> bs=200k count=2
+	$ dd if=/dev/zero of=<filename> bs=200k count=2
 
 2. Attach the file to loop device (A - optional for files larger than 500k?)
-	#losetup -f <filename>
+	# losetup -f <filename>
 
 3. (Optional) List all attached loop devices (A)
-	$losetup -a
+	$ losetup -a
 
 4. Partition the attached loop-device: (A)
 	notes: If you want a bootable device, you'll need to create an EFI Partition or similar at this step.
 	if such is the case step #7.0 teaches you to format an EFI Partition for when you finish formatting it
 	with an EFI Partition here in this step.
 
-		#fdisk /dev/loopX
+		# fdisk /dev/loopX
 			or
-		#fdisk <filename>
+		# fdisk <filename>
 	
 	^ both options requires going through step #2.
 	
 5. (Optional) Force kernel to re-scan for existing partition tables:
-	#losetup --partscan
+	# losetup --partscan
 		or
-	#losetup -P
+	# losetup -P
 
 6. (Optional) Lists all block devices partition tables:
-	$lsblk
+	$ lsblk
 
 7. Format Filesystems: (A) 
 	7.0 - EFI Partition:
-		#mkfs.fat -F 32 -t vfat /dev/<efi_loop_partition>
+		# mkfs.fat -F 32 -t vfat /dev/<efi_loop_partition>
 		^ Only meant for bootable devices
 
 	7.1 - EXT4 Partition: (A)
-		#mkfs.ext4 /dev/<ext4_loop_partition>
+		# mkfs.ext4 /dev/<ext4_loop_partition>
 			or
-		#mkfs.ext4 <filename>
+		# mkfs.ext4 <filename>
 		^ use this if you're following (A)
 
 8. Mount loop device partitions:
 	8.0 - Mount EFI Partition:
-		#mount --mkdir -t vfat /dev/<efi_partition> /mnt/<directory_name>
+		# mount --mkdir -t vfat /dev/<efi_partition> /mnt/<directory_name>
 
 	8.1 - Mount EXT4 Partition (A):
-		#mount --mkdir -t ext4 /dev/<ext4_loop_partition> /mnt/<directory_name>
+		# mount --mkdir -t ext4 /dev/<ext4_loop_partition> /mnt/<directory_name>
 				or
-		#mount <filename> /mnt/<directory_name>
+		# mount <filename> /mnt/<directory_name>
 		^ you can use this if device doesn't contains more than 1 filesystem and it is already formatted.
 		^ use this if you're following (A) - this is also the FINAL STEP for (A)
 		
@@ -18544,13 +18548,13 @@ CREATING AND MOUNTING LOOP DEVICES
 9. if you have more than one partition in a given loop-device and it's already formatted,
 one can just mount the device by using the following steps for each partition to mount on the system:
 	9.1 - List Partition table of a loop device file:
-		$fdisk -l <loop_device_file>
+		$ fdisk -l <loop_device_file>
 			ex.: fdisk -l loop_device.raw
 			^ note: the loop device in /dev/ can also be used here, as long as the file has been attached using step 2.
 
 	9.2 - Grab Sector Size and Multiply by Start Sector of the desirable partition table
-		#mount --mkdir -o loop,offset=<Sector_Size * Start_Sector> <loop_device_file> <mount_directory>
-			ex.: #mount --mkdir -o loop,offset=<Sector_Size * Start_Sector> ./file.raw /mnt/loopX_mnt
+		# mount --mkdir -o loop,offset=<Sector_Size * Start_Sector> <loop_device_file> <mount_directory>
+			ex.: # mount --mkdir -o loop,offset=<Sector_Size * Start_Sector> ./file.raw /mnt/loopX_mnt
 	
 	9.3 - Final note: Mounting this way described in step 7 is not possible if the attached loop-device block isn't partitioned and formatted!
 
@@ -18558,10 +18562,10 @@ one can just mount the device by using the following steps for each partition to
 only then umount the loop device; otherwise you don't have to worry and just 
 using umount on the folder and the loop-device will be umounted automatically:
 
-	#losetup -D
+	# losetup -D
 	^ only use this if you have no loop devices mounted on the system.
 		or
-	#losetup -d /dev/<loop_device>
+	# losetup -d /dev/<loop_device>
 
 	In case of doubt, use 'lsblk' to list block, loop and bind devices on the system
 	to make sure you're umounting the right devices and finally dettaching the loop device.
@@ -20776,9 +20780,9 @@ as soon as internet connection is available.
 	Note2.: Make sure time/date is correct by typing: $timedatectl
 
 3 - USING HWCLOCK
-	#hwclock --set --date='2024-01-22 04:43:05'	#Manually sets hardware clock to the given clock
-	#hwclock --hctosys				#Sets hardware clock to system clock
-	#hwclock --systohc				#Sets system clock to hardware clock
+	# hwclock --set --date='2024-01-22 04:43:05'	#Manually sets hardware clock to the given clock
+	# hwclock --hctosys				#Sets hardware clock to system clock
+	# hwclock --systohc				#Sets system clock to hardware clock
 							^ Useful after using SYSTEMD-TIMESYNCD
 --------------------------------------------------------------------------------
 --------------------------------------------------
@@ -20821,22 +20825,22 @@ Some themes may install under a different folder in /boot/grub/themes/.
 
 Once a theme has been chosen and set on /etc/default/grub file,
 it is necessary to generate a new grub configuration file using the following tool:
-	#grub-mkconfig -O /boot/grub/grub.cfg-newfile	
+	# grub-mkconfig -O /boot/grub/grub.cfg-newfile	
 	^ Very Important: Avoid using the above to generate a new file on top of an existing one,
 	^ since it will overwrite the current working grub configuration file with a non-configured file
 	^ which might prevent you from booting up your computer.
 	^ so don't use this if you already have a grub.cfg file like this:
-	^ #grub-mkconfig -O /boot/grub/grub.cfg 	AVOID THIS AT ALL COSTS IF YOU HAVE AN ALREADY WORKING LINUX!
+	^ # grub-mkconfig -O /boot/grub/grub.cfg 	AVOID THIS IF YOU HAVE AN ALREADY WORKING LINUX GRUB, UNLESS IT'S REALLY NECESSARY!
 
 The "-newfile" prefix helps preventing overwriting the old grub.cfg configuration file,
 since it will still be needed on the last step.
 
 The Final Step here is to use nvim to cut & paste content difference from grub.cfg-newfile into grub.cfg,
 but before doing this it is recommended to make a backup copy of the old grub.cfg file:
-	#cp /boot/grub/grub.cfg /boot/grub/grub.cfg-backup
+	# cp /boot/grub/grub.cfg /boot/grub/grub.cfg-backup
 
 Now use nvim to checkout differences in both files:
-	#nvim -d /boot/grub/grub.cfg /boot/grub/grub.cfg-newfile
+	# nvim -d /boot/grub/grub.cfg /boot/grub/grub.cfg-newfile
 	
 The file on the left panel is your current working grub configuration file, 
 the file on the right panel is the file with the new theme,
@@ -20893,21 +20897,21 @@ PROCESS(RUNNING APPLICATION OR PROGRAM) MANAGEMENT AND CONTROL
 these are the few ones among them: htop, glances, kill, killall, jobs, bg, fg, pidof, disown, ps, pmap.
 
 1 - ps: allows you to look at running and idle processes.
-	$ps aux					#Lists all running processes
-	$ps auxww				#Lists all running processes including arguments 
+	$ ps aux					#Lists all running processes
+	$ ps auxww				#Lists all running processes including arguments 
 					 	^ that might have been passed for execution.
-	$ps aux | grep -p "process_name" 	#Lists all processes that have a given name
-	$ps --user $(id -u) -F			#Lists all processes of current user in extra full format
-	$ps --user $(id -u) f			#Lists all processes of current user in binary tree format
-	$ps --sort size				#Sorts processes by memory consuption
-	$ps -o ppid= -p <pid>			#Gets the parent PID of a given process
+	$ ps aux | grep -p "process_name" 	#Lists all processes that have a given name
+	$ ps --user $(id -u) -F			#Lists all processes of current user in extra full format
+	$ ps --user $(id -u) f			#Lists all processes of current user in binary tree format
+	$ ps --sort size				#Sorts processes by memory consuption
+	$ ps -o ppid= -p <pid>			#Gets the parent PID of a given process
 
 2 - disown: allows the current shell to disown a given process.
-    $disown 					#Disown the current job
-    $disown %<job_number> 			#Disown a specific job
+    $ disown 					#Disown the current job
+    $ disown %<job_number> 			#Disown a specific job
     						^ use 'jobs' to list jobs by number
-    $disown -a  				#Disown all jobs
-    $disown -h %job_number 			#Keep job (do not disown it), but mark it so that 
+    $ disown -a  				#Disown all jobs
+    $ disown -h %job_number 			#Keep job (do not disown it), but mark it so that 
     						^ no future SIGHUP is received on shell exit:
 
     note: this allows the process to keep running regardless if the current shell has been closed or not.
@@ -20916,28 +20920,28 @@ these are the few ones among them: htop, glances, kill, killall, jobs, bg, fg, p
     from the moment it's launched. HOWEVER, All that nohup does is make the process impervious to the terminal closing down and    unlike disown, 'nohup' doesn’t turn the process into a background task.
 
 3 - jobs: lists all jobs that may have been started or suspended by a given shell.
-    $jobs  					#View jobs spawned by the current shell
-    $jobs -l  					#List jobs and their process IDs
-    $jobs -n  					#Display information about jobs with changed status
-    $jobs -p  					#Display process ID of process group leader
-    $jobs -r  					#Display running processes
-    $jobs -s  					#Display stopped processes
+    $ jobs  					#View jobs spawned by the current shell
+    $ jobs -l  					#List jobs and their process IDs
+    $ jobs -n  					#Display information about jobs with changed status
+    $ jobs -p  					#Display process ID of process group leader
+    $ jobs -r  					#Display running processes
+    $ jobs -s  					#Display stopped processes
 
     note: use 'bg' to restart a given 'sleeping' process in the background or 'fg' to restart it as a foreground process.
 
 4 - bg: resumes a given process as a background process
-    $bg						#Resumes process as a background process
-    $bg %<job id>				#Resumes given process as background process
+    $ bg						#Resumes process as a background process
+    $ bg %<job id>				#Resumes given process as background process
 
 5 - fg: restarts a given process as a foreground process
-    $fg 					#Resumes given process as foreground process
-    $fg %<job id>				#Resumes given process as foreground process
+    $ fg 					#Resumes given process as foreground process
+    $ fg %<job id>				#Resumes given process as foreground process
 
 6 - pidof: retrieves the process id of a given executing program
-    $pidof bash  				#List all process IDs with given name:
-    $pidof -s bash  				#List a single process ID with given name:
-    $pidof -x script.py  			#List process IDs including scripts with given name:
-    #kill $(pidof name)  			#Kill all processes with given name:
+    $ pidof bash  				#List all process IDs with given name:
+    $ pidof -s bash  				#List a single process ID with given name:
+    $ pidof -x script.py  			#List process IDs including scripts with given name:
+    # kill $(pidof name)  			#Kill all processes with given name:
 
 note: both 'bg' and 'fg' operate on the first process that has been set to slept as an actual stack.
 
@@ -20973,21 +20977,25 @@ FORCE SHUTDOWN FROZEN PROCESSES
 	It's possible to either use 'xkill', given you haved it installed.
 or do it manually using killall:
 	
-	1 - #killall <process_name>
-	^ kills all process tree for a given process name.
+	1 - Killing all process tree using a given process name:
+		# killall <process_name>
 
-	2(alternate) #kill -SIGKILL <process_id>
-	^ kills a single rocess by it's ID
+	2 - Killing a single process by it's ID:
+		# kill -SIGKILL <process_id>
+	
+	3 - Kills all processes meeting the regex criteria:
+		# killall -s KILL -r <regex_string>	
+
 -----------------------------------------
 SUSPENDING & PAUSING PROGRAMS(PROCESSES) AND RESTARTING THEM
 1. For suspending a process, you can do in more than 1 way:
-	1.1.0 - #killall -TSTP <process_name>
+	1.1.0 - # killall -TSTP <process_name>
 		or
-	1.1.1 - #killall -STP <process_name>
+	1.1.1 - # killall -STP <process_name>
 		or
-	1.1.2 - #kill -TSTP <PID>
+	1.1.2 - # kill -TSTP <PID>
 		or
-	1.1.3 - #kill -STOP <PID>
+	1.1.3 - # kill -STOP <PID>
 		or
 	1.1.4 - ctrl+z  or ^z after executing the program
 
@@ -20996,18 +21004,18 @@ SUSPENDING & PAUSING PROGRAMS(PROCESSES) AND RESTARTING THEM
 
 2. Listing all available suspended jobs:
 	2.1 - Type in: 
-		$jobs
+		$ jobs
 		  or
-		$jobs -l
+		$ jobs -l
 		^ displays suspended jobs along with their PIDs.
 
 3. Restarting / Unsuspending a job:
-	3.1 - $fg %<job number>
+	3.1 - $ fg %<job number>
 	      ^you can list job number by typing: $jobs
 		or
-	3.2 - #kill -CONT <PID>
+	3.2 - # kill -CONT <PID>
 		or
-	3.3 - #killall -CONT <process_name>
+	3.3 - # killall -CONT <process_name>
 	
 	note.: about 3.1, it'll only display & restart jobs suspended on the same shell/terminal/vt
 	^ this means that jobs suspended on different shells/terminal/vt will not be listed.
@@ -21016,45 +21024,45 @@ FETCHING PIDS ON A LINE-PER-LINE STYLE
 	'pgrep' makes possible to feed another commandline tool with a list of PIDs,
 	wherareas 'pidof' retrieves a list in a single entire line.
 
-	1 - $pgrep <process name>
+	1 - $ pgrep <process name>
 
 -------------------------------
 RETRIEVING PIDS IN A SINGLE ENTIRE LINE
-	1 - $pidof <process name>
+	1 - $ pidof <process name>
 
 -------------------------------
 LISTING A PROCESS MEMORY MAP
 	It's possible to use 'pmap' for listing a process memory map using the PID of a given process.
 
 	1 - First, fetch the PID(Process id of the desired process)
-		$pidof firefox
+		$ pidof firefox
 
 	2 - Use pmap
-		$pmap <PID>
+		$ pmap <PID>
 
 Also, with this method it's possible to find out which linuix and non-linux libraries a program relies on.
 	1 - Type in:
-		$pmap <PID> | grep ".so"
+		$ pmap <PID> | grep ".so"
 
 -------------------------------
 LISTING A PROCESS WORKING DIRECTORY
 	It's possible to retrieve the working directory of a process by using 'pwdx'
-	1 - $pwdx <PID>
+	1 - $ pwdx <PID>
 		or
-	2 - #pwdx $(pgrep firefox)
+	2 - # pwdx $(pgrep firefox)
 -------------------------------
 LISTING OPEN FILES AND THEIR RELATED PROCESS
 	'lsof' is a tool that allows to list open-files that are being used by current running processes. - VERY IMPORTANT!
 
-    #lsof path/to/file				#Find the processes that have a given file open
-    #lsof -i :port				#Find the process that opened a local internet port
+    # lsof path/to/file				#Find the processes that have a given file open
+    # lsof -i :port				#Find the process that opened a local internet port
     						^ you can find out ports on use through a firewall like 'gufw'.
-    #lsof -t path/to/file			#Only output the process ID (PID)
-    #lsof -u username				#List files opened by the given user
-    #lsof -c process_or_command_name		#List files opened by the given command or process
-    #lsof -p PID				#List files opened by a specific process, given its PID
-    #lsof +D path/to/directory			#List open files in a directory
-    #lsof -i6TCP:port -sTCP:LISTEN -n -P 	#Find the process that is listening on a local IPv6 TCP port 
+    # lsof -t path/to/file			#Only output the process ID (PID)
+    # lsof -u username				#List files opened by the given user
+    # lsof -c process_or_command_name		#List files opened by the given command or process
+    # lsof -p PID				#List files opened by a specific process, given its PID
+    # lsof +D path/to/directory			#List open files in a directory
+    # lsof -i6TCP:port -sTCP:LISTEN -n -P 	#Find the process that is listening on a local IPv6 TCP port 
     						^ and don't convert network or port numbers
 
 note: info extracted from 'tldr'
@@ -21077,16 +21085,16 @@ dbus-broker is a drop-in replacement for the libdbus reference implementation, w
 
 Installation steps:
 	1 - Download and Install it
-		#pacman -S dbus-broker
+		# pacman -S dbus-broker
 	
 	2 - To enable dbus-broker as system bus		
-		#systemctl enable dbus-broker.service
+		# systemctl enable dbus-broker.service
 
 	3(Optional) - Enables dbus-broker globally(all users):
-		#systemctl --global enable dbus-broker.service
+		# systemctl --global enable dbus-broker.service
 
 	4(Optional) - Enables dbus-broker for Local user only:
-		#systemctl --user enable dbus-broker.service
+		# systemctl --user enable dbus-broker.service
 
 	5 - Reboot system
 
@@ -21106,12 +21114,12 @@ LISTING DETAILED NVIDIA INFORMATION
 SETTING UP SYSTEM(GLOBAL) AND USER SERVICES USING SYSTEMD
 
 	1(Optional) - Enables dbus-broker globally(all users):
-		#systemctl --global enable dbus-broker.service
+		# systemctl --global enable dbus-broker.service
 
 			or
 
 	2(Optional) - Enables dbus-broker for Local user only:
-		#systemctl --user enable dbus-broker.service
+		# systemctl --user enable dbus-broker.service
 
 --------------------------------------------------------------------------------
 --------------------------------------------------
@@ -21120,14 +21128,14 @@ FINDING OUT PACKAGE OWNER OF A GIVEN FILE
 	Archlinux package manager allows to track which file/directory belongs to which packages.
 
 1 - Feed pacman filename/directory:
-	$pacman -Qo <filename/directory>
+	$ pacman -Qo <filename/directory>
 
 ------
 LISTING ALL FILES OWNED BY A GIVEN PACKAGE
 	Archlinux package manager allows to list all files created/managed by a given package.
 
 1 - Feed pacman package name:
-	$pacman -Ql <package_name>
+	$ pacman -Ql <package_name>
 
 
 ^ This is helpful to find out how to execute certain binary tools that come installed with certain packages,
@@ -21183,9 +21191,10 @@ CHANGING MAKEPKG.CONF FOR BUILDING APPLICATIONS FROM SCRATCH:
 	/etc/makepkg.conf is a file owned by pacman, which is the default archlinux package manager tool.
 yay manager also uses that file.
 
-	0(optional). read gcc manual if necessary: $man gcc
-	1. sudo edit the following file: /etc/makepkg.conf
-	2. make the following chage to -march and -mtunes
+	0(optional) - read gcc manual if necessary: 
+		$ man gcc
+	1 - sudo edit the following file: /etc/makepkg.conf
+	2 - make the following chage to -march and -mtunes
 		-march=ivybridge -mtune=ivybridge
 	
 VERY IMPORTANT: Make sure your CPU Type is an Ivybridge first!
@@ -21194,18 +21203,18 @@ source: https://man.archlinux.org/man/makepkg.conf.5 			#MAN PAGE
 
 ----
 LISTING OPTIMIZATION FLAGS FOR GCC THAT CAN BE USED IN MAKEPKG.CONF
-	Type in: $gcc --help=optimizers
+	Type in: $ gcc --help=optimizers
 	
 ----
 LISTING WHICH OPTIMIZATION FLAGS ARE ENABLED AT WHICH LEVEL
 	1. Listing optimization flags at -Oi level:
-		 $gcc -c -Q -Oi --help=optimizers
+		 $ gcc -c -Q -Oi --help=optimizers
 			or
-		 $gcc -c -Q -O2 --help=optimizers
+		 $ gcc -c -Q -O2 --help=optimizers
 
 	2. Alternate(NEWER):
 		2.1 - Listing all flags enabled on Optimization Level 3: 
-			gcc -c -Q -O3 --help=optimizers | grep enabled | less
+			$ gcc -c -Q -O3 --help=optimizers | grep enabled | less
 
 	VERY HELPFUL SOURCE: 
 		https://gcc.gnu.org/onlinedocs/gcc-13.1.0/gcc/
@@ -21348,27 +21357,27 @@ VERY IMPORTANT: PYPY CAN'T BE USED FOR COMPILATION!!!! SO THE FOLLOWING INSTRUCT
 DO NOT USE THIS BELOW!!!:
 In order to optmize python based packages, it's possible to use 'pypy'(OUTDATED):
 	1 - Install pypy
-		#pacman -S pypy3
+		# pacman -S pypy3
 
 	2 - Enable pip mode for pypy
-		$pypy3 -m ensurepip
+		$ pypy3 -m ensurepip
 
 		2.1 - Upgrade pypy3's PIP
-			$pypy4 -m pip install --upgrade pip
+			$ pypy4 -m pip install --upgrade pip
 
 	3  - Install desired package
-		$pypy3 -m pip install <package_name>
+		$ pypy3 -m pip install <package_name>
 
 		ex.: $pypy3 -m pip install qutebrowser
 
 	4 - Change directory to:
-		$cd ~/.local/bin/
+		$ cd ~/.local/bin/
 
 	5 - Execute installed program:
-		$./<program_name>
+		$ ./<program_name>
 
 	6(Optional) - Install required packages for running program upon failure:
-		#pacman -S <required package>
+		# pacman -S <required package>
 
 		6.1 - Try step 5 again.
 -----
@@ -21507,37 +21516,37 @@ this is also the same package managers for Redhat, CentOS, Scientific Linux.
 DNF COMMANDS
 	DNF is the next upcoming major version of YUM package manager.
 
-$dnf --help | less		##Displays available DNF commands
+$ dnf --help | less		##Displays available DNF commands
 
-#dnf upgrade			##Updates packages
-#dnf distro-sync		##Updates packages
-#dnf upgrade-minimal		##Upgrades only packages that have been affected by some problem
+# dnf upgrade			##Updates packages
+# dnf distro-sync		##Updates packages
+# dnf upgrade-minimal		##Upgrades only packages that have been affected by some problem
 				^ Equivalent to updating packages that have only modified it's 'pkgrel'
 				ex.: package_name 1.2.3-2 would get updated with this, but not package_name 2.3-1.
 
 
-#dnf install <package_name>	##Installs the desired given package
-#dnf remove <package_name>	##Uninstalls/Remove desired given package
-#dnf clean			##Cleans Cache
+# dnf install <package_name>	##Installs the desired given package
+# dnf remove <package_name>	##Uninstalls/Remove desired given package
+# dnf clean			##Cleans Cache
 
-$dnf search <string>		##Searchers for given string on package database
+$ dnf search <string>		##Searchers for given string on package database
 
-$dnf history			#Displays dnf's usage history
-$dnf info <package_name>	#Returns info on current package
+$ dnf history			#Displays dnf's usage history
+$ dnf info <package_name>	#Returns info on current package
 
 ---
 ---
 RPM COMMANDS
 	RPM is the official Package Manager for RPM-based distributions like Fedora Linux.
 
-$rpm --query <string>			##Queries/Searches local packages
-$rpm --query --list <package_name>	##Lists package owned files
+$ rpm --query <string>			##Queries/Searches local packages
+$ rpm --query --list <package_name>	##Lists package owned files
 					^ Same as 'pacman -Ql'
-$rpm --query --file <filename>		##Finds owner package of a given file
-$rpm --verify --all <package_name>	##Verifies package integrity
+$ rpm --query --file <filename>		##Finds owner package of a given file
+$ rpm --verify --all <package_name>	##Verifies package integrity
 					^ Same as 'pacman -Qk'
 
-$rpm --query --changelog <package_name> ##Displays the changelog for a given package
+$ rpm --query --changelog <package_name> ##Displays the changelog for a given package
 
 
 -------------------
@@ -21547,10 +21556,10 @@ FEDORA FUSION REPOSITORY
 it has to be installed and enabled on the system separetely, since it doesn't come ready out-of-box.
 
 1 - Enabling Free Repository:
-	#dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+	# dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 
 2 - Enabling Non-Free Repository:
-	#dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+	# dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 Source: 
 	https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/
@@ -21566,104 +21575,104 @@ About:
 	use Funtoo is a fork that provides pre-compiled packages.
 	
 	Only a few packages can be installed directly from binaries, like firefox:
-		#emerge --ask firefox --autounmask-continue
+		# emerge --ask firefox --autounmask-continue
 
 Protips:
 	1 - Install 'resolve-march-native' package
-		#emerge --ask resolve-march-native
+		# emerge --ask resolve-march-native
 	2 - Run it: $resolve-march-native
 	3 - set compile flags on: /etc/portage/make.conf
 	4 - read if necessary: MY CUSTOM MAKEPKG.CONF CFLAG AND CXXFLAG CHOICE
 
 EMERGE COMMANDS: 
 
-#emerge --update sys-apps/portage			#Updates all portage tools - VERY IMPORTANT
+# emerge --update sys-apps/portage			#Updates all portage tools - VERY IMPORTANT
 
-#emerge --list-sets					#Displays the list of package sets
-#emerge --update <package_set>				#Updates a given package set
+# emerge --list-sets					#Displays the list of package sets
+# emerge --update <package_set>				#Updates a given package set
 							^ ex.: emerge --update [@world | system]
 							^ using #emerge -avDuN <package_set> might be the preferred
 							^ way of updating system!
 
-#emerge --sync						#Syncs database | MANDATORY
-#glsa-check -t all					#Checks security issues throught the current gentoo system
-#glsa-check -f all					#Checks AND Fixes all security issues on the current gentoo system
+# emerge --sync						#Syncs database | MANDATORY
+# glsa-check -t all					#Checks security issues throught the current gentoo system
+# glsa-check -f all					#Checks AND Fixes all security issues on the current gentoo system
 
-#emerge -avDuN @world					#Updates entire system
+# emerge -avDuN @world					#Updates entire system
 							^ /var/lib/portage/ contains @world package list
 							^ after world updates, '#emerge --depclean' is required.
 
 #emerge --depclean					#Cleans unused dependencies
 							^ VERY IMPORTANT: should be used after world updates
-#emerge --clean						#Cleans old packages in case they have been replaced by newer ones
+# emerge --clean						#Cleans old packages in case they have been replaced by newer ones
 
-#emerge --ask <package_name>				#Installs a given package
+# emerge --ask <package_name>				#Installs a given package
 							^ Installing new packages may require the use of 'etc-update' or
 							^ 'dispatch-conf'.
-#emerge --ask --noreplace <package_name>		#Installs given package while avoiding replacing packages that
+# emerge --ask --noreplace <package_name>		#Installs given package while avoiding replacing packages that
 							^ already exist in the system.
 
-#emerge --config					#Run  package specific actions needed to be executed 
+# emerge --config					#Run  package specific actions needed to be executed 
 							^ after the emerge process has completed.
 							^ VERY IMPORTANT
 
-#emerge --resume 					#Resumes the most recent merge list that has been aborted 
+# emerge --resume 					#Resumes the most recent merge list that has been aborted 
 							^ due to an error.
 							^ VERY IMPORTANT.
 
-#emerge --ask --autounmask-continue <package_name>	#Auto-unmasks
+# emerge --ask --autounmask-continue <package_name>	#Auto-unmasks
 
-#emerge --cav <package_name> 				#Removes(SAFE!) package only if no other packages depend on it
+# emerge --cav <package_name> 				#Removes(SAFE!) package only if no other packages depend on it
 							^ -c(--depclean), -a(--ask), -v(--version).
 
-#emerge --unmerge --ask <package_name>			#Removes/Uninstall a given package WITHOUT checking dependencies
+# emerge --unmerge --ask <package_name>			#Removes/Uninstall a given package WITHOUT checking dependencies
 							^ UNSAFE
 							^ --unmerge <-> -C
 
-#emerge --ask --verbose --depclean <package_name>	#Removes/Uninstall package by checking if it has any dependency first
+# emerge --ask --verbose --depclean <package_name>	#Removes/Uninstall package by checking if it has any dependency first
 							^ --depclean <-> -c
 
-#emerge --ask --usepkg <package_name>			#This allows package installation from it's compiled binary, ONLY if 
-#emerge --ask --usepkgonly <package_name>		^ it exists on the local machine. 1st one IS -k, 2nd IS -K
+# emerge --ask --usepkg <package_name>			#This allows package installation from it's compiled binary, ONLY if 
+# emerge --ask --usepkgonly <package_name>		^ it exists on the local machine. 1st one IS -k, 2nd IS -K
 
-#emerge --ask --buildpkgonly <package_name>		#Builds package only without merging/installing them,
+# emerge --ask --buildpkgonly <package_name>		#Builds package only without merging/installing them,
 							^ Built packages are stored on PKGDIR.
 
-#emerge --getbinpkg <package_name>			#Fetches binary package for building/installation????
+# emerge --getbinpkg <package_name>			#Fetches binary package for building/installation????
 							^ this option implies -k(--usepkg).
 							Requires: FEATURES="getbinpkg" to be set on /etc/portage/make.conf
 
-#emerge --ask --getbinpkgonly <package_name>		#Same as above, but binaries from the remote server are 
+# emerge --ask --getbinpkgonly <package_name>		#Same as above, but binaries from the remote server are 
 	or						^ preferred over local packages if they are not identical.
-#emerge --ask -gK
+# emerge --ask -gK
 	or
-#emerge --ask -G
+# emerge --ask -G
 
-#emerge --searchdesc <description or package_name>	#Searches description and package names in the online repository
-#emerge -S						# Same as above, --fuzzy-search can be used to allow non-exact
+# emerge --searchdesc <description or package_name>	#Searches description and package names in the online repository
+# emerge -S						# Same as above, --fuzzy-search can be used to allow non-exact
 							^searches to be performed.
 
-#emerge --search <package_name>				#Searches available packages in the online repository
-#emerge -s <package_name>				#Searches available packages in the online repository
+# emerge --search <package_name>				#Searches available packages in the online repository
+# emerge -s <package_name>				#Searches available packages in the online repository
 
 
-$equery d <package_name>				#Lists all package dependencies
-$eselect news read					#???
+$ equery d <package_name>				#Lists all package dependencies
+$ eselect news read					#???
 
-#fixpackages 						#???
+# fixpackages 						#???
 
-#dispatch-conf						#Allows Configuration Files to be updated
+# dispatch-conf						#Allows Configuration Files to be updated
 							^ This exists due to the nature of emerge package manager of
 							protecting configuration files that may be overwritten by
 							new installed updates. read: $man emerge | 
 							^ Search for CONFIGURATION FILES
 
-#etc-update						#Same purpose as dispatch-conf
+# etc-update						#Same purpose as dispatch-conf
 							^ read: $man emerge
 							^ Search for CONFIGURATION FILES
 
-#eclean-dist						#Clears gentoo's source code package cache as well as object files.
-#eclean-dist -dp					#Pretends to clear gentoo's source code package cache
+# eclean-dist						#Clears gentoo's source code package cache as well as object files.
+# eclean-dist -dp					#Pretends to clear gentoo's source code package cache
 							^ VERY IMPORTANT
 
 --------------------------------------------------------------------------------
@@ -21673,21 +21682,21 @@ DEBIAN PACKAGE MANAGER
 	
 APT COMMANDS:
 
-#apt update						#Updates package information from all configure source
+# apt update						#Updates package information from all configure source
 							^ Similar to pacman -Sy
 
-#apt upgrade						#Upgrades all locally installed packages
+# apt upgrade						#Upgrades all locally installed packages
 							^ Similar to pacman -Su
 
-#apt full-upgrade					#Fully upgrades the system, removing conflicting packages if necessary
+# apt full-upgrade					#Fully upgrades the system, removing conflicting packages if necessary
 
-#apt < install | reinstall | remove | purge > 		#Installs/Reinstalls/Removes/Purges packages from system
+# apt < install | reinstall | remove | purge > 		#Installs/Reinstalls/Removes/Purges packages from system
 
-$apt search <package_name>				#Searches for given package name on the remote repos
+$ apt search <package_name>				#Searches for given package name on the remote repos
 
-$apt list 						#Returns a list of packages available on the remote
+$ apt list 						#Returns a list of packages available on the remote
 
-$apt show <package_name>				#Displays information about a given named package
+$ apt show <package_name>				#Displays information about a given named package
 							^ Similar to pacman -Si
 
 --------------------------------------------------------------------------------
@@ -21889,37 +21898,37 @@ IN-DEPTH ANALYSIS OF A HARD DISK / HARD DRIVE WITH SMARTCTL
 
 well known commands:
 
-#smartctl --scan					#Scans for Storage Devices and list each of it's type
-#smartctl --scan-open					#Same as above, but listens on device type change 
+# smartctl --scan					#Scans for Storage Devices and list each of it's type
+# smartctl --scan-open					#Same as above, but listens on device type change 
 							^ when openning storage devices.
 
-#smartctl -r <ioctl_type> <disk-device>			#Outputs ioctl() call for a given device
+# smartctl -r <ioctl_type> <disk-device>			#Outputs ioctl() call for a given device
 							^ioctl types can be:
 										ioctl,
 										ataioctl,
 										scsiioctl,
 										nvmeioctl.
 							
-#smartctl --all <disk_device>				#Displays SMART Data on the given disk device
+# smartctl --all <disk_device>				#Displays SMART Data on the given disk device
 							^ same as: #smartctl --all --format=old
 
-#smartctl -x <disk_device>				#Displays long list of SMART and Non-Smart data stored on disk
+# smartctl -x <disk_device>				#Displays long list of SMART and Non-Smart data stored on disk
 							^ same as: #smartctl --all --format=brief 
 									or 
 								   #smartctl --xall
 
-#smartctl -i						#Displays DISK Information
+# smartctl -i						#Displays DISK Information
 							^ same as: #smartctl --info <disk_device> 
 
-#smartctl -A <disk_device>				#Displays SMART Attributes for the given disk device.
-#smartctl -H <disk_device>				#Displays SMART result for the most recent SMART Test for SCSI/SATA devices.
+# smartctl -A <disk_device>				#Displays SMART Attributes for the given disk device.
+# smartctl -H <disk_device>				#Displays SMART result for the most recent SMART Test for SCSI/SATA devices.
 							^ Read man page for other devices - not very important
 
-#smartctl -c <disk_device>				#Displays DISK SMART Capabilities and also Displays any ongoing tests
+# smartctl -c <disk_device>				#Displays DISK SMART Capabilities and also Displays any ongoing tests
 							^ Not to be mistaken with -C!!
-#smartctl -lerror /dev/sda				#Lists error log for /dev/sda
+# smartctl -lerror /dev/sda				#Lists error log for /dev/sda
 
-#smartctl <disk_device>	--log=<log name/type> 		#Displays the given Log Data stored on the disk
+# smartctl <disk_device>	--log=<log name/type> 		#Displays the given Log Data stored on the disk
 							^ same as: #smartctl -l <log name/type> <disk_device> 
 							log types are: 
 									error, 
@@ -21949,7 +21958,7 @@ well known commands:
 								$man smartctl
 
 									
-#smartctl --test=short <disk_device>			#Does a SHORT test on the given disk-device
+# smartctl --test=short <disk_device>			#Does a SHORT test on the given disk-device
 
 							From smartctl man page: 
 								"""The "Self" tests check the electrical and mechanical 
@@ -21965,14 +21974,14 @@ well known commands:
 							it only checks for electrical, mechanic and read performance.
 
 
-#smartctl --test=long <disk_device>			#Similar to --test=short, but does a longer test.
+# smartctl --test=long <disk_device>			#Similar to --test=short, but does a longer test.
 							^ This test also doesn't update SMART Attributes of the disk.
 
-#smartctl --test=offline <disk_device>			#This test UPDATES THE SMART ATTRIBUTE VALUES, 
+# smartctl --test=offline <disk_device>			#This test UPDATES THE SMART ATTRIBUTE VALUES, 
 							^ and if errors are found they will appear in 
 							the SMART error log, visible with the '-l error' option.
 
-#smartctl -X <disk_device>				#Aborts any test!
+# smartctl -X <disk_device>				#Aborts any test!
 
 VERY IMPORTANT: ONLY use -C or --captive TESTS if the DISK ISN'T MOUNTED!
 --captive tests are pretty much the same as the default test types, the only difference being the speed they're realized.
@@ -21982,7 +21991,7 @@ VERY IMPORTANT: ONLY use -C or --captive TESTS if the DISK ISN'T MOUNTED!
 -------
 CHECKING USAGE PERCENTAGE FOR SSD DISKS
 	It's important to check on usage percentage when using SSD disks:
-		#smartctl --log=ssd <disk_device>
+		# smartctl --log=ssd <disk_device>
 
 	A value of 0 indicates as new condition while 100 indicates the device is at the end of its lifetime 
 	as projected by the manufacturer.  The value may or may not reach 255.
@@ -21993,7 +22002,7 @@ CHECKING FOR ERRORS ON DISK
 to a newer disk, mainly because disk death will be iminent from this point onwards and if it happens access to data may be
 lost permanently and all important data WILL be lost.
 
-	#smartctl -l xerror <disk_device>
+	# smartctl -l xerror <disk_device>
 
 -------
 READING AND UNDERSTANDING ATTRIBUTE COLUMNS ON SMARTCTL -A
@@ -22022,21 +22031,21 @@ IN SUMMARY - VERY IMPORTANT
 Disk Failure Problems. always make sure to do these steps on both newer and old disks:
 	
 	1 - Execute Long/Extended test:
-		#smartctl -t long <disk_device>
+		# smartctl -t long <disk_device>
 
 	2 - Execute offline test:
-		#smartctl -t offline <disk_device>
+		# smartctl -t offline <disk_device>
 	
 	3 - After both tests have finished:
 		3.1 - Type for results on Long/Extended test:
-			#smartctl -c <disk_device>
+			# smartctl -c <disk_device>
 
 		3.2 - Type for offline test results:
-			#smartctl -A <disk_device>
+			# smartctl -A <disk_device>
 
 		3.3 - Finally, check for the most critical error results:
-			#smartctl -l error <disk_device>
-			#smartctl -l xerror <disk_device>
+			# smartctl -l error <disk_device>
+			# smartctl -l xerror <disk_device>
 
 	4 - In summary, if step #3.3 displays any error, it's self-sufficient to say that Hard Disk failure is imminent
 	if it has not failed yet, it's important from this point to backup all your important data on a complete 
@@ -22045,8 +22054,8 @@ Disk Failure Problems. always make sure to do these steps on both newer and old 
 -------
 AUXILIARY COMMANDS
 	
-#lsblk							#Displays mounted/umounted disks connected to the system!
-#hdparm							#Linux Kernel Only: it can set disk flags to improve performance!
+# lsblk							#Displays mounted/umounted disks connected to the system!
+# hdparm							#Linux Kernel Only: it can set disk flags to improve performance!
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -22092,18 +22101,18 @@ CREATING FILE ARCHIVES USING AR
 Should be used, if necessary, for storing multiple static versions of the same library.
 for C/C++, archives should be created with .a extensions.
 
-$ar -q <archive> <files>				#Adds file to end of archive; does NOT replace data.
-$ar -r <archive> <files>				#Adds file/directory into archive REPLACING data with same name
-$ar -s <archive> 					#Creates/Updates index to the archive
-$ar -d <archive> <files>				#Deletes members from the archive
-$ar -x <archive>					#Extracts members of the archive
+$ ar -q <archive> <files>				#Adds file to end of archive; does NOT replace data.
+$ ar -r <archive> <files>				#Adds file/directory into archive REPLACING data with same name
+$ ar -s <archive> 					#Creates/Updates index to the archive
+$ ar -d <archive> <files>				#Deletes members from the archive
+$ ar -x <archive>					#Extracts members of the archive
 
-$ar -m <archive> <files>				#Moves members in the archive
+$ ar -m <archive> <files>				#Moves members in the archive
 							^ Pushes given files to the end of the queue in the archive
-$ar -p <archive> <files>				#Prints the content of a given file member in the archive
-$ar -r <archive>					#Displays a table listing the contents of the archive
+$ ar -p <archive> <files>				#Prints the content of a given file member in the archive
+$ ar -r <archive>					#Displays a table listing the contents of the archive
 
-$ar -pl <archive> -L./ -l<library>			#Creates/Specifies library dependency for a given archive
+$ ar -pl <archive> -L./ -l<library>			#Creates/Specifies library dependency for a given archive
 
 --------------------------------------------------
 --------------------------------------------------
@@ -22138,64 +22147,64 @@ and is part of libarchive package on linux distros.
 
 
 SOME OLD EXAMPLES:
-	$tar cf path/to/target.tar path/to/file1 path/to/file2  	# [c]reate an archive and write it to a [f]ile:
+	$ tar cf path/to/target.tar path/to/file1 path/to/file2  	# [c]reate an archive and write it to a [f]ile:
 	    
 
-	$tar czf path/to/target.tar.gz path/to/file1 path/to/file2 	# [c]reate a g[z]ipped archive and 
+	$ tar czf path/to/target.tar.gz path/to/file1 path/to/file2 	# [c]reate a g[z]ipped archive and 
 									  write it to a [f]ile.
 
-	$tar czf path/to/target.tar.gz --directory=path/to/directory   	# [c]reate a g[z]ipped archive from a directory using 
+	$ tar czf path/to/target.tar.gz --directory=path/to/directory   	# [c]reate a g[z]ipped archive from a directory using 
 									  relative paths.
 
-	$tar xkvf path/to/source.tar[.gz|.bz2|.xz]			# E[x]tract a (compressed) archive [f]ile 
+	$ tar xkvf path/to/source.tar[.gz|.bz2|.xz]			# E[x]tract a (compressed) archive [f]ile 
 									  into the current directory [v]erbosely.
 
-	$tar xkf path/to/source.tar[.gz|.bz2|.xz] --directory=path/to/directory  	# E[x]tract a (compressed) archive 
+	$ tar xkf path/to/source.tar[.gz|.bz2|.xz] --directory=path/to/directory  	# E[x]tract a (compressed) archive 
 											^ [f]ile into the target directory.
 
-	$tar caf path/to/target.tar.xz path/to/file1 path/to/file2	# [c]reate a compressed archive and write it 
+	$ tar caf path/to/target.tar.xz path/to/file1 path/to/file2	# [c]reate a compressed archive and write it 
 									^ to a [f]ile, using [a]rchive suffix to determine 
 									^ the compression program.
 
 
-	$tar tvf path/to/source.tar 					# Lis[t] the contents of a tar [f]ile [v]erbosely:
+	$ tar tvf path/to/source.tar 					# Lis[t] the contents of a tar [f]ile [v]erbosely:
 
-	$tar xkf path/to/source.tar --wildcards "*.html"		# E[x]tract files matching a pattern from 
+	$ tar xkf path/to/source.tar --wildcards "*.html"		# E[x]tract files matching a pattern from 
 									  an archive [f]ile 	
 
 UNIX-STYLE USAGE
-       $tar -A [OPTIONS] -f ARCHIVE ARCHIVE...
+       $ tar -A [OPTIONS] -f ARCHIVE ARCHIVE...
 
-       $tar -c [-f ARCHIVE] [OPTIONS] [FILE...]
+       $ tar -c [-f ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar -d [-f ARCHIVE] [OPTIONS] [FILE...]
+       $ tar -d [-f ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar -r [-f ARCHIVE] [OPTIONS] [FILE...]
+       $ tar -r [-f ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar -t [-f ARCHIVE] [OPTIONS] [MEMBER...]
+       $ tar -t [-f ARCHIVE] [OPTIONS] [MEMBER...]
 
-       $tar -u [-f ARCHIVE] [OPTIONS] [FILE...]
+       $ tar -u [-f ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar -x [-f ARCHIVE] [OPTIONS] [MEMBER...]
+       $ tar -x [-f ARCHIVE] [OPTIONS] [MEMBER...]
 
 GNU-STYLE USAGE
-       $tar {--catenate|--concatenate} [OPTIONS] --file ARCHIVE ARCHIVE...
+       $ tar {--catenate|--concatenate} [OPTIONS] --file ARCHIVE ARCHIVE...
 
-       $tar --create [--file ARCHIVE] [OPTIONS] [FILE...]
+       $ tar --create [--file ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar {--diff|--compare} [--file ARCHIVE] [OPTIONS] [FILE...]
+       $ tar {--diff|--compare} [--file ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar --delete [--file ARCHIVE] [OPTIONS] [MEMBER...]
+       $ tar --delete [--file ARCHIVE] [OPTIONS] [MEMBER...]
 
-       $tar --append [--file ARCHIVE] [OPTIONS] [FILE...]
+       $ tar --append [--file ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar --list [--file ARCHIVE] [OPTIONS] [MEMBER...]
+       $ tar --list [--file ARCHIVE] [OPTIONS] [MEMBER...]
 
-       $tar --test-label [--file ARCHIVE] [OPTIONS] [LABEL...]
+       $ tar --test-label [--file ARCHIVE] [OPTIONS] [LABEL...]
 
-       $tar --update [--file ARCHIVE] [OPTIONS] [FILE...]
+       $ tar --update [--file ARCHIVE] [OPTIONS] [FILE...]
 
-       $tar {--extract|--get} [--file ARCHIVE] [OPTIONS] [MEMBER...]
+       $ tar {--extract|--get} [--file ARCHIVE] [OPTIONS] [MEMBER...]
 
 ---
 ---
@@ -22240,11 +22249,11 @@ different than the current one, ex:
 
 
 EXAMPLE #1 - CREATING, UPDATING AND APPENDING TO ARCHIVE
-	$tar cf ./my_filename.tar ./file_1 		# [C]reates TAR archive called 'my_filename'
+	$ tar cf ./my_filename.tar ./file_1 		# [C]reates TAR archive called 'my_filename'
 							and adds 'file_1' to it.
 							^ obs: it's not possible to create empty archive files
 
-	$tar uf ./my_filename.tar ./file_2		# [U]pdates 'file_2' to the archive
+	$ tar uf ./my_filename.tar ./file_2		# [U]pdates 'file_2' to the archive
 							^ If the file already exists, 
 							a new index for the file will be created,
 							both new and old files with same name will co-exist,
@@ -22252,19 +22261,19 @@ EXAMPLE #1 - CREATING, UPDATING AND APPENDING TO ARCHIVE
 
 							obs: [c]ompresssed files can't be updated/appended!
 
-	$tar rf./my_filename.tar ./file_1		# [A]ppends given file to the archive
+	$ tar rf./my_filename.tar ./file_1		# [A]ppends given file to the archive
 							^ doesn't care if the file exists, just appends it anyways.
 
-	$tar tvf ./my_filename.tar			# [V]erbosely lists all files
+	$ tar tvf ./my_filename.tar			# [V]erbosely lists all files
 	
-	$tar xkf ./my_filename.tar			# [X]tracts contents of the archive
+	$ tar xkf ./my_filename.tar			# [X]tracts contents of the archive
 							^ if there's a file with same-name on the same directory
 							inside the archive, only the newest version of that
 							file is extracted, older versions are kept in the archive.
 
 
 EXAMPLE 1.2 - DELETING
-	$tar --delete -f ./my_filename.tar ./file_1	# Deletes data from archive
+	$ tar --delete -f ./my_filename.tar ./file_1	# Deletes data from archive
 							^ can not delete from compressed archives
 							^ it's note possible to use both UNIX and GNU Style together:
 							'tar --delete f ./my_filename.tar ...'
@@ -22273,11 +22282,11 @@ EXAMPLE 1.2 - DELETING
 							in UNIX-STYLE; same happens for GNU-STYLE.
 
 EXAMPLE 1.3 - AUTO COMPRESSING
-	$tar caf ./my_filename.tar.gz ./my_filename.tar		#[A]uto-compresses my_filename.tar into gzip format
+	$ tar caf ./my_filename.tar.gz ./my_filename.tar		#[A]uto-compresses my_filename.tar into gzip format
 
 
 EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE
-	$tar xkf path/to/source.tar --wildcards "*.html"		#Extracts only .html files/dirs
+	$ tar xkf path/to/source.tar --wildcards "*.html"		#Extracts only .html files/dirs
 
 
 ---
@@ -22293,9 +22302,9 @@ Observation 2: It's a good practice to always archive ALL files inside a folder,
 --------------------------------------------------
 --------------------------------------------------
 FINDING OUT IF COMMAND IS A BINARY EXECUTABLE OR A SHELL BUILT IN COMMAND
-$whence -c <command_name>
+$ whence -c <command_name>
 	or
-$type -p <command_name>
+$ type -p <command_name>
 
 
 --------------------------------------------------
@@ -22310,21 +22319,21 @@ be the solution to the problem.
 Once your system is booting from installation media, do as follows:
 
 0 - Execute a filesystem check to make sure everything is 'ok' before mounting
-	#fsck.ext4 -Dfy /dev/sdXY
+	# fsck.ext4 -Dfy /dev/sdXY
 	ex.: fsck.ext4 -Dfy /dev/sdb2
 
 1 - Mount the partition where your linux is installed:
-	#mount -m /dev/sdXY /mnt/my_linux_system
+	# mount -m /dev/sdXY /mnt/my_linux_system
 	ex.: mount -m /dev/sdb2 /mnt/archlinux
 
 2 - Now arch-chroot into your mounted partition:
-	#arch-chroot /mnt/my_linux_system
+	# arch-chroot /mnt/my_linux_system
 
 
 3 - From this point forward you can try many options for restoring your system
 
 	3.1(Optional) - Rebuilding initramfs on archlinux:
-		#mkinitcpio -P	
+		# mkinitcpio -P	
 	
 	3.2(Optional) - Checking system package integrity:
 		# pacman -Qqk > /home/<your_username>/pacman.qqk.log	#Lists only packages whose files are missing files, it uses -q for quite mode.
@@ -22335,7 +22344,7 @@ Once your system is booting from installation media, do as follows:
 	3.2.1 - ex.: # pacman -Qkk > /home/me_myself/pacman.qkk.log-20-jul-2023
 
 		3.2.1.1 - once it's finished, you can do the following:
-			$cat /home/me_myself/pacman.qkk.log-20-jul-2023 | less
+			$ cat /home/me_myself/pacman.qkk.log-20-jul-2023 | less
 
 		3.2.1.2 - press '/' character on your keyboard to start a regex search and type:
 			[1..9] altered
@@ -22345,7 +22354,7 @@ Once your system is booting from installation media, do as follows:
 		3.2.2.3 - finally press 'n' and 'N' to navigate between found occurrences
 
 		3.2.3.4 - Check how many packages have been affected and fix it with
-			#pacman -S <package_name_1> <package_name_2> ... <package_name_n>
+			# pacman -S <package_name_1> <package_name_2> ... <package_name_n>
 	
 	3.3 (Optional) - Check if your /etc/fstab file is okay and generate a new one ONLY if necessary.
 			HINT: Your fstab should contain metadata on hard disks that would be mounted at system boot.
@@ -22374,10 +22383,10 @@ nor pending updates scheduled, either access or modification dates in between th
 be a spyware/trojan on the system.
 
 1 - Listing files MODIFICATION within the last 3h:
-	$find . -mtime +3 
+	$ find . -mtime +3 
 
 2 - Listing files ACCESS within the last 3h:
-	$find . -atime +3
+	$ find . -atime +3
 
 
 --------------------------------------------------
@@ -22386,29 +22395,29 @@ be a spyware/trojan on the system.
 CLAMAV ANTI-VIRUS
 
 1 - Running clamav daemon for the first time
-	#clamd
+	# clamd
 
 2 - Updating clamav
-	#freshclam
+	# freshclam
 
 3 - Scanning & Showing only infected files, with clamav daemon
-	#clamdscan -v -i <dir>
+	# clamdscan -v -i <dir>
 
 4(Optional) - Scanning with multi-threading enabled, with clamav daemon
-	#clamdscan -v -m <dir>
+	# clamdscan -v -m <dir>
 
 5(Optional/Preferred) - Recursive Scanning(scan all directories) without clamav daemon
-	#clamscan -v -r <dir>
+	# clamscan -v -r <dir>
 
 6(Optional/Preferred) - Recursive Scanning(scan all directories) without clamav daemon
-	#clamscan -v -r --multiscan <dir>
+	# clamscan -v -r --multiscan <dir>
 
 7(Optional) - Clamav Monitoring Tool for monitoring multiple instances of clamd
-	#clamdtop
+	# clamdtop
 
 8(Optional) - Enabling On-Access Scanning for the entire system, this causes performance loss on the system,
 	      it requires clamd to be running: 
-		#clamonacc
+		# clamonacc
 
 	CLAMAV GRAPHICAL USER INTERFACE / CLAMAV GUI
 		#clamtk
@@ -22421,7 +22430,7 @@ CLAMAV ANTI-VIRUS
 
 
 	FINDING OTHER CLAMAV DATA/FILES
-		$pacman -Ql clamav
+		$ pacman -Ql clamav
 
 source:
 	https://docs.clamav.net/Introduction.html
@@ -22432,17 +22441,17 @@ source:
 --------------------------------------------------
 NETWORK MONITORING
 	Use Network Activity Viewer:
-		1 - #netactview
+		1 - # netactview
 		    ^ requires package install
 FIREWALLING
 	Several Options Available Out-of-box:
-		1 - #systemctl start firewalld
+		1 - # systemctl start firewalld
 			Firewall daemon
 
-		2 - #firewall-config
+		2 - # firewall-config
 			Requires X11 or Wayland
 
-		3 - #gufw
+		3 - # gufw
 			^ requires package install
 			^ Firewall GUI, Requires X11 or Wayland
 
@@ -22457,8 +22466,8 @@ PULSEAUDIO BASICS(OLD)
 		as pipewire still uses some pulse and alsa configuration files.
 
 RESTART PULSEAUDIO SERVICES:
-$pulseaudio -k
-$pulseaudio --start
+$ pulseaudio -k
+$ pulseaudio --start
 
 OPTIMIZING PULSEAUDIO FOR PERFORMANCE:
 You should at least have at least these options below on /etc/pulseaudio/daemon.conf :
