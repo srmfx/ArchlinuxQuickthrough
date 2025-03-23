@@ -220,6 +220,11 @@ ctrl+shift+v
 			VOICE MODULATION THROUGH CARLA
 			TROUBLESHOOTING
 			INSTALLATION STEPS
+			USING PIPEWIRE AS AUDIO RECORDER
+				USING PIPEWIRE FOR RECORDING MICROPHONE AUDIO  
+				USING PIPEWIRE TO RECORD DESKTOP AUDIO
+				USING PIPEWIRE TO RECORD AUDIO FROM SPECIFIC APPLICATION
+				USING PIPEWIRE FOR TESTING AUDIO FILE 
 
 		SECURITY
 			SECURITY CONCERN
@@ -308,6 +313,41 @@ ctrl+shift+v
 		INCREASING SSD LIFETIME
 
 	---VERY BASIC:
+		THE VERY QUICK INTRODUCTION TO GIMP
+			SAVING FILES WITH BEST COMPRESSION
+			USING THE PATH TOOL FOR CREATING MASKS AND CHANNELS
+				CONVERTING A CHANNEL AND PATHS TO SELECTION FOR EDITING
+				EDITING AN ALREADY EXISTING PATH
+			SAVING SELECTION AS A NEW CHANNEL
+				MAKING/LOADING SELECTION FROM EXISTING CHANNEL
+			CREATING A LAYER MASK | APPLYING LAYER MASK | APPLYING MASK TO LAYER
+			SELECTION EDITOR
+			DUPLICATING LAYERS
+				DELETING A LAYER MASK
+			APPLYING MASK
+			CREATE NEW LAYER GROUP
+			TRANSFORM TOOLS
+			BETTER FREEDOM WHEN COLORIZING
+			SOME GOOD FILTERS
+			MORE OPTIONS
+				INCREASING SHADOW HIGHLIGHTS
+				POSTERIZE
+				COLOR TO ALPHA
+				ROTATE COLOR
+				CHANNEL MIXER
+				RGB CLIP
+				OTHER EFFECTS
+			OTHER OPTIONS ON GIMP'S GUI ( OLD )
+
+		USING FFMPEG - THE UNIVERSAL MEDIA CONVERTER
+			RECORDING MICROPHONE AUDIO USING FFMPEG
+			EXTRACTING AUDIO FROM VIDEO
+			TRIM A VIDEO FROM ONE POINT TO ANOTHER
+			CONVERTS IMAGES INTO EITHER ANIMATED .GIF OR .MPG
+			SAVE VIDEO AS AN ANIMATED .GIF
+			RECORDING SCREEN USING FFMPEG
+				RECORDING SCREEN ALONG WITH AUDIO INPUT/SOURCE DEVICE
+
 		THE ONION WEB / TOR WEB
 			HOW TO USE TOR
 			LINKS
@@ -1285,6 +1325,7 @@ SETTING UP SYSTEM LANGUAGE | SYSTEM LOCALE (NOT MANDATORY FOR KEYBOARD LAYOUT)
 		1.1 - uncomment en_US.UTF-8 UTF8  and pt_BR.UTF-8 UTF8 or any other locale you may want
 	2 - then type: # locale-gen
 	3 - last step: # localectl set-locale LANG=EN_us.utf-8
+	VERY IMPORTANT: currently, localcectl set-locale is only applied after system reboot.
 		or
 	alternatively to last step(not recommended): nvim /etc/locale.conf 
 					ex.: add LANG=en_US.UTF-8
@@ -4843,12 +4884,7 @@ git merge --continue 	     #The third syntax, can only be used when merge confli
 git mergetool 		     #Executes tool for resolving merging conflicts manually
 				^Requires merge tool to be set and configured.
 
-git rebase <commit|branch>   #Merges ALL OF THE COMMITS from a given branch into the current one!
-				The difference between git merge and git rebase is that git merges
-				only merges the last of commit of a given branch into the current commit of 
-				the current branch; however, git rebase merges ALL OF THE COMMITS into the 
-				current branch?? - NEEDS TO CHECK - WRONG!
-
+git rebase <commit|branch>   #Merges ALL OF THE COMMITS from a given branch into the current one! - READ PRACTICAL EXAMPLE BELOW
 				Rebase will present conflicts one commit at a time whereas merge will present them 
 				all at once. It is better and much easier to handle the conflicts but you shouldn’t 
 				forget that reverting a rebase is much more difficult than reverting a merge if 
@@ -4871,6 +4907,17 @@ git rebase <commit|branch>   #Merges ALL OF THE COMMITS from a given branch into
 				long-running feature branch (go easy on the last one, though).
 
 				source: https://www.benmarshall.me/git-rebase/
+
+				PRACTICAL EXAMPLE: 
+					summary: git merge turns all commits from a given branch into a single commit on the merging branch.
+				Pretend that branch B has +11 different commits, that means when master merges 'Branch B' it'll turn 
+				all those 11 commits into a single commit on the Master branch, while branch B remains unchanged after this.
+
+				'git rebase' in the other hand will bring all +11 commit history into the master branch, in front of the master branch, 
+				preserving the history of all 11 commmits. This makes it easier bug solving a new feature that has been completely 
+				or partially developed on a different branch.
+
+				However, you should always use 'git merge' whenever you have no intention on keeping the log history of the commmits.
 
 git rebase --onto <base_branch> <branch_1> <branch_2> 	#Rebases branch_1 and branch_2 onto base_branch 
 git rebase --onto topicA~5 topicA~3 topicA 		#Removes Commits from 3rd(excluded) to 5th(included) from 
@@ -5087,6 +5134,10 @@ git pull <repo_name>		#Incorporates changes from a remote repository into the cu
 				and calls git merge to merge the retrieved branch heads into the current branch. 
 				With --rebase, it runs git rebase instead of git merge.
 					ex.: git pull origin
+
+Git pulling one single file | git pull on a single file:
+	$ git fetch --all
+	$ git checkout origin/master -- path/to/file
 
   ---MISC COMMANDS---
   	git config color.ui true              #sets colored output
@@ -8767,7 +8818,7 @@ UNDERSTANDING RPCS3 | PS3 EMULATOR
 
 		1 - (NOT USING) Modified Firmware:
 			HFW_4.91.1_PS3UPDAT.PUP
-		2 - (USING) Default Firmware:
+		2 - Default Firmware 4.90:
 			PS3UPDAT2020.PUP
 ================================================================================
 ================================================================================
@@ -17601,6 +17652,9 @@ OBS STUDIO SETTINGS:
 	The settings in here are mostly used for recording, for live streaming try the
 "PERFECT OBS STUDIO CONFIGURATION AND SETTINGS / PERFECT LIVE STREAMING CONFIGURATION" manual section.
 
+VERY IMPORTANT: Base (Canvas) and Output (Scale) have to be the same resolution as the desktop,
+all games and applications must run under this one resolution.
+
 Settings > Videos:
 	Base (Canvas) Resolution: 1440x900
 	Output (Scale) Resolution: 1440x900
@@ -25255,19 +25309,19 @@ HOW TO DOSBOX-X
 				[/file]
 
 				A2) Reload /etc/fstab on the system:
-					#systemctl daemon-reload
+					# systemctl daemon-reload
 
 				A3) Mount all unmounted partitions:
-					#mount -a
+					# mount -a
 
 				A4) Attach file to newly created PC-98 Floppy loop device
-					#losetup -L -o 4096 /dev/loop4 disk.fdi
+					# losetup -L -o 4096 /dev/loop4 disk.fdi
 
 				A5) Mount the Virtual PC-98 Floppy device
-					#mount /dev/loop4
+					# mount /dev/loop4
 
 				A6) Access files and copy them to local hard disk:
-					$cd /mnt/FloppyA
+					$ cd /mnt/FloppyA
 
 				A7) Access files from distrobox by mounting directory of copied files as hard disk.
 
@@ -29370,6 +29424,8 @@ boosts security. Another main feature is that flatpak allows programs to not  re
 relying on it's own packaged files and libraries. This allows the program to execute using different library versions than the ones
 installed on the system, causing no issues with current system libraries located in /lib/ for example.
 
+Because of this nature, flatpak also allows you to run applications that may not be available on your linux operating system yet.
+
 	DEFAULT FLATPAK SETTINGS
 		source: https://docs.flatpak.org/en/latest/sandbox-permissions.html
 
@@ -30141,6 +30197,506 @@ ls ./ | awk '{system("file="$0"; rm ../${file%%.*}.*")}'
 ---------------------
 ---------------------
 ---------------------
+THE VERY QUICK INTRODUCTION TO GIMP
+	Hint: Always save image files as .xcf when working with selection and masks.
+	Hint2: When working with 'Layer grouping', applying effects on 'layer group' instead of an individual layer works differently,
+	it allows to apply the choosen effect for all effects of every single layer in the group.
+	
+	SAVING FILES WITH BEST COMPRESSION
+		Click on 'File' tab > Click on 'Save File as' > Click on 'Save this .XCF file with better but slower compression' > 
+		Click 'Select File Type by Extension' > Now choose 'xz archive' (xcf.xz or xcfxz) > Click Save
+
+	USING THE PATH TOOL FOR CREATING MASKS AND CHANNELS
+		The 'paths tool' can be used to better create and handle 'selection', 'masks' and 'channels'.
+	With the 'paths tool' you can easily modify(edit/update) an existing 'mask' or 'channel'
+
+		1 - First create a path using the 'Paths Tool'
+
+		2 - Create a new Selection from Path
+			Click on 'Select' tab -> then click on 'Selection from Paths'
+
+		3 - Create a new Channel based on the current selection
+			Click on 'Select' tab -> now click on 'Save to Channel'
+
+		4 - Create a new Path
+			Click on 'Select' tab -> click on 'To Path'
+
+
+		CONVERTING A CHANNEL AND PATHS TO SELECTION FOR EDITING
+			This is useful for creating a new selection based on an already existing one, given that you have saved it 
+		previously as either 'Channel' or 'Path'.
+
+			1 - Select 'Windows' Tab -> Hover over the mouse on 'Dockable Dialogs' -> Click on either 'Path' or 'Channels'
+
+			2 - Select a 'Path' or 'Channel' -> Right-Click on the choosen Path/Channel -> 
+			Click on 'Path to Selection' or 'Channel to Selection'
+
+			3 - Note: Besides creating a new 'Selection' from an existing path/channel that it' also possible to Add, Subtract or Intersect
+			with an already existing 'Selection'.
+
+		EDITING AN ALREADY EXISTING PATH
+
+			1 - Select 'Windows' Tab -> Hover over the mouse on 'Dockable Dialogs' -> Click on either 'Path'.
+
+			2 - Select a 'Path' -> Right-Click on the choosen Path -> Click on 'Edit Path'.
+
+			3 - Note: This will allow you to modify an existing path, which can later be converted into a new selection,
+			also allowing you to create a new channel if necessary.
+
+	SAVING SELECTION AS A NEW CHANNEL
+		A Channel allows to save a selection for creating new masks:
+			Right-Click (after making selection) > Select > Save to Channel
+
+		MAKING/LOADING SELECTION FROM EXISTING CHANNEL
+			If a selection has already been saved/converted to channel: 
+
+				1 - Select 'Windows' Tab -> Hover over the mouse on 'Dockable Dialogs' -> click on 'Channels'
+
+				2 - Select a 'Channel' -> Right-Click on the choosen 'Channel' -> Click on 'Channel to Selection'
+
+				3 - Note: Besides creating a new 'Selection' from an existing channel that it' also possible to Add, Subtract or Intersect
+				with an already existing 'Selection'.
+
+	CREATING A LAYER MASK | APPLYING LAYER MASK | APPLYING MASK TO LAYER
+		For this to work, a 'Channel' needs to be created using 'Selection' tools; in turn a 'Selection' can be made from either an
+		existing 'Channel' or 'Path; Only one single mask can be a applied per existing layer:
+
+			1 - Click on 'Windows' tab -> Hover over the mouse on 'Dockable Dialogs' -> Click on 'Layers'
+
+			2 - Choose the desired layer and then duplicate it:
+				2.1 - Click on 'Layer' tab -> Click on 'Duplicate Layers'.
+
+			3 - Now right click the new duplicated layer -> Click on 'Add Layer Masks' :
+				-> Click on 'Selection' to Initialize Layer Mask from what's been already selected.
+					or
+				-> Click on 'Channel' to Initialize Layer Mask from an existing channel.
+
+			4 - Finally, Right-click the layer on #4 again -> Click on 'Apply Layer Masks'
+			
+
+	SELECTION EDITOR
+		It might be useful to edit a selection when making an either incomplete or bad 'LAYER MASK', 'CHANNEL' or 'PATH'
+			1 (Optional) - This will assist you in making a new selection:
+				Click on 'Select' tab -> Click on 'Selection Editor' 
+
+			2 - Select either a 'Channel' or 'Path':
+				Read topic on: 
+					'CONVERTING A CHANNEL AND PATHS TO SELECTION FOR EDITING'
+
+			3 - Either 'select', 'add', 'subtract' or 'intersect' by Right-Clicking the Channel/Path.
+
+			4 - Happy Editing!
+
+	DUPLICATING LAYERS
+		Useful when you need to work on multiple Layer Masks:
+			Select Layer -> Right-Click the image -> Layer -> 'Duplicate Layers'
+				or
+			Select Layer -> Click on 'Layer' Tab -> 'Duplicate Layers'
+
+		DELETING A LAYER MASK
+			Useful after duplicating layers that contain a mask:
+				Select Layer -> Right click on 'Delete Mask'	
+					or
+				Select Layer -> Click on 'Layer' tab -> 'Delete Layer'
+
+	APPLYING MASK
+		Allows the Mask to be used as a Regular Layer,
+	Duplicating Layers might be useful before applying a mask:
+
+		Select Layer -> Right-Click  'Apply Layer Mask'
+			or
+		Select Layer -> Click on Layer tab -> Mask -> Apply Layer Mask
+
+	CREATE NEW LAYER GROUP
+		Useful for grouping together Masks that have been applied as a new layer,
+	allowing these layers to be easily duplicated for applying and testing different effects:
+
+		Click on 'Layer' tab -> New Layer Group
+
+	TRANSFORM TOOLS
+		Changing image positioning, angle and visualization:
+			Click 'Tools' Tab -> Click on 'Transform Tools' -> Choose a transform:
+				1 - Unified Transform
+				2 - Handle Transform
+				3 - Perspective
+				4 - Shear
+				5 - Scale
+				6 - Cage Transform
+				7 - Warp Transform
+
+
+	BETTER FREEDOM WHEN COLORIZING
+		Recommended when applying colorization to masks:
+			1.1- Colors > Exposure > Set exposure until it allows to reveal more color, either by clearing or darkenning the image.
+				1.1.2 - You can also use 'Blending Options' in the 'Exposure' effect, by choosing an opacity/transparency effect,
+				- NOTE: Colorization also has opacity options! - 
+				here are some good Blending Modes:
+
+					1.1.2.1 - Screen
+						Useful when trying to use Light Colors but it doesn't blends too well.
+
+					1.1.2.2 - 'Burn' and 'Linear Burn'
+						Burns vivid color into a dark one. Useful when a choosen color is too bright/too light, 
+					it helps enhancing the dark spots by controlling 'Opacity' option. 
+
+					1.1.2.3 - Darken Only
+						Helps applying Dark Color from a Vivid Color, by controlling saturation, lightness and
+					opacity.
+
+					1.1.2.4 - Subtract
+						Subtracts the choosen color, acting like a color removal filter for the mask/selection.
+
+					1.1.2.5 - Grain Extract
+						Similar to Subtract.
+
+					1.1.2.6 - Hard Mix
+						Helps in applying dark colors.
+
+					1.1.2.7 - Vivid light
+						Helps applying vivid light colors by balancing 'Opacity', 'Saturation' and 'Lighteness'.
+
+						Note: The 'Dodge' effect may help in situations where 'Vivid Light' can't and vice-versa.
+
+					1.1.2.8 - Dodge
+						Helps applying vivid color by controlling Saturation, Lighteness and Opacity.
+						'vivid light' might still be a better option.
+
+						Note: However, Dodge may help in situations where 'Vivid Light' can't and vice-versa.
+
+			1.2 - Colors > Colorize > Set whatever color you want.
+
+			1.3 - Colors > Colorize > Click to select color you want > Click on 'Wheel' tab > Click on 'HSV' Option
+			next to 'LCh', on the  'H' letter you can switch colors using the same saturation and color value.
+
+	SOME GOOD FILTERS
+		Apply filters to image:
+			1.1 - Click on 'Filters' tab:
+				1.1.1 - 'Filters' Tab -> Click on 'Distort'
+					1.1.1.1 - 'Apply Lens'
+					1.1.1.2 - 'Emboss'
+					1.1.1.3 - 'Engrave'
+					1.1.1.4 - 'Lens Distortion'
+					1.1.1.5 - 'Kaleidoscope'
+					1.1.1.6 - 'Mosaic'
+						Makes image look from old magazine.
+					1.1.1.7 - 'Newsprint'
+						Same as mosaic.
+					1.1.1.8 - 'Polar Coordinates'
+						Similar to Kaleidoscope.
+					1.1.1.9 - 'Ripple'
+						Adds Water ripple effect.
+					1.1.1.10 - 'Shift'
+						Adds shifting pixels effect to image.
+					1.1.1.11 - 'Spherize'
+						Similar to 'Polar Coordinates'.
+					1.1.1.12 - 'Video Degradation'
+						Adds video degradation effect to image.
+					1.1.1.13 - 'Waves'
+						Water drop effect.
+					1.1.1.14 - 'Whirl and Pinch'
+						Whirlwind effect.
+					1.1.1.15 - 'Wind'
+						Adds Wind effect to the image.
+					1.1.1.16 - 'Blinds'
+						Adds blind stripes to the image.
+					1.1.1.17 - 'Curve Bend'
+						Allows bending the image.
+					1.1.1.18 - 'Page Curl'
+						Turning over page effect.
+												
+				1.1.2 - 'Filters' Tab -> Click on 'Blur'
+					1.1.2.1 - 'Zoom Motion blur'
+					1.1.2.2 - 'Linear Motion blur'
+						Adds directional motion blur, like god's ray effect or volumetric lights.
+					1.1.2.3 - 'Selective Gaussian Blur'
+					1.1.2.4 - 'Median Blur'
+					1.1.2.5 - 'Mean Curvate Blur'
+					1.1.2.6 - 'Lens Blur'
+
+				1.1.3 - 'Filters' Tab -> Click on 'Enhance'
+					1.1.3.1 - 'High Pass'
+					1.1.3.2 - 'Noise Reduction'
+					1.1.3.3 - 'Red Eye Removal'
+					1.1.3.4 - 'Sharpen'
+						Looks very good after 'Noise Reduction' has been applied.
+					1.1.3.5 - 'Despeckle'
+					
+
+				1.1.4 - 'Filters' Tab -> Click on 'Lights and Shadow'
+					1.1.4.1 - 'Bloom'
+					1.1.4.2 - 'Lens Flare'
+					1.1.4.3 - 'Gradient Flare'
+					1.1.4.4 - 'Lightning Effect'
+					1.1.4.5 - 'Vignete'
+					
+				1.1.5 - 'Filters' Tab -> Click on 'Noise'
+					1.1.5.1 - 'CIE Ich noise'
+					1.1.5.2 - 'HSV Noise'
+					1.1.5.3 - 'Hurl'
+					1.1.5.4 - 'Pick'
+
+				1.1.6 - 'Filters' Tab -> Click on 'Edge-Detect'
+					All of the filters
+
+				1.1.8 - 'Filters' Tab -> Click on 'Generic'
+					1.1.8.1 - 'Distance Map'
+					1.1.8.2 - 'Normal Map'
+					1.1.8.3 - 'Erode'
+						Very good in enhancing images
+
+				1.1.9 - 'Filters' Tab -> Click on 'Combine'
+					1.1.9.1 - 'Filmstrip'
+						Creates a filmstrip from multiple images.
+
+				1.1.10 - 'Filters' Tab -> Click on 'Decor'
+					1.1.10.1 - 'Fog'
+					1.1.10.2 - 'Stain'
+					1.1.10.3 - 'Fuzzy Border'
+					1.1.10.4 - 'Old Photo'
+					1.1.10.5 - 'Round Corners'
+						Creates border for better displaying on web page.
+					1.1.10.6 - 'Add Border'
+						
+				1.1.11 - 'Filters' Tab -> Click on 'Artistic'
+					1.1.11.1 - 'Apply Canvas'
+					1.1.11.2 - 'Cartoon'
+					1.1.11.3 - 'Cubism'
+					1.1.11.4 - 'Glass Tile'
+					1.1.11.5 - 'Oilify'
+					1.1.11.6 - 'Photocopy'
+					1.1.11.7 - 'Simple Linear Clustering'
+						Very good.
+					1.1.11.8 - 'Soft Glow'
+						Very good.
+					1.1.11.9 - 'Waterpixels'
+						Similar to 'Cartoon'
+					1.1.11.10 - 'Clothify'
+						Makes image looks like it's been drawn on a piece of cloth.
+					1.1.11.11 - 'GIMPressionist'
+						Applies several effects not listed.
+					1.1.11.12 - 'Weave'
+						Makes image looks like it's been drawn on weave.
+
+				1.1.12 - 'Filters' Tab -> Click on 'Map'
+					1.1.12.1 - 'Fractal Trace'
+					1.1.12.2 - 'Illusion'
+					1.1.12.3 - 'Little Planet'
+					1.1.12.4 - 'Panorama Projection'
+					1.1.12.5 - 'Paper Tile'
+					1.1.12.6 - 'Tile Seamless'
+					1.1.12.7 - 'Small tiles'
+					1.1.12.8 - 'Wrap'
+
+	-----
+	MORE OPTIONS:
+		Some of these options are applied on a layer basis, which means you'll be required to chose one layer before applying these.
+
+		INCREASING SHADOW HIGHLIGHTS:
+			Increasing shadow highlights can help reduce the perceived light reflection in an image.
+
+				Click 'Color' tab -> Click 'Shadows-Highlight'
+
+		POSTERIZE:
+			Adds a cool posterize effect:
+				Click 'Color' tab -> Click 'Posterize'
+		
+		COLOR TO ALPHA:
+			Can be used to improve 'Colorize' options, only use when you feel you've got the right color, 
+		this will add color to transparency/oppacity effects:
+				
+				Click 'Color' tab -> Click 'Color to Alpha'
+
+		ROTATE COLOR:
+			Rotates a chosen color into a new color on the selected layer:
+				Click 'Color' tab -> Click 'Map' -> Rotate Colors
+
+		CHANNEL MIXER:
+			This will change the current color RGB Values, likely making it hard to apply other colors:
+				Click 'Color' tab -> Click 'Components' -> Channel Mixer
+
+		RGB CLIP:
+			Same as 'color to alpha', but can help in shading the color of the image/mask instead of brigthness/contrast.
+
+		OTHER EFFECTS:
+				Click 'Color' tab -> Invert
+				Click 'Color' tab -> Linear Invert
+				Click 'Color' tab -> Value Invert
+				Click 'Color' tab -> Click 'Map' -> Alien Mapping
+				Click 'Color' tab -> Click 'Tone Mapping' -> Destripe
+				Click 'Color' tab -> Click 'Tone Mapping' -> Retinex
+				Click 'Image' tab -> Click 'Mode' -> Grayscale
+
+
+
+OTHER OPTIONS ON GIMP'S GUI ( OLD ): 
+	1 - Select > By Color (Shift+O)
+	2 - Colors > Colorize
+	3 - Working with Layers:
+		Layer > Duplicate Layer
+		then Select > Select Invert
+		finally Press <Del>
+	4 - Zoom IN/OUT: 
+		Press <+> or <->
+	5 - Magic Wand/Fuzzy Selection Tools:
+		Tools > Selection Tools 
+		> Fuzzy Select
+
+	Note.: You can hold down ALT key and press the first letter to each of those options(Faster-Productive)
+---------------------
+---------------------
+---------------------
+---------------------
+USING PIPEWIRE AS AUDIO RECORDER
+	This will only work if you're using pipewire.
+
+	0) Find out if you're on pipewire:
+		$ pactl info | grep -P -i "pipewire"
+
+		0.1) ( Alternative) Try running 'pw-top', if you're on pipewire, pw-top should work:
+			$ pw-top
+
+		NOTE: If you're not on pipewire, use something else instead like 'ffmpeg' or 'sox'.
+
+	USING PIPEWIRE FOR RECORDING MICROPHONE AUDIO  
+		This will use the input device for recording audio:
+
+			$ pw-record ~/output.flac
+				or
+			$ pw-record --volume 1.25 ~/output.flac
+				or
+			$ pw-record --rate 48000 ~/output.flac
+
+	USING PIPEWIRE TO RECORD DESKTOP AUDIO
+		If you're using pipewire, you can use this to capture and record desktop audio:
+			$ pw-record -P '{ stream.capture.sink=true }' ~/test.flac   
+
+	USING PIPEWIRE TO RECORD AUDIO FROM SPECIFIC APPLICATION
+		This will record audio from one single specific application:
+		VERY IMPORTANT: This method will only work if the chosen program is already running and sending audio as output.
+		
+		1) List all pipewire objects to find the one program you want:
+			$ pw-cli list-objects | grep node.name
+		
+			1.1) Alternative solution, if you're using an old pipewire version you'll have to fetch the object.serial 
+			of the active program:
+				1.1.1) using 'wpctl' to fetch object ID:
+					$ wpctl status
+						or
+					$ wpctl status | less
+
+				1.1.2) use 'pw-cli' to find object.serial of a given ID:
+					$ pw-cli <Object_ID>
+						or
+					$ pw-cli info 486
+
+				1.1.3)(Alternative) Fetching object serial of a given ID using grep:
+					$ pw-cli info <Object_ID> | grep -P -i "object.serial"
+						or
+					$ pw-cli info 486 | grep -P -i "object.serial"
+
+		2) This will record audio from a single program:
+			$ pw-record --target < node.name | object.serial > ~/audio.flac
+				or
+			$ pw-record --target "Firefox" test.flac   
+				or
+			$ pw-record --target=Firefox test.flac   
+				or
+			$ pw-record --target="Firefox" test.flac   
+				or
+			$ pw-record --target=10805 test.flac
+			
+	USING PIPEWIRE FOR TESTING AUDIO FILE 
+		This will playback your audio file:
+			$ pw-play ~/output.flac
+
+---------------------
+---------------------
+---------------------
+---------------------
+USING FFMPEG - THE UNIVERSAL MEDIA CONVERTER
+
+	RECORDING MICROPHONE AUDIO USING FFMPEG
+		VERY IMPORTANT: If you have PIPEWIRE, it's better to use 'pw-record' for recording audio from microphone,
+	Only follow these instructions if you're not using pipewire:
+
+		0) Find out if you're on pipewire:
+			$ pactl info | grep -P -i "pipewire"
+
+			0.1) ( Alternative) Try running 'pw-top', if you're on pipewire, pw-top should work:
+				$ pw-top
+
+			NOTE: If it works, this means you're using pipewire, use 'pw-record' instead.
+
+		1) Find out your sink/source audio device:
+			$ pactl info
+			
+			output example:
+				Default Sink: alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.iec958-stereo
+				Default Source: alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.mono-fallback
+
+				NOTE: 'Sink' is the Speaker/Headphone, 
+				'Source' is the microphone or any other input device.
+
+		2) Record audio using the following:
+			This will record audio. 
+				$ ffmpeg -f pulse -i <monitor_source_name> < audio_filename.<audio_format> >
+						or
+				$ ffmpeg -f pulse -i alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.mono-fallback ~/audio_output.wav
+
+		3) Test audio with MPV:
+			This requires installing 'mpv'.
+				$ mpv <audio_filename>
+					or
+				$ mpv ~/audio_output.wav
+
+	EXTRACTING AUDIO FROM VIDEO
+		Note, you can choose whichever 'audio format' you want:
+			$ ffmpeg -i <path_to_video> -vn < path_to_sound.<audio_format> >
+					or
+			$ ffmpeg -i ./video.mp4 -vn ./audio_output.mp3
+
+	TRIM A VIDEO FROM ONE POINT TO ANOTHER
+		Note, you can choose whichever 'video format' you want:
+			$ ffmpeg -i <path_to_video> -ss <start_time> -to <end_time> -c copy < output_video.<video_format> >
+					or
+			$ ffmpeg -i ./video.mp4 -ss 00:10 -to 0:30 -c copy ./video_output.mp4
+
+
+	CONVERTS IMAGES INTO EITHER ANIMATED .GIF OR .MPG
+		This will convert all filenames starting with 'image_' and ending on a number:
+			$ ffmpeg -i ./image_%d.* -f image2 ./video.mpg
+				or
+			$ ffmpeg -i ./image_%d.* -f image2 ./video.gif
+	
+	SAVE VIDEO AS AN ANIMATED .GIF
+		This will covnert video to .gif, -r will set the framerate to 15:
+			$ ffmpeg -i <path_to_video> -vf 'scale=-1:1000' -r <framerate> ./output.gif
+				or
+			$ ffmpeg -i ./video.mp4 -vf 'scale=-1:1000' -r 15 ./output.gif
+
+	RECORDING SCREEN USING FFMPEG
+		NOTE: This is a xorg server only solution
+
+		I'd recommend using 'OBS STUDIO' instead of using 'fmmpeg', however
+	it's still possible to do this task using 'ffmpeg':
+
+		$ ffmpeg -f x11grab -video_size <screen_resolution> -framerate <frame> -i :0.0+0,0 <video_filename.<video_format>>
+				or
+		$ ffmpeg -f x11grab -video_size 1280x768 -framerate 25 -i :0.0+0,0 ~/output.mp4
+
+		RECORDING SCREEN ALONG WITH AUDIO INPUT/SOURCE DEVICE
+			This full example will require you to follow both steps:
+
+				1 - RECORDING SCREEN USING FFMPEG
+				2 - RECORDING MICROPHONE AUDIO USING FFMPEG
+
+			Example:
+				$ ffmpeg -f x11grab -video_size 1280x768 -framerate 25 -i :0.0+0,0 -f pulse -i alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.mono-fallback ~/output.mp4
+
+---------------------
+---------------------
+---------------------
+---------------------
 THE ONION WEB / TOR WEB
 	HOW TO USE TOR
 		1 - On linux, download and install 'torbrowser-launcher' and 'tor' packages.
@@ -30160,7 +30716,8 @@ THE ONION WEB / TOR WEB
 		http://archiveiya74codqgiixo33q62qlrqtkgmcitqx5u2oeqnmn5bpcbiyd.onion/ - Archive  today
 		http://zqktlwiuavvvqqt4ybvgvi7tyo4hjl5xgfuvpdf6otjiycgwqbym2qad.onion/ -  The Hidden Wikia
 			http://zqktlwiuavvvqqt4ybvgvi7tyo4hjl5xgfuvpdf6otjiycgwqbym2qad.onion/wiki/index.php/Main_Page
-		http://tenchan4v5bnlu3gatyjyctlsb25asvncbz4pr7gmomhsrvyx5zfpcad.onion/ - 10chan
+
+		http://w7m432cocr665kf5tlpcxojwldajr3njd2etcxwhpbrt44eemuxhp7ad.onion/ - 8kun imageboard
 
 		http://3bbad7fauom4d6sgppalyqddsqbf5u5p56b5k5uk2zxsy3d6ey2jobad.onion/	- Tor Search
 		http://torbox36ijlcevujx7mjb4oiusvwgvmue7jfn2cvutwa6kl6to3uyqad.onion/welcome - TorBox Onion Mail
@@ -30323,6 +30880,8 @@ Smaller TODO list:
 			# chmod u+t ./file
 
 	6 - /etc/security/limits.d/username.conf can help setting user limits on the system
+	7 - Mount usb device automatically on plug-in
+		https://unix.stackexchange.com/questions/134797/how-to-automatically-mount-an-usb-device-on-plugin-time-on-an-already-running-sy 
 
 
 
@@ -30374,20 +30933,6 @@ TEMPORARY 2:
 	libva-nvidia-driver: Allows VA-API Hardware Video Acceleration
 3 - Explain how to setup custom startup resolution
 4 - save new firewall settings, since it allows pipewire server's ip to be used locally.
-5 - Explain git merge and git rebase:
-	https://phoenixnap.com/kb/git-rebase-vs-merge
-	summary: git merge allows turns all commits from a given branch into a single commit on the merging branch.
-	Pretend that branch B has +11 different commits, that means when master merges 'Branch B' it'll turn all those 11 commits into a single
-	commit on the Master branch, while branch B remains unchanged after this.
-
-	'git rebase' in the other hand will bring all +11 commit history into the master branch, in front of the master branch, preserving the history
-	of all 11 commmits. This makes it easier bug solving a new feature that has been completely or partially developed on a different branch.
-
-	However, you should always use 'git merge' whenever you have no intention on keeping the log history of the commmits.
-
-6 - Git pulling one single file:
-	$ git fetch --all
-	$ git checkout origin/master -- path/to/file
 
 ---
 VERY IMPORTANT/TASK  LOGS:
@@ -30402,7 +30947,7 @@ on /etc/modprobe.d/nvidia.conf file i just disabled Nvidia GSP Firmware, since '
 
 Furtherover, the reason you shouldn't completely disable EDID is because TTY only supports EDID resolutions. 
 -----
-TEMPORARY2:
+TEMPORARY 2:
 I've patched /etc/pipewire/pipewire.conf to work without relying on "pw-metadata -n settings 0 clock.force-quantum 2000"
 requires testing to see how it'll roll.
 
@@ -30410,8 +30955,6 @@ TEMPORARY3:
 describe differences between 7z, tar, zip/unzip, bzip2
 
 ----
+Temporary 3:
 Custom Modeline 70hz:
 "1280x768_70n" 73.685 1280 1288 1320 1360 768 780 788 794 +HSync -VSync
-
-
-PROTON_ENABLE_NVAPI=1 ENABLE_VKBASALT=1 gamescope --force-grab-cursor -f -S stretch -w 1280 -h 800 -W 1280 -H 800 -- %command% -fileopenlog
