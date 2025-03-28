@@ -1,7 +1,7 @@
 {STACK OF  THINGS DONE}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
 {OPTIMIZATION, TWEAK}
-{PERFORMANCE, QUALITY, SPEED, WARNING}
+{PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
 
 MAN PAGE SAVES LIVES
 MAN PAGE SAVES LIVES
@@ -165,7 +165,8 @@ ctrl+shift+v
 				PIPEWIRE AND WIREPLUMBER
 			EXPLAINNING CARD PROFILES
 				ANALOG X DIGITAL
-			TROUBLESHOOTING AUDIO CRACKLING / AUDIO STUTTERS ON PIPEWIRE/WIREPLUMBER
+			TROUBLESHOOTING AUDIO / AUDIO CRACKLING / AUDIO STUTTERS ON PIPEWIRE/WIREPLUMBER
+				MODIFYING MONO AUDIO MICROPHONES TO PLAY AUDIO ON BOTH SIDES WITH EASY EFFECTS
 				ELIMINATING AUDIO STUTTERS DUE TO USING EASY EFFECTS
 				ELIMINATING AUDIO STUTTERS FROM  PIPEWIRE/WIREPLUMBER
 				SETTING UP QUANTUM ON A PER APPLICATION BASIS
@@ -313,6 +314,33 @@ ctrl+shift+v
 		INCREASING SSD LIFETIME
 
 	---VERY BASIC:
+		HOW TO USE THE 'LESS' COMMANDLINE TOOL
+		USING CUPS FOR HANDLING PRINTERS AND PRINTING DOCUMENTS ON LINUX
+			CUPS - THE COMMON UNIX SYSTEM PRINTER
+			ENABLING CUPS TO FIND OUT AVAILABLE PRINTERS FOR USE | ENABLING AND STARTING AVAHI-DAEMON.SERVICE
+			INSTALLING AND ENABLING 'CUPS' AND 'CUPS-PDF'
+			VERIFYING YOUR USB PRINTER IS CONNECTED
+			VERIFYING YOUR PARALLEL PORT PRINTER IS CONNECTED
+			ADDING A NETWORK PRINTER
+			ADDING A LEGACY PRINTER
+			VIEWING PRINTER INK LEVELS
+			CUPS MANAGEMENT THROUGH WEB INTERFACE
+			SETTING UP DEFAULT PAGE SIZE FOR CUPS
+			SETTING UP DEFAULT PRINTER FOR CUPS USING 'LPADMIN'
+			DISPLAYING DEFAULT SYSTEM PRINTER USING 'LPSTAT'
+			DISPLAYING ALL AVAILABLE SYSTEM PRINTERS USING 'LPSTAT'
+			LISTING ALL QUEUED PRINT JOBS USING 'LPSTAT'
+			CANCEL ALL QUEUED PRINT JOBS USING 'LPRM'
+			CANCEL ONLY CURRENT QUEUED JOB USING 'LPRM'
+			USING 'LP' FOR PRINTING DOCUMENTS ON COMMANDLINE
+				PRINTING A FILE
+				PRINTING FILE USING A KNOWN PRINTER
+				PRINTING A KNOWN NUMBER OF COPIES USING THE DEFAULT PRINTER
+				PRINTING SPECIFIC PAGES USING THE SYSTEM DEFAULT PRINTER
+				PRINTING OUTPUT OF A COMMAND
+				DISPLAYING DEFAULT SYSTEM PRINTER USING 'LPSTAT'
+			IMPORTANT LINKS
+
 		THE VERY QUICK INTRODUCTION TO GIMP
 			SAVING FILES WITH BEST COMPRESSION
 			USING THE PATH TOOL FOR CREATING MASKS AND CHANNELS
@@ -9215,6 +9243,28 @@ Megaman Zero/ZX Collection:
 	use Proton 7.0rc3-GE-1 (1639951196) 
 
 	note: Works perfectly in newer versions of proton.
+
+The Legend of Heroes: Trails in the Sky
+	Install 'amstream', 'lavfilter' and 'quartz' to make video work:
+		protontricks 251150 amstream lavfilters quartz  
+
+	NOTE: Running Config_DX9.exe or Config.exe outside steam will be required using regular 'wine', on a small test steam didn't launch
+	it for me; Click 'Save Config' and then Click 'OK', DO NOT LAUNCH THE GAME YET as settings have yet not been applied until you click 'OK' after
+	saving it.
+
+	you can edit further configurations manually if you want(optional):
+	"~/.local/share/Steam/steamapps/common/Trails in the Sky FC/SAVE/config.ini" manually first and add your resolution:
+		example:
+			WidthDX9=1280
+			HeightDX9=768
+			WindowMode=0
+			KeepAspect=1
+			Camera45Deg=0
+			UseMipmap=1
+	
+	Mod:
+		Download and install the linux version, then point installation to 'ed6_win_DX9.exe':
+			https://github.com/chyyran/skyinstaller
 
 Garou Mark of the Wolves:
 	use Proton 5.0-10
@@ -22647,7 +22697,53 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 			than the analog one, whereas analog profile will cause audio stutters and crackling under those
 			conditions.
 
-	TROUBLESHOOTING AUDIO CRACKLING / AUDIO STUTTERS ON PIPEWIRE/WIREPLUMBER
+	TROUBLESHOOTING AUDIO / AUDIO CRACKLING / AUDIO STUTTERS ON PIPEWIRE/WIREPLUMBER
+		MODIFYING MONO AUDIO MICROPHONES TO PLAY AUDIO ON BOTH SIDES WITH EASY EFFECTS
+			NOTE: You don't need this step if you're not being affected by microphone audio playing only from one channel.
+
+			Some headsets may come with mono audio microphones, this means audio will likely play at only one side.
+		There is an easy way checking for this: 
+
+		1 (Preferred method) - you can either record audio using 'pw-recorder' or 'ffmpeg' and then play it back for testing.
+		If you own a mono input device(mono microphone), then you'll only hear sound coming from one side.
+
+		2 (Alternative) - Another way is to use 'pactl' to see if your input device is stereo by default: 
+				$ pactl get-default-source
+
+		3 (Alternative) - You'll need 'pavucontrol' tool installed on your system, run 'pavucontrol' then go to the 'Microphone Tab',
+				  then click on the 'padlock' icon respectively to your input device(microphone); if it's stereo device, 
+				  you should be able to see 2 different channels and be able to change volume for each of them separately,
+				  but if it's a mono device, there will only be one channel for changing volume.
+
+
+		In order to solve this, currently you'll have to download and use 'easyeffects'.
+
+			1 - Make sure easyeffects catches all input streams:
+				Run Easyeffects -> Click on 'Settings' icon -> Click on 'Preferences' -> Make sure you're on 'General' tab ->  
+				-> Enable  'Process All Input Streams'.
+
+				1.2 - Ignore streams from 'Monitor of Devices'
+
+			2 - Close 'settings', go back and select 'Input' Tab -> Then go to 'Effects'.
+
+			3 - In the 'Effects' page, click on 'Add Effects' -> Choose 'Stereo Tools'.
+				NOTE: If necessary, you'll have to install any of the required plugins/tools.
+
+				3.1 - Click on the 'Stereo Mix' inside the effect page
+				3.2 - Select 'LR > MS (Stereo to Mid-Side)' on the scroll buton at the page.
+				3.3 (Optional) - You can test how good each option sounds like using the test button inside easy effects program,
+				which is located at the bottom of the page with 'a Microphone Icon and Arrows pointing to a speaker icon', 
+				on mouse hover it'll say 'Enable/Disable input monitoring'
+
+					3.3.1 (Alternatively) you can test using 'ffmpeg' or 'pw-recorder'.
+				3.4 - Make sure to choose the one option that sounds best for you during the test. 
+				On my case, the best choice was the one described in step #3.2 here.
+			
+			4 - Make sure 'easyeffects' is booting with your system at Settings -> Preferences inside easyeffects. 
+
+			OBSERVATION: There might be other ways of doing this same task using pipewire/wireplumber,
+			however this is the only method i'm going to cover from now.
+
 		SOUND CRACKLING / AUDIO STUTTERS WITH EASY EFFECTS + PIPEWIRE
 		ELIMINATING AUDIO STUTTERS DUE TO USING EASY EFFECTS
 			This is meant to fix audio crackling/stutter issues
@@ -26841,7 +26937,7 @@ USEFUL COMMANDS || EXTENDED REGEX USING GREP
 		the '|' operator is an inclusive 'or'.
 
 USEFUL LINKS
-	https://portforward.com/ports/a/	#Contains PORT number collection for several programs/games.
+	https://portforward.com/ports/a/	#Contains PORT FORWARD number collection for several programs.
 						^ Port Forwarding
 
 LISTING ALL FILTERS CREATED FOR IPTABLES
@@ -26897,27 +26993,29 @@ CREATING BASH SCRIPTS TO SIMPLIFY RULE CREATION
 
 TESTING TO SEE IF A GIVEN PORT IS BLOCKED
 	1) Open 2 terminals
+
 	1.1) Type inside one terminal:
-		#nc -l <port_number>
+		# nc -l <port_number>
 			or
-		#nc -l 443
+		# nc -l 443
+
 	1.2) Type inside another terminal:
-		#nc <machine_ip_address> <port_number> 
+		# nc <machine_ip_address> <port_number> 
 			or
-		#nc 192.168.1.8 443
+		# nc 192.168.1.8 443
 		^ you can find your local ip address using 'ifconfig' tool
 
 ADDING IP ADDRESSES TO IPTABLES FILTER: 
-	#iptables --append <chain> --source <ip_address> --jump <rule> 
+	# iptables --append <chain> --source <ip_address> --jump <rule> 
 				or
-	#iptables --append <chain> --destination <ip_address> --protocol <tcp | udp | icmp | ...> --dport <port> --jump <rule> 
+	# iptables --append <chain> --destination <ip_address> --protocol <tcp | udp | icmp | ...> --dport <port> --jump <rule> 
 
 	Examples:
-		#iptables --append --ipv4 INPUT --source 192.168.1.13 --jump DROP
-		#iptables --append --ipv4 INPUT --destination 192.168.1.13 --jump DROP
+		# iptables --append --ipv4 INPUT --source 192.168.1.13 --jump DROP
+		# iptables --append --ipv4 INPUT --destination 192.168.1.13 --jump DROP
 					or
-		#iptables --append --ipv4 INPUT -s 192.168.1.13 --jump DROP
-		#iptables --append --ipv4 INPUT -d 192.168.1.13 --jump DROP
+		# iptables --append --ipv4 INPUT -s 192.168.1.13 --jump DROP
+		# iptables --append --ipv4 INPUT -d 192.168.1.13 --jump DROP
 
 	This blocks both incoming and outgoing packages for the given addresss.
 
@@ -26927,9 +27025,9 @@ IPTABLES LOGGING
 
 	It's possible to create filters for an specific IP Address, Port, Chain or Rule:
 	example:
-		#iptables -A INPUT --ipv4 -s 192.168.11.0/24 -j LOG --log-prefix='[netfilter] '
+		# iptables -A INPUT --ipv4 -s 192.168.11.0/24 -j LOG --log-prefix='[netfilter] '
 			or
-		#iptables -A INPUT --ipv6 -j LOG --log-prefix='[IPV6 ACCEPTING]'
+		# iptables -A INPUT --ipv6 -j LOG --log-prefix='[IPV6 ACCEPTING]'
 
 	the command above will filter-log all INPUT packages coming from given IP Address and add
 	a '[netfilter]' prefix to the message so that it can be easily read on DMESG and Journalctl.
@@ -26954,35 +27052,35 @@ FORMATTING IPTABLES LOG ON A HUMAN READABLE FORMAT
 # journalctl -b-0 | grep "IPV6" | sed -e 's/MAC=.*SRC/SRC/' -e 's/\[IPV6 ACCEPTING\]/\n\n\[IPV6 ACCEPTING\]\n/' -e 's/ /&\n/g' | less
 
 DROPPING PACKETS USING IP ADDRESS RANGE, USE THE 'IPRANGE' MODULE
-	#iptables -A INPUT --ipv4 -m iprange --src-range 192.168.1.100-192.168.1.200 -j DROP
+	# iptables -A INPUT --ipv4 -m iprange --src-range 192.168.1.100-192.168.1.200 -j DROP
 
 DROPPING PACKAGES TO/FROM SPECIFIC PORTS
-	#iptables -A <chain> -p <tcp | udp | icmp | ... > --dport <port> -j <rule>
+	# iptables -A <chain> -p <tcp | udp | icmp | ... > --dport <port> -j <rule>
 			or
-	#iptables -A INPUT --ipv4 -p tcp --dport 80 -j DROP
+	# iptables -A INPUT --ipv4 -p tcp --dport 80 -j DROP
 
 DELETING A RULE
-	#iptables --delete <chain> <rule_line_number>
+	# iptables --delete <chain> <rule_line_number>
 
 CREATING A NAT RULE TO TRANSLATE ALL TRAFFIC FROM THE `192.168.0.0/24` SUBNET TO THE HOST'S PUBLIC IP
     	example:
-	    #iptables --table nat --append POSTROUTING --ipv4 --source 192.168.0.0/24 --jump MASQUERADE
+	    # iptables --table nat --append POSTROUTING --ipv4 --source 192.168.0.0/24 --jump MASQUERADE
 
 DROPPING PACKAGES FROM UNWANTED SOURCES
 	This is gonna drop all packages that aren't defined as an ACCEPT rule for iptables.
-	#iptables -A INPUT -j DROP
+	# iptables -A INPUT -j DROP
 
 BLOCKING ALL INCOMING AND ONGOING CONNECTIONS
 	Make sure to use 'iptables-save' first before doing this in case you have any new rules pending to save.
 	
-	#iptables-restore < /etc/iptables/empty.rules
-	#ip6tables-restore < /etc/iptables/empty.rules
-	#iptables -A INPUT -j DROP
-	#iptables -A OUTPUT -j DROP
-	#iptables -A FORWARD -j DROP
-	#ip6tables -A INPUT -j DROP
-	#ip6tables -A OUTPUT -j DROP
-	#ip6tables -A FORWARD -j DROP
+	# iptables-restore < /etc/iptables/empty.rules
+	# ip6tables-restore < /etc/iptables/empty.rules
+	# iptables -A INPUT -j DROP
+	# iptables -A OUTPUT -j DROP
+	# iptables -A FORWARD -j DROP
+	# ip6tables -A INPUT -j DROP
+	# ip6tables -A OUTPUT -j DROP
+	# ip6tables -A FORWARD -j DROP
 
 
 	Rule file should look like this:
@@ -27008,7 +27106,7 @@ BLOCKING ALL INCOMING AND ONGOING CONNECTIONS
 	[/file]
 
 SAVING AND PERSISTING RULES ON DISK FILE
-	#iptables-save | sudo tee /etc/iptables/my_rules.v4
+	# iptables-save | sudo tee /etc/iptables/my_rules.v4
 
 	Always make sure you have a backup file just in case:
 		#cp /etc/iptables/my_rules.v4 /etc/iptables/my_rules.v4-backup
@@ -27022,7 +27120,7 @@ SAVING AND PERSISTING RULES ON DISK FILE
 		for him to access the system.
 
 RESTORING RULES FROM DISK FILE
-	#iptables-restore < /etc/iptables/my_rules.v4
+	# iptables-restore < /etc/iptables/my_rules.v4
 	^ VERY IMPORTANT: iptables-restore has to be used everytime you need to load rules into iptables.
 
 CREATING CHAINS TO FACILITATE RULE APPLICATIONS AND LOGGINGS || VERY IMPORTANT
@@ -27092,16 +27190,16 @@ the same thing, the INPUT chain will allow the connection into the computer.
 	The following describes on how to create a firewall chain facilitating logging and rule applications:
 
 	1. Create a new chain on iptables:
-		#iptables -N <chain_name>
+		# iptables -N <chain_name>
 			or
-		#iptables -N LOG_DROP
+		# iptables -N LOG_DROP
 
 	3. Populate Rules on the newly created chain:
-		#iptables -A LOG_DROP -j LOG --log-level 4 --log-prefix "[iptables:LOG_DROP] "
-		#iptables -A LOG_DROP -j DROP
+		# iptables -A LOG_DROP -j LOG --log-level 4 --log-prefix "[iptables:LOG_DROP] "
+		# iptables -A LOG_DROP -j DROP
 	
 	4. Create IP Filters on the newly created chain:
-		#iptables -A INPUT --ipv4 -m iprange --src-range 192.168.0.2-192.168.253.253 -j LOG_DROP
+		# iptables -A INPUT --ipv4 -m iprange --src-range 192.168.0.2-192.168.253.253 -j LOG_DROP
 	
 	Observation: all IP ADDRESSES inserted to the LOG_DROP chain will be automatically dropped and logged this way.
 	Remember: iptable rule insertions have to be inserted in the specified order here,
@@ -27119,8 +27217,8 @@ HOW TO BLOCK BY LINK ADDRESS / HOW TO BLOCK BY MAC ADDRESS
 	LINK and MAC Address are pretty much the same thing.
 on iptables, it's possible to use the 'mac' module for blocking a MAC/LINK Address.
 
-	#iptables -A FORWARD -m mac --mac-source cc:ed:21:87:02:50 -j LOG_DROP
-	#iptables -A INPUT -m mac --mac-source cc:ed:21:87:02:50 -j LOG_DROP
+	# iptables -A FORWARD -m mac --mac-source cc:ed:21:87:02:50 -j LOG_DROP
+	# iptables -A INPUT -m mac --mac-source cc:ed:21:87:02:50 -j LOG_DROP
 
 
 HOW TO BLOCK IP BY WEBSITE / DOMAIN NAME
@@ -27128,24 +27226,24 @@ HOW TO BLOCK IP BY WEBSITE / DOMAIN NAME
 	the topic "CREATING CHAINS TO FACILITATE RULE APPLICATIONS AND LOGGINGS".
 
 	1. Find out IP Address of website
-		$host -ta www.google.com
+		$ host -ta www.google.com
 		^ it'll output an IP Address
 
 	2. Find out who this ip belongs to:
-		$whois 142.250.219.164
+		$ whois 142.250.219.164
 		^ fetch the CIDR IP Address
 
 	3. Add it to iptables:
-		#iptables -A LOG_DROP --ipv4 -s 142.250.0.0/15
-		#iptables -A LOG_DROP --ipv4 -d 142.250.0.0/15
+		# iptables -A LOG_DROP --ipv4 -s 142.250.0.0/15
+		# iptables -A LOG_DROP --ipv4 -d 142.250.0.0/15
 			or
-		#iptables -A LOG_DROP -m iprange --src-range 142.250.0.0-142.250.255.255
-		#iptables -A LOG_DROP -m iprange --dst-range 142.250.0.0-142.250.255.255
+		# iptables -A LOG_DROP -m iprange --src-range 142.250.0.0-142.250.255.255
+		# iptables -A LOG_DROP -m iprange --dst-range 142.250.0.0-142.250.255.255
 
 REGULATING INTERNET ACCESS THROUGH UDP/TCP CONNECTIONS BY TIME
 	All UPD and TCP packets will be dropped only between at 12:00AM and 13PM
-		#iptables -A INPUT -p tcp -m time --timestart 12:00 --timestop 13:00 -j DROP 
-		#iptables -A INPUT -p udp -m time --timestart 12:00 --timestop 13:00 -j DROP
+		# iptables -A INPUT -p tcp -m time --timestart 12:00 --timestop 13:00 -j DROP 
+		# iptables -A INPUT -p udp -m time --timestart 12:00 --timestop 13:00 -j DROP
 	
 	As a reminder, ip6tables also need to be set and configured.
 
@@ -27153,7 +27251,7 @@ LIMITING CONNECTIONS FROM A SINGLE HOST
 	If a single host makes more than 20 new connection through HTTP/HTTPS using the TCP protocol, reject
 the connection.
 
-		#iptables –A INPUT –p tcp –syn -m multiport -–dport http,https –m connlimit -–connlimit-above 20 –j REJECT -–reject-with-tcp-reset
+		# iptables –A INPUT –p tcp –syn -m multiport -–dport http,https –m connlimit -–connlimit-above 20 –j REJECT -–reject-with-tcp-reset
 
 BLOCKING ALL IP ADDRESSES IN THE LOCAL NETWORK
 	If you're using an untrusted local network, you can block everyone in it, adding the local broadcast address
@@ -27162,50 +27260,50 @@ to the exception. The example in here follows up the topic "CREATING CHAINS TO F
 	As a reminder, ip6tables also need to be set and configured.
 
 	1. Find out your local ip address using:
-		$ifconfig
+		$ ifconfig
 	
 	2.(Optional/Skippable) Add the broadcast address to exception for both source and destination :
-		#iptable -A INPUT --ipv4 -s 192.168.1.254 -j ACCEPT
+		# iptable -A INPUT --ipv4 -s 192.168.1.254 -j ACCEPT
 		^ this is only required when you have a tool like ping for ping testing.
 
 	4. Add entire IP Range for local network:
-		#iptable -A INPUT --ipv4 -m iprange --src-range 192.168.0.0-192.168.255.255 -j LOG_DROP
+		# iptable -A INPUT --ipv4 -m iprange --src-range 192.168.0.0-192.168.255.255 -j LOG_DROP
 
 		Very important: - DO NOT USE THIS BELOW -
 			#iptable -A INPUT -m iprange --dst-range 192.168.0.0-192.168.255.255 -j LOG_DROP
 			^ DO NOT USE --dst-range OR ELSE you won't receive any packets coming outside the
-			network to your machine. Using this will force you to use
-			#iptable -A INPUT -d 192.168.1.<your_machine_ip> -j ACCEPT
+			network to your machine. Using this will force you to use:
+				# iptable -A INPUT -d 192.168.1.<your_machine_ip> -j ACCEPT
 			which will create a weak rule that will override all other blocking rules!!!
 	
 	VERY IMPORTANT: if you edited your .rule files located under /etc/iptables/ 
 	you'll have to use iptables-restore to load the new configurations:
 		example:
-			#iptables-restore < /etc/iptables/my_custom_filters.rule
+			# iptables-restore < /etc/iptables/my_custom_filters.rule
 
 SEEING HOW MANY TIMES A RULE HAS BEEN HIT
-	#iptables -L -vn --line-numbers
+	# iptables -L -vn --line-numbers
 		or
-	#iptables -nvL --line-numbers
+	# iptables -nvL --line-numbers
 
 	SHOWING SUMMARY ONLY
-		#iptables -nvL | grep -v "0     0"
+		# iptables -nvL | grep -v "0     0"
 		^ there is no tabulation character, those are 5 white-space characters.
 	
 		CONSTANT MONITORING
 			uses 'watch' to monitor every 5 seconds:
-			#watch --interval=5 'iptables -nvL | grep -v "0     0"
+			# watch --interval=5 'iptables -nvL | grep -v "0     0"
 				or
-			#watch --interval=5 'iptables -nvL' | grep -v "0     0"
+			# watch --interval=5 'iptables -nvL' | grep -v "0     0"
 
 ASSURING AND VERIFYING A GIVEN IPTABLE MODULE HAS BEEN LOADED 
 	 1. Verify that the module exists:
-		 #lsmod | grep iprange
+		 # lsmod | grep iprange
 
 IP RANGE BLOCK USING CIDR IP ADDRESS NOTATION
 	It's possible to use CIDR to block an entire IP Address range.
 
-	#iptables -A OUTPUT --ipv4 –d 31.13.64.0/24 -j DROP
+	# iptables -A OUTPUT --ipv4 –d 31.13.64.0/24 -j DROP
 	^ the above rule will block 31.14.64.0 to 31.14.64.255
 
 
@@ -27533,16 +27631,16 @@ CUSTOM IPTABLES RULES
 
 LISTING CONNECTED IP ADDRESSES AND CURRENT OPEN DOORS ON THE SYSTEM
 	use 'ss' tool to look for IP Address to block.
-		#ss -spantu
+		# ss -spantu
 		    or
-		#ss -lpntu
+		# ss -lpntu
 
 	note: incomplete, there are other network tools that allows doing 
 	this that needs to be described here TOO AS WELL like 'netwatch':
 
-		#netwatch -e eth0
+		# netwatch -e eth0
 			or
-		#netwatch -e enp3s0
+		# netwatch -e enp3s0
 	
 	Observation: if a given IP Address is still passing through the firewall,
 	make sure you have the same rules blocking on both iptable (IPV4) and ip6table (IPV6).
@@ -27551,8 +27649,8 @@ LISTING CONNECTED IP ADDRESSES AND CURRENT OPEN DOORS ON THE SYSTEM
 	due to firewalls.
 
 ENABLING IPTABLES TO BOOT UP WITH THE SYSTEM
-	#systemctl start iptables;
-	#systemctl enable iptables;
+	# systemctl start iptables;
+	# systemctl enable iptables;
 
 	VERY IMPORTANT: use iptables-restore to load rules for iptables.
 
@@ -27560,7 +27658,7 @@ ENABLING LOOPBACK INTERFACE TO BE LISTENED FOR PACKAGES
 	This is only important for virtual machines, distrobox, dosbox-x,
 	and only if it's an actual problem: 
 
-	#iptables -A INPUT -i lo -j ACCEPT
+	# iptables -A INPUT -i lo -j ACCEPT
 
 GOING INTO DETAILS
 	Iptables relies on 3 important things: tables, chains and rules
@@ -27652,16 +27750,16 @@ FIREWALLD VS IPTABLES
 VERY IMPORTANT 0:
 	iptables can't be used with firewalld, you need to complete disable it to prevent iptables from being turned off.
 
-	#systemctl stop firewalld
-	#systemctl disable firewalld
-	#systemctl mask firewalld
+	# systemctl stop firewalld
+	# systemctl disable firewalld
+	# systemctl mask firewalld
 	^ masking services simply create a symlink to /dev/null
 	^ Output Message is: 
 			Created symlink /etc/systemd/system/firewalld.service → /dev/null.
 	
 	If you ever need to revert this choice, use:
-		#systemctl unmask firewalld;
-		#systemctl enable firewalld;
+		# systemctl unmask firewalld;
+		# systemctl enable firewalld;
 	
 
 VERY IMPORTANT 1:
@@ -30206,14 +30304,281 @@ ls ./ | awk '{system("file="$0"; rm ../${file%%.*}.*")}'
 ---------------------
 ---------------------
 ---------------------
+HOW TO USE THE 'LESS' COMMANDLINE TOOL
+	It's a very common thing to pipe linux commands to 'less', this is how you use it:
+
+		1 - press 'q' to exit, 
+		2 - ctrl+f for forward page scroll
+		3 - cltr+u for upwards page scroll 
+		4 - shift+g for moving to the end of the page
+		5 - press 'g' twice for moving to the top of the page
+		6 - press '/' for querying a regex search towards the end of the page from the current page.
+		7 - press '?' for querying a regex search towards the beginning of the page from the current page.
+		7 - press 'n' to go for next occurrence of the queried search.
+		8 - press shift+n to go for previous occurrence of the queried search.
+---------------------
+---------------------
+---------------------
+---------------------
+USING CUPS FOR HANDLING PRINTERS AND PRINTING DOCUMENTS ON LINUX
+	CUPS - THE COMMON UNIX SYSTEM PRINTER
+		Most recent printers support driverless usage by implementing 'AirPrint' and 'IPP Everywhere' technology.
+		CUPS today Relies on AirPrint and 'IPP Everywhere' which requires 'avahi-daemon.service' to be running on the system.
+
+		"IPP Everywhere" allows computers and mobile devices to find and print to networked and USB printers without 
+		using vendor-specific software.
+
+		"AirPrint" is a feature in Apple Inc.'s macOS and iOS operating systems for printing without installing printer-specific 
+		drivers. 
+
+	ENABLING CUPS TO FIND OUT AVAILABLE PRINTERS FOR USE | ENABLING AND STARTING AVAHI-DAEMON.SERVICE
+		Enabling and starting is required for CUPS to find out available printers by using AirPrint and/or IPP_Everywhere.
+
+		1 - For permanently enabling 'avahi-daemon.service' throughout multiple system boots:
+			# systemctl enable avahi-daemon.service
+
+		2 - Starting the service:
+			# systemctl start avahi-daemon.service
+
+		3 - (Alternative) One in all solution:
+			# systemctl enable avahi-daemon.service && systemctl start avahi-daemon.service
+
+		4 - (Optional) Disabling Avahi Service Completely:
+			# systemctl disable avahi-daemon.service && systemctl disable avahi-daemon.socket
+			# systemctl stop avahi-daemon.service && systemctl stop avahi-daemon.socket
+
+	INSTALLING AND ENABLING 'CUPS' AND 'CUPS-PDF'
+
+		1 - If you're on archlinux:
+			# pacman -S cups cups-pdf
+
+			Note: cups-pdf allows the user to create PDF files by printing documents to a virtual printer.
+
+		2 - Enable and Start cups.service:
+			# systemctl enable cups.service && systemctl start cups.service
+
+			Note: Enabling a service will persist it throughout multiple system boots.
+		
+		3 - (Alternative) If you don't want CUPS running as a service, you can use 'Socket Activation' instead:
+			Socket Activation will allow CUPS to be initialized only when needed by printer progams:
+
+				3.1 - If you previously enabled and start cups.service, you'll have to disable and stop it from running:
+					# systemctl disable cups.service && systemctl stop cups.service
+
+				3.2 - Enable cups.socket, but do not start it:
+					# systemctl enable cups.socket
+
+				Note: When an application needs CUPS for printing, it'll 'start' cups.socket and 'stop' it on it's own.
+
+		 4 - (Alternative) Running CUPS as a process using 'cupsd'
+		 	It's possible to run 'cupsd' to make it run as a daemon process
+				4.1 - Running 'cupsd' as background process:
+					# cupsd
+					
+					Note: you want to kill 'cupsd' once you've finished all your tasks using the bellow command:
+						# killall -r cupsd
+
+				4.2(Alternative) Running 'cupsd' as foreground process:
+					This will allow 'cupsd' to take over the terminal as a running process,
+					press ctrl+c to finish and kill it afterwards:
+						# cupsd -f
+
+				
+	NOTE: After doing either Step #2 or Step #4, you may want to access 'http://localhost:631' for more information.
+
+	VERY IMPORTANT: Some of the mentioned tools below here may require either Step #2 or Step #4 to be done, they won't work with Step #3.
+	
+	VERIFYING YOUR USB PRINTER IS CONNECTED
+		$ lsusb
+
+		output example:
+			Bus 002 Device 007: ID 9b0:300 Hewlett-Packard DeskJet
+		
+	VERIFYING YOUR PARALLEL PORT PRINTER IS CONNECTED
+		Using a printer connected on the parallel port will require the 'lp', 'parport' and 'parport_pc' kernel modules to be installed.
+	You'll need to check the 'IMPORTANT LINKS' section if you're completely clueless on how to set them up.
+
+			1 - Querying for parallel port printers:
+				# dmesg | grep -i parport
+
+			output example:
+				parport0: Printer, Hewlett-Packard HP LaserJet
+				lp0: using parport0 (polling)
+
+	ADDING A NETWORK PRINTER
+		You'll need to use 'lpadmin' for adding a printer on the network.
+			# lpadmin -p <printer_name> -E -v "<device_URI>" -m <driver>
+						
+		Example:
+			# lpadmin -p myprinter -E -v "ipp://11.22.33.44/ipp/print" -m everywhere
+
+	ADDING A LEGACY PRINTER
+		As explained before, since 2010 manufactured printers have support for 'IPP Everywhere' and 'AirPrint'.
+
+		Legacy(old) printers are supported by CUPS using PPD (PostScript Printer Description) files that describe printer capabilities 
+		and driver programs needed for each printer. CUPS includes several sample PPD files for common legacy printers,
+		type in :
+			$ lpinfo -m | less
+
+			Read topic if you don't know how to use the 'less' tool:
+				"HOW TO USE 'LESS' COMMANDLINE TOOL"
+
+		Once you have the Device URI and Driver Name you can add the printer using:
+			# lpadmin -p <PRINTER_ALIAS> -E -v "<DEVICE_URI>" -m <DRIVER_NAME>
+
+		MORE PPDS FILES:
+			1 - The Linux Foundation's OpenPrinting workgroup's foomatic provides PPDs for many printer drivers, 
+			here's a small list of packages available on Archlinux: 
+					'foomatic-db-ppds' 'foomatic-db-nonfree-ppds'
+
+				You can install them using:
+					# pacman -S foomatic-db-ppds foomatic-db-nonfree-ppds
+				
+			2 - The 'Guttenprint Project' also provides ppds files for use with CUPS and GIMP:
+			Install them:
+				 # pacman -S gutenprint and foomatic-db-gutenprint-ppds
+
+				VERY IMPORTANT: When the 'gutenprint' or 'foomatic-db-gutenprint-ppds' packages gets updated  post-installation,
+				you'll need to to run the following command:
+					# cups-genupdate
+					# systemctl restart cups.service
+
+			3 - Many printer manufacturers provides their own Linux Drivers,
+			you can look for it in the AUR by having YAY Installed and set on your system, read more on:
+				"INSTALLING YAY / AUR REPOSITORY"
+
+			IMPORTANT: Remember, only install 'ppds' files if you own a legacy printer device with no support 
+			to 'AirPrint' and 'IPP Everywhere'.
+
+
+	CUPS MANAGEMENT THROUGH WEB INTERFACE
+		CUPS allow complete management through it's web interface:	
+				http://localhost:631
+				http://localhost:631/jobs/
+				http://localhost:631/printers/
+				http://localhost:631/classes/
+				http://localhost:631/admin
+
+	VIEWING PRINTER INK LEVELS
+		Some printers provide support for viewing how much ink remains on the printer device,
+		if you're on archlinux, install 'ink' package from the AUR:
+			# yay -S ink
+
+			Read more on if you need:
+				"INSTALLING YAY / AUR REPOSITORY"
+
+			Very Important: you'll need to add yourself to the 'lp' group and then login again:
+				# usermod -aG lp <username>
+				$ sudo -iu <username>
+
+		 Examples:
+			1 - queries the first usb device for ink levels:
+				$ ink -p usb
+
+			2 - queries the second usb device for ink levels:
+				$ ink -p usb -n 1
+
+			3 - prints usb devices that are below 37% ink:
+				$ ink -p usb -t 37 	
+
+	SETTING UP DEFAULT PAGE SIZE FOR CUPS
+		1 - List all available paper size
+			$ paper --no-size --all
+		
+		2 - Once you've chosen the desired paper size, you can add it to /etc/papersize:
+			# nvim /etc/papersize
+
+	SETTING UP DEFAULT PRINTER FOR CUPS USING 'LPADMIN'
+		$ lpadmin -d <printer_name>
+
+		Note: if you're using 'zsh' you can press TAB Key for listing available printers.
+			$ lpadmin -d <tab-key>
+
+	DISPLAYING DEFAULT SYSTEM PRINTER USING 'LPSTAT'
+		$ lpstat -d
+	
+	DISPLAYING ALL AVAILABLE SYSTEM PRINTERS USING 'LPSTAT'
+		$ lpstat -p
+			or
+		$ lpstat -v
+	
+	LISTING ALL QUEUED PRINT JOBS USING 'LPSTAT'
+		$ lpstat -u
+		
+		Note: Only shows print jobs queued by the current user.
+	
+	CANCEL ALL QUEUED PRINT JOBS USING 'LPRM'
+		$ lprm -
+
+	CANCEL ONLY CURRENT QUEUED JOB USING 'LPRM'
+		$ lprm
+
+	USING 'LP' FOR PRINTING DOCUMENTS ON COMMANDLINE
+		This tool relies on an already set default printer on the system, 
+		CUPS provides many ways for setting up default printers, 'lpadmin' can be used to do this, read more on topic:
+			"SETTING UP DEFAULT PRINTER FOR CUPS"
+			
+		PRINTING A FILE
+			$ lp <path_to_file>
+				or
+			$ lp ~/Documents/Document_A.pdf
+		
+		PRINTING FILE USING A KNOWN PRINTER
+			$ lp -d <printer_name> <path_to_file>
+				or
+			$ lp -d lp0 ~/Documents/Document_A.pdf
+
+			Note: if you're using 'zsh' you can auto-complete the printer's name using the TAB Key on your keyboard
+				$ lp -d <TAB-KEY> <path_to_file>
+
+		PRINTING A KNOWN NUMBER OF COPIES USING THE DEFAULT PRINTER
+			$ lp -n <number> <path_to_file>
+				or
+			$ lp -n 5 ~/Documents/Document_A.pdf
+
+		PRINTING SPECIFIC PAGES USING THE SYSTEM DEFAULT PRINTER
+			This will print only page 1, page 3 to 5 and page 8:
+				$ lp -P 1,3-5,8
+
+		PRINTING OUTPUT OF A COMMAND
+			This will send any output of a given command to the printer as text:
+				$ <command> | lp
+					or
+				$ cal -y | lp
+
+		IMPORTANT LINKS
+			https://wiki.archlinux.org/title/CUPS
+			https://wiki.archlinux.org/title/Kernel_module
+			https://github.com/OpenPrinting/cups/
+
+			These links will only work if you have either 'cupsd' or 'cups.service' running:
+				http://localhost:631
+				http://localhost:631/jobs/
+				http://localhost:631/printers/
+				http://localhost:631/classes/
+				http://localhost:631/admin
+
+---------------------
+---------------------
+---------------------
+---------------------
 THE VERY QUICK INTRODUCTION TO GIMP
 	Hint: Always save image files as .xcf when working with selection and masks.
 	Hint2: When working with 'Layer grouping', applying effects on 'layer group' instead of an individual layer works differently,
 	it allows to apply the choosen effect for all effects of every single layer in the group.
 	
+	CHOOSING TMPFS DIRECTORY AS SWAP FOR GIMP
+		If you know you have more than enough RAM Memory, you can do this:
+
+		1 - Click 'Edit' tab -> Go to 'Preferences' -> Click on 'Folder' -> Select /tmp/ as swap directory
+		2 - Click 'Edit' tab -> Go to 'Preferences' -> Click on 'Folder' -> Select /tmp/ as temporary folder.
+
+		Note: By default, swap directory is set to a folder on your hard disk.
+		By default, temporary directory is set inside /tmp/ folder on linux.
+
 	SAVING FILES WITH BEST COMPRESSION
-		Click on 'File' tab > Click on 'Save File as' > Click on 'Save this .XCF file with better but slower compression' > 
-		Click 'Select File Type by Extension' > Now choose 'xz archive' (xcf.xz or xcfxz) > Click Save
+		Click on 'File' tab -> Click on 'Save File as' -> Click on 'Save this .XCF file with better but slower compression' -> 
+		Click 'Select File Type by Extension' -> Now choose 'xz archive' (xcf.xz or xcfxz) -> Click Save
 
 	USING THE PATH TOOL FOR CREATING MASKS AND CHANNELS
 		The 'paths tool' can be used to better create and handle 'selection', 'masks' and 'channels'.
