@@ -25870,31 +25870,76 @@ PROPERLY USING 'CP' FOR COPYING FILES
 specially when using 'cp -r' for copying directories, it is important to specify
 the '*' to ensure files and sub-directories are copied as well.
 
-Case 0: Copying files:
+Case 0: Copying all files and sub-directories as well as hidden files and sub-directories:
+
+	$ cp -r ~/Test\ Folder/{*,.*} /tmp
+	^ This will copy all regular files and folders as well as the hidden ones into tmp
+	
+	VERY IMPORTANT: the character '.' for hidden file/folder isn't included when using '*' wildcard character.
+	therefore hidden files/folders aren't included automatically when using the '*' wildcard character alone.
+	in order to solve this, you need to explicitely let the shell know you also want the hidden files using '.*' instead.
+		Example - Only copy the hidden files in the directory:
+			$ cp ~/Test\ Folder/.* /tmp
+
+
+	VERY IMPORTANT 2: Note that when using '*' the parent directory 'Test Folder' WILL NOT be created under /tmp,
+	only the files contained inside of it will be copied to /tmp, 
+	the '-r' argument allows sub-directories to be copied in this case, and thus any existing sub-dir will also be copied to /tmp.
+	For copying the parent directory and not just it's contents, you need to ommit the '*' wildcard character.
+
+	Note, this is the same as doing:
+		$ cp -r ~/Test\ Folder/* ~/Test\ Folder/.* /tmp
+			or
+		$ cp -r ~/Test\ Folder/* /tmp && cp -r ~/Test\ Folder/.* /tmp
+
+Case 1: Copying files:
 	$ cp status/2007/november/nov12.txt /home/peter/tmp
 	^ will just copy the file into /home/peter/tmp/
 
-Case 1: Copying parent directories and file:
-	$ cp --parents status/2007/november/nov12.txt /home/peter/tmp
-	^ will create all directories status, 2007, november and copy the given file 'nov12.txt'
-	^ to /home/peter/tmp
+Case 2: Copy all 'test folder' containning a number from 0 to 9 at the end into /tmp/
+	cp ./test\ folder\ [0-9] /tmp/
+	
+	Note: 'test folder 1', 'test folder 2', 'test folder 3' ... 'test folder 9' will all be copied to /tmp/	
+	given that they exist.
 
-Case 2: Recursive Copy:
+Case 3: Copying multiple files/folders at the same time
+	$ cp -r ~/{folder\ 1,folder\ 2,folder\ 3}/ ~/test\ folder
+
+	Note: use this first if you want to test the example above:
+		$ mkdir ~/{folder\ 1,folder\ 2,folder\ 3,test\ folder}    
+
+		Note: you can easily remove folders using:
+			rm -r ~/{folder\ 1,folder\ 2,folder\ 3,test\ folder}    
+	
+	VERY IMPORTANT: You can easily use 'zsh' for auto-completing names and commands using TAB Key on your keyboard.
+
+Case 4: Copying file to multiple destinations at the same time
+	This is similar to case mentioned right above:
+		$ cp -r  ~/test\ folder ~/{folder\ 1,folder\ 2,folder\ 3}/
+
+		Note: this will copy 'test folder' into 'folder 1', 'folder 2' and 'folder 3'.
+
+Case 5: Copying parent directories and file:
+	$ cp --parents status/2007/november/nov12.txt /home/peter/tmp
+	^ When these folders don't exist on the destination(s),
+	^ this will create all of the directories 'status', '2007', 'november' and the file 'nov12.txt' into '/home/peter/tmp' path.
+
+Case 5: Recursive Copy:
 	$ cp --recursive status/ /home/peter/tmp/
 	^ will copy all the contents of status directory to /home/peter/tmp/
 
-Case 3: Creating a symlink | Creating a shortcut:
+Case 6: Creating a symlink | Creating a shortcut:
 	$ cp -s ./file_A ./file_shortcut
 	^ this creates a file shortcut to 'file_A'.
 
-Case 4: Creating a hard link:
+Case 7: Creating a hard link:
 	$ cp -l ./file_A ./file_hardlink
 	^ creates a hardlinked file called 'file_hardlink"
 
 	READ MORE ON:
 		DIFFERENCES BETWEEN SOFTLINKS/SYMLINKS, HARDLINKS AND REFLINKS
 
-Case 4: Suppose directory 'my_backup_dir' already exists, and you just want to overwrite the contents,
+Case 8: Suppose directory 'my_backup_dir' already exists, and you just want to overwrite the contents,
 this is how it has to be done:
 	example:
 		$ cp -r ~/my_directory/* ~/my_backup_dir/
@@ -25919,11 +25964,11 @@ are the same using the 'diff' tool(comes installed with 'diffutils' package).
 
 using 'rsync' for backing up and copying data is also an option.
 
-Case 4: Preserving file ownership as another user:
+Case 9: Preserving file ownership as another user:
 	When running 'cp' as root through sudo/doas/run0, ALWAYS use -a option to preserve file permissions/ownership:
 		$ sudo cp -ra <Path_A> <Path_B>
 
-Case 5: Preserving only specific attributes when using cp as another user ( --preserve= ) :
+Case 10: Preserving only specific attributes when using cp as another user ( --preserve= ) :
 	ATTR_LIST is a comma-separated list of attributes. Attributes are 
 		1 - 'mode' for permissions (including any ACL  and  xattr permissions),  
 		2 - 'ownership'  for user and group.
@@ -25948,7 +25993,7 @@ Case 5: Preserving only specific attributes when using cp as another user ( --pr
 				$ cp --preserve=all ~/source_dir/* ~/destination_folder/
 				^ this will copy only files from source dir into destination directory.
 
-Case 5: Deciding how and which files are updated/overwritten when using 'cp' for pre-existing backup data:
+Case 11: Deciding how and which files are updated/overwritten when using 'cp' for pre-existing backup data:
 	UPDATE controls which existing files in the destination are replaced. ( --update= ) 
 
 	1 - default is 'all' when --update option is never used; in this cp will copy ALL files.
@@ -25967,7 +26012,7 @@ Case 5: Deciding how and which files are updated/overwritten when using 'cp' for
 	This means that files previoulsy copied with -a option and also had it's content changed that they would never
 	get updated/overwritten. Read 'Case 5' for more knowledge.
 
-Case 6: Overwritting data only when they're different ( --reflink= ) 
+Case 12: Overwritting data only when they're different ( --reflink= ) 
 	REFLINK creates a file that is similar to a Hardlink, but only referenced data blocks are changed 
 	when file gets updated/modified instead of the entire file.
 
@@ -26003,18 +26048,30 @@ around requires the use of 'awk'.
 	set in the files and directories.
 
 	exampple 0: - mv the easy way -
-		cd ~/.cache/yay/;
+		cd ~/.cache/yay/ &&
 		mv ./ ~/backup\ packages/
+	
+	example 1: - Moving more than one folder at the same time, without using 'awk':
+			$ mv ~/{folder\ 1,folder\ 2,folder\ 3}/ ~/test\ folder
 
-	example 1: - Moving yay package cache data to a different folder - 
-		mkdir ~/backup\ packages;
-		cd ~/.cache/yay/;
-		ls | sudo awk '{system("mv \"${PWD}/"$0"\" \"${PWD}/../../backup packages/"$0"\"")}'
+			Note: use this first if you want to test the example above:
+				$ mkdir ~/{folder\ 1,folder\ 2,folder\ 3,test\ folder}    
+
+				Note: you can easily remove folders using:
+					rm -r ~/{folder\ 1,folder\ 2,folder\ 3,test\ folder}    
+			
+			VERY IMPORTANT: You can easily use 'zsh' for auto-completing names and commands using TAB Key on your keyboard.
+
+	example 2: - Moving yay package cache data to a different folder, using 'awk' - 
+		This will move yay's cache folder to 'backup folder' in the user home directory:
+			mkdir ~/backup\ packages &&
+			cd ~/.cache/yay/ &&
+			ls | sudo awk '{system("mv \"${PWD}/"$0"\" \"${PWD}/../../backup packages/"$0"\"")}';
 
 
-	example 1.2: - Moving data back to yay package cache folder - 
-		cd ~;
-		ls ~/backup\ dir | sudo awk '{system("mv \"${PWD}/backup dir/"$0"\" \"${PWD}/.cache/yay/"$0"\"")}'
+		example 2.2: - Moving data back to yay package cache folder - 
+			cd ~ &&
+			ls ~/backup\ dir | sudo awk '{system("mv \"${PWD}/backup dir/"$0"\" \"${PWD}/.cache/yay/"$0"\"")}'
 	
 	note: ${PWD} ensures the correct path to which data has to be moved from/to without having to type fullpath
 	of the user home directory; this is because running 'awk' as sudo prevents the use of '~' character,
@@ -26022,7 +26079,7 @@ around requires the use of 'awk'.
 
 	WHY USE 'MV' AND 'AWK' INSTEAD OF GRAPHICAL USER INTERFACE?
 		Simple. Moving files through the GUI doesn't allows the user to rename the files if so desirable,
-	through the scripting above it is possible to not only change filenames but also add preffix and suffix.
+	through the scripting above it is possible to not only change filenames but also add preffix and suffix when moving the files.
 --------------------------------------------------
 --------------------------------------------------
 PROPERLY USING 'RM' FOR REMOVING FILES
@@ -26051,7 +26108,7 @@ VERY IMPORTANT (2024 Update):
 	2 - For removing hidden files 'rm ./.*' has to be used, since hidden files start with '.' character.
 	3 - Using 'rm ./*' and 'rm ./.*' will also fail to remove folders, since 'rm' requires the '-r' argument to delete folders.
 
-	For completely removing all files and folders, you can use this:
+	For completely removing all files and hidden folders, you can use this:
 		sudo rm -r ./* ./.*
 	
 	VERY IMPORTANT:
@@ -26061,10 +26118,10 @@ VERY IMPORTANT (2024 Update):
 VERY USEFUL: You can also use 'rm' in the following manner to remove numbered folders:
 	
 	1 - Removing folders/files numbered from 1 to 10:
-		$ rm ./test_file[0..9]*
+		$ rm ./test_file[1-10]
 
 		^ this will remove all files that start with  'test_file' in the filename in which the following character 
-		contain numbers from 0 to 9 followed again by any type and number of characters.
+		contain numbers from 1 to 10 followed again by any type and number of characters.
 		^ For example: if a filename called 'test_file910B' exists, it will get deleted.
 	
 	2  - Removing files  recursively without using -r option:
@@ -26072,6 +26129,12 @@ VERY USEFUL: You can also use 'rm' in the following manner to remove numbered fo
 
 		^ This will delete all files with '.h' extension from all directories and sub-directories
 		from "desired folder".
+	
+	3 - Removing more than one folder at the same time
+		This command will remove three different folders located at the user home directory in one go:
+			$ rm ~/{folder\ data,folder\ documents,folder\ tmp/}
+
+	Note: if you're using 'zsh', then you can always use <tab-key> for auto-completing the folder's name above.
 
 --------------------------------------------------
 --------------------------------------------------
