@@ -46,6 +46,12 @@ USE LICENSE:
 ---
 ========================================INDEX========================================
 --LINUX:
+	USING RAMDISK UTILITY IN LINUX | ZICRORAM
+		CREATING .ZICRORAM FILES
+			RULES FOR IDENTATION AND COMMENTS IN .ZICRORAM FILES
+		ADDING PROGRAMS/DATA TO RAM DURING SYSTEM STARTUP USING ZICRORAM
+		WORKAROUND FOR FIREFOX IN RAMDISK
+
 	BASIC LINUX CONCEPTS
 		WHAT IS THE LINUX KERNEL
 	DIFFERENCE BETWEEN BASH, SH AND SOURCE LINUX COMMAND
@@ -286,6 +292,15 @@ USE LICENSE:
 		INCREASING SSD LIFETIME
 
 	---VERY BASIC:
+		USING RAMDISK UTILITY IN LINUX | ZICRORAM
+			CREATING .ZICRORAM FILES
+				RULES FOR IDENTATION AND COMMENTS IN .ZICRORAM FILES
+			ADDING PROGRAMS/DATA TO RAM DURING SYSTEM STARTUP USING ZICRORAM
+			WORKAROUND FOR FIREFOX IN RAMDISK
+
+		USING CDPARANOIA TO EXTRACT AUDIO FROM .BIN .CUE FILES | EXTRACTING AUDIO FROM CD-ROM CONTAINNING CDDA LAYER
+
+		7Z ZIP RAR TAR CHEAT SHEET
 		HOW TO USE THE 'LESS' COMMANDLINE TOOL
 		USING CUPS FOR HANDLING PRINTERS AND PRINTING DOCUMENTS ON LINUX
 			CUPS - THE COMMON UNIX SYSTEM PRINTER
@@ -356,7 +371,7 @@ USE LICENSE:
 		THE ONION WEB / TOR WEB
 			HOW TO USE TOR
 			LINKS
-		MAKE TOPIC ON DISABLING OOM(OUT-OF-MEMORY) KILLER
+		DISABLING OOM(OUT-OF-MEMORY) KILLER
 		CLEANING SWAP MEMORY
 		SETTING UP STRETCHED RESOLUTION FOR NVIDIA WITHOUT USING GAMESCOPE
 		ADDING NEW SUPPORTED/UNSUPPORTED SCREEN RESOLUTION | NVIDIA ONLY
@@ -415,7 +430,7 @@ USE LICENSE:
 				DISPLAYING ALL USER EDITED PERMISSIONS
 				MISC LINKS
 				FLATPACK SOURCES
-			SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER
+			SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER | LIST OF UNSAFE DIRECTORIES
 			FURTHER INSTRUCTIONS ON LINUX DATA OBFUSCATION
 			WHY NOT ENCRYPT THE ENTIRE HOME DIRECTORY?
 			ADVANCED OBFUSCATION
@@ -580,6 +595,7 @@ USE LICENSE:
 		SHORTCUT/HOTKEYS
 			COMMON TEXT EDITOR SHORTCUT KEYS
 			TERMINOLOGY/YAKUAKE/SOME TERMINALS SHORTCUT/HOTKEYS KEYS
+				KDE KONSOLE HOTKEYS
 			ZSH VI KEYS
 			AWESOME WM SHORTCUT/HOTKEYS
 			MOZILLA FIREFOX HOTKEYS
@@ -588,6 +604,12 @@ USE LICENSE:
 			VIVALDI HOTKEYS
 			WEECHAT HOTKEYS 
 			TEXT EDITOR HOTKEYS
+
+		MOZILLA FIREFOX TIPS
+			USING AND MANAGING DIFFERENT PROFILES ON MOZILLA
+			MOZILLA FIREFOX HOTKEYS
+			ENABLING CARET MODE  IN FIREFOX
+			WORKAROUND FOR FIREFOX IN RAMDISK
 
 		--BASICS PART 2
 			ENABLING VSYNC FOR NVIDIA
@@ -605,8 +627,10 @@ USE LICENSE:
 			MACHINE TYPES DOSBOX-X CAN RUN
 			MOUNTING DISK IMAGES
 				HOW TO USE FDI FILETYPES ON DOSBOX-X
+				MOUNTING .HDI FILETYPES ON LINUX
 				UMOUNTING DISK
 				UMOUNTING AND MOUNTING A 2ND DISK AT THE SAME TIME
+				ALTERNATE OPTION TO MOUNTING .FDI FILES ON LINUX
 			RUNNING DOSBOX-X AS PC-9800
 			SAVING AND LOADING STATES
 			HOTKEYS
@@ -842,6 +866,7 @@ USE LICENSE:
 		HOW TO CHECK GNOME SETTING
 
 --MISCALENEOUS:
+	FRAME INTERPOLATION
 	HTOP HOTKEYS
 	TOP HOTKEYS
 	WEECHAT HOTKEYS
@@ -1048,6 +1073,13 @@ New Syntax(2023):
 ====================================================================================================
 ===================================STACK OF THINGS DONE==========================================
 ====================================================================================================
+
+2025 - April:
+	--Day 21:
+		FRAME INTERPOLATION
+		USING AND MANAGING DIFFERENT PROFILES ON MOZILLA
+		SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER | LIST OF UNSAFE DIRECTORIES
+		BATCH CONVERSION OF MULTIPLE VIDEOS INTO COMPRESSED FORMAT
 
 2025 - March:
 	--Day 30:
@@ -7241,6 +7273,8 @@ Kernel Modules can be loaded using:
 	2 - /etc/modules-load.d/
 
 Listing Kernel Modules Parameters Manually:
+	lsmod
+		or
 	grep -R . /sys/module/zswap/parameters
 		or
 	cat /proc/driver/nvidia/params
@@ -9180,14 +9214,14 @@ PHASMOPHOBIA:
 	^ -W and -H helps upscaling the graphics a bit.
 	^ Remember to change in-game resolution to 1280 x 800
 	^ SteamDeck=1 enables to hear other players in lobby.
-	^ you have to disable and enable microphone device in-game between one map and another to make your mic work again.
+	^NOTE: you may have to disable and enable the microphone device in-game between one game and another to make your mic work again.
 
 	Note: Recommended topic if you're having issue when talking to players:
 		MICROPHONE GARBLED AUDIO INPUT
 		MICROPHONE UNMUTED BUT STILL GIVES NO AUDIO
 		MICROPHONE INPUT/SOURCE AUDIO MUTE OR CRACKLING ON FEW APPLICATIONS
 	
-	At current state, phasmos only accept S16 audio depth.
+		NOTE: At current state, phasmos only accept S16 audio depth.
 
 	NOTE: Install 'vosk-api' and 'python-vosk' for Voice Recognition to work.
 		# pacman -S vosk-api python-vosk
@@ -9214,6 +9248,9 @@ Granblue Fantasy Versus Rising | GBVSR | GBFVSR:
 	When streaming,  if you run into audio stutters:
 					$ pw-metadata -n settings 0 clock.force-rate 48000 && pw-metadata -n settings 0 clock.force-quantum 500
 					^ Microphone audio output may display audio cracklings and stutter with higher quantum values
+					VERY IMPORTANT: This changes both audio input & audio output rate and quantum and may break games/apps that rely
+					on Microphone Input!!!
+
 	[file: Engine.ini]
 		[ConsoleVariables]
 		r.ScreenPercentage=200
@@ -12829,11 +12866,19 @@ Check if it's possible to create ENV PATH VARS as ARRAY;
 Study more about Shells: ZSHELL GLOBBING IS VERY USEFUL
 Add a section for PKGBUILD
 ---------------------------------------
-MOZILLA FIREFOX HOTKEYS
+MOZILLA FIREFOX TIPS
 
-F7			#Enables Caret Mode: Allows cursor to be set on text when clicked | ENABLING CARET MODE IN FIREFOX
-alt+<numbers>		#Changes tab
-ctrl + mouse_click	#Opens link in new tab
+	USING AND MANAGING DIFFERENT PROFILES ON MOZILLA
+		This might come in handy if you like using RamDisk:
+			$ firefox -P
+
+		Note: Profiles are located under  ~/.mozilla/ 
+
+	MOZILLA FIREFOX HOTKEYS
+
+	F7			#Enables Caret Mode: Allows cursor to be set on text when clicked | ENABLING CARET MODE IN FIREFOX
+	alt+<numbers>		#Changes tab
+	ctrl + mouse_click	#Opens link in new tab
 
 
 
@@ -15162,9 +15207,9 @@ BPF PROGRAM
 ================================================================================
 LISTING ALL LINUX KERNEL MODULES CURRENTLY IN USE:
 
-lsmod 			#Show the status of modules in the Linux Kernel
-			^ Nicely formats the contents of the /proc/modules
-			showing all currently loaded modules.
+$ lsmod 			#Show the status of modules in the Linux Kernel
+				^ Nicely formats the contents of the /proc/modules
+				showing all currently loaded modules.
 
 ---Blacklisting Kernel Modules:
 You can blacklist modules from being loaded at boot 
@@ -15784,6 +15829,10 @@ ctrl+e 				#End of Line
 TERMINOLOGY/YAKUAKE/SOME TERMINALS SHORTCUT/HOTKEYS KEYS:
 	^ By default, terminology doesn't work with GPU Hardware Accelerated
 	^ Go to settings > Toolkit > Launch Elementary Toolkit > MORE > Rendering > Select OpenGL and restart terminology
+
+	KDE KONSOLE HOTKEYS
+		ctrl+shift+m	#Displays Menu Options
+				Note: Useful if your tab gets locked into read-only mode by accident.
 
 ctrl+shift+page_up		#[TERMINOLOGY] Creates a new window, splits terminal on the vertical
 ctrl+shift+page_down		#[TERMINOLOGY] Creates a new window, splits terminal on the horizontal.
@@ -19156,16 +19205,18 @@ MOUNTING HARD DISKS
 --------------------------------------
 MOUNTING .CUE AND .BIN FILES USING CDEMU
 	This method emulates a cdrom drive:
+		NOTE: (Optional) parts here are actually mandatory if you don't have these utils installed.
 
-	1 - Install cdemu-client package
+	1 (Optional) - Install cdemu-client package
 		# pacman -S cdemu-client
 
-	2 - Install vhba-module-dkms which is a kernel module that emulates scsi drivers:
+	2 (Optional) - Install vhba-module-dkms which is a kernel module that emulates scsi drivers:
 		# pacman -S vhba-module-dkms
 
 	3 - Enable all required kernel modules:
 		Note: It's possible to add those modules for system initializion on /etc/mkinitcpio.conf;
-	however, this is optional.
+	however, this is optional. If you don't have them in your mkinitcpio.conf file, you'll have to use
+	modprobe every single time you need them:
 
 		# modprobe -a sg sr_mod vhba
 
@@ -20841,6 +20892,9 @@ example:
 			^ If you start to have AUDIO CRACKLING OR AUDIO STUTTERINGS this is the solution(Linux Pipewire only):
 				Type this on commandline:
 					$ pw-metadata -n settings 0 clock.force-rate 48000 && pw-metadata -n settings 0 clock.force-quantum 2000
+
+					VERY IMPORTANT: This changes both audio input & audio output rate and quantum and may break games/apps that rely
+					on Microphone Input!!!
 					^ clock.force-quantum 2000 is the best settings as  audio delays will not be noticeable at 14ms frame time
 					^ VERY IMPORTANT: The higher the quantum buffer, the more delay you'll get for hearing audio/sound effects.
 					^ PIPEWIRE_QUANTUM can be used as environment var for doing the same thing.
@@ -22775,8 +22829,14 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 
 	TROUBLESHOOTING AUDIO / AUDIO CRACKLING / AUDIO STUTTERS ON PIPEWIRE/WIREPLUMBER
 		MICROPHONE GARBLED AUDIO INPUT
-			Trying to restart audio services to give it a go, it might be required to restart application as well:
+			1) Trying to restart audio services to give it a go, it might be required to restart application as well:
 				$ systemctl --user restart wireplumber pipewire pipewire-pulse
+
+			2) Some programs that rely too much on System Resources may garble your audio input, so increasing the quantum is a solution:
+				$ pw-metadata -n settings 0 clock.force-quantum 600
+				Note: This will apply 'clock.force-quantum' not only to audio input but to audio output as well.
+				VERY IMPORTANT: DO NOT USE 'clock.force-rate' as specified below, since this will also force audio-input rate:
+					pw-metadata -n settings 0 clock.force-rate 48000 && pw-metadata -n settings 0 clock.force-quantum 600 
 
 			RECOMMENDED TOPIC READINGS:
 				MICROPHONE UNMUTED BUT STILL GIVES NO AUDIO OR GIVES GARBLED MICROPHONE INPUT
@@ -22850,6 +22910,7 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 				$ systemctl --user restart wireplumber pipewire pipewire-pulse
 
 		MODIFYING MONO AUDIO MICROPHONES TO PLAY AUDIO ON BOTH SIDES WITH EASY EFFECTS
+			NOTE: Doing this may not be necessary, since some applications seems to understand what a Mono Microphone is.
 			NOTE: You don't need this step if you're not being affected by microphone audio playing only from one channel.
 
 			Some headsets may come with mono audio microphones, this means audio will likely play at only one side.
@@ -22904,6 +22965,9 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 					$ pw-metadata -n settings 0 clock.force-rate 48000 && pw-metadata -n settings 0 clock.force-quantum 500
 						or
 					$ pw-metadata -n settings 0 clock.force-rate 48000 && pw-metadata -n settings 0 clock.force-quantum 2000
+						NOTE: This changes both audio input & audio output rate and quantum and may break games that rely
+						on Microphone Input!!!
+
 						^ I'm currently using this one, emulators who are able to lower frame time may still have audio 
 						^ stutters with clock.force-quantum 500
 						^ VERY IMPORTANT: The higher the quantum buffer, the more delay you'll get for hearing audio/sound effects.
@@ -25575,15 +25639,15 @@ HOW TO DOSBOX-X
 		svga_ati_mach8, svga_ati_mach32, svga_ati_mach64, fm_towns.
                   
 	MOUNTING DISK IMAGES
-		Disk images can be  mounted through 'Drive' tab in Dosbox-x GUI,
-	using the "Mount a Disk or CD Image"; it then can be accessed by accessing the mounted drive,
-	by typing the mounted drive letter: 'A:' or 'cd A:'
+			Disk images can be  mounted through 'Drive' tab in Dosbox-x GUI,
+		using the "Mount a Disk or CD Image"; it then can be accessed by accessing the mounted drive,
+		by typing the mounted drive letter: 'A:' or 'cd A:'
 
-	Supported image formats are: 
-		.img, .ima, .vhd, .hdi, .iso, .cue, .bin, .chd, .mdf, .gog, .ins
+		Supported image formats are: 
+			.img, .ima, .vhd, .hdi, .iso, .cue, .bin, .chd, .mdf, .gog, .ins
 
 
-	Booting from disk image is also possible but only for programs that can be actually booted!
+		Booting from disk image is also possible but only for programs that can be actually booted!
 	
 		VERY IMPORTANT NOTE ABOUT MOUNTING 
 			It's important to have a backup copy of the original file(s) you're mounting in the system,
@@ -25591,50 +25655,72 @@ HOW TO DOSBOX-X
 		system freezes, etc. Always have a backup copy and never mount from them.
 		
 		HOW TO USE FDI FILETYPES ON DOSBOX-X
+			Note: 'imgmount' and 'mount' are exclusive tools to dosbox/dosbox-x,
+		the 'mount' tool works completely different on linux.
+
 			An FDI file is a floppy disk image created by various emulator programs such as Amiga, Commodore, Sinclair, and other platforms. It stores an exact copy of the complete disk and can be loaded and run on a PC with the emulator.
 
 		To use it on Dosbox-x, mount the folder containning the FDI/FDD file using dosbox-x then go into dosbox-x 
 		terminal and use IMGMOUNT: 
-			$imgmount k disk.fdi -t floppy
+			$ imgmount k disk.fdi -t floppy
 				or
-			$mount k disk.fdi -t floppy
+			$ mount k disk.fdi -t floppy
 
 		^ the image will then be mounted at K: disk!
 
 		It's also possible to mount multiple images at the same time:
-			$imgmount k disk_a.fdi disk_b.fdi disk_c.fdi disk_d.fdi -t floppy
+			$ imgmount k disk_a.fdi disk_b.fdi disk_c.fdi disk_d.fdi -t floppy
 				or
-			$mount k disk_a.fdi disk_b.fdi disk_c.fdi disk_d.fdi -t floppy
-		use $imgswap for swapping disks!
+			$ mount k disk_a.fdi disk_b.fdi disk_c.fdi disk_d.fdi -t floppy
+		use $ imgswap for swapping disks!
 		
+		MOUNTING .HDI FILETYPES ON LINUX
+			source: https://github.com/drojaazu/pc98_disks_in_linux/blob/main/README.md
+
+			1 - Setup a loop device:
+				$ IMAGE=imagefile.hdi; OFFSET=$(expr `grep -Ebaom 1 "FAT1[2|6]" ${IMAGE} | sed -E 's/:FAT1[2|6]//g'` - 54); sudo losetup --show -fL -o ${OFFSET} ${IMAGE}
+			
+			2 - Check which loop device your .hdi file has been attached to:
+				$ losetup -a
+
+			3 - Mount the identified loop device:
+				$ mount --mkdir /dev/loopX /mnt/loopX
+
+			4 - When done with all the tasks, finally umount and turn off the loop device:
+				# umount /mnt/loopX && losetup -d /dev/loopX
+
 		UMOUNTING DISK
 			Umounts A: disk :
-				$imgmount a -u
+				$ imgmount a -u
 					or
-				$mount a -u
+				$ mount a -u
 
 		UMOUNTING AND MOUNTING A 2ND DISK AT THE SAME TIME
 			The command below will unmount the A: disk and mount disk2.ima on A: letter:
-				$imgmount a disk2.ima -u
+				$ imgmount a disk2.ima -u
 			
-		ALTERNATE OPTION:
+		ALTERNATE OPTION TO MOUNTING .FDI FILES ON LINUX
 			A) CREATE A VIRTUAL PC-98 FLOPPY DEVICE ON THE SYSTEM
+				NOTE: This only works for single .fdi files that are not split between multiple .fdi files.
+				If you have multiple .fdi files, consider using 'imgmount' from dosbox-x. Refer to:
+					HOW TO USE FDI FILETYPES ON DOSBOX-X
+
 				This is actually a better and faster solution, because if you mount .fdi or any other
 				floppy device inside dosbox-x, the floppy device speeds will be emulated,
 				you can assume floppy devices are very slow.
 
 				source: https://github.com/drojaazu/pc98_disks_in_linux/blob/main/README.md
 
-				A1) add the following line to /etc/fstab
+				A1) (Optional) - (Mandatory only this is the first time) add the following line to /etc/fstab
 				[file: /etc/fstab ]
 					#VIRTUAL PC-98 FLOPPY DEVICE
 					/dev/loop4  /mnt/FloppyA  auto  users,rw,exec,nofail,noauto,sync,check=strict,codepage=932,iocharset=euc-jp,x-gvfs-show  0 0
 				[/file]
 
-				A2) Reload /etc/fstab on the system:
+				A2) (Optional) - (Mandatory only if this is the first time) Reload /etc/fstab on the system:
 					# systemctl daemon-reload
 
-				A3) Mount all unmounted partitions:
+				A3) (Optional) - (Mandatory only if this is the first time) Mount all unmounted partitions:
 					# mount -a
 
 				A4) Attach file to newly created PC-98 Floppy loop device
@@ -25646,26 +25732,28 @@ HOW TO DOSBOX-X
 				A6) Access files and copy them to local hard disk:
 					$ cd /mnt/FloppyA
 
-				A7) Access files from distrobox by mounting directory of copied files as hard disk.
+				A7) (Optional) Access files from distrobox by mounting directory of copied files as hard disk.
 
 				A8) Once you're done with the disk, umount & detach the loop device:
-					$sudo umount /dev/loop4 && sudo losetup -d /dev/loop4
+					$ sudo umount /dev/loop4 && sudo losetup -d /dev/loop4
 
-			B) Using linux's mtool util that comes installed with guestfs-tools package.
+			B) (ALTERNATE) -  using linux 'mount' tool is also possible for automating loop device setup:
+				Note: Note this still requires steps A1 to A2 to be done, /dev/loop4 has to exist in the /etc/fstab.
+				# mount --mkdir ./disk.fdi /mnt/FloppyA/ -o loop=/dev/loop4,offset=4096
+				
+				Note2: /mnt/FloppyA/ can be replaced here with anything you want.
+
+				B1) Umounting from this point will automatically detach the used loop device at /dev/loop4:
+					# umount /mnt/FloppyA
+
+			C) (ALTERNATE - UNTESTED) -  Using linux's mtool util that comes installed with guestfs-tools package.
 			but this only works with real Floppy Disks!
 
 				source: https://dosbox-x.com/wiki/Guide%3AManaging-image-files-in-DOSBox%E2%80%90X
 
-			C) Using 'gnome-disk-image-mounter' on linux is also possible!
-			please read the "VERY IMPORTANT" section below when doing this option.
+			D) (ALTERNATE - UNTESTED) - Using 'gnome-disk-image-mounter' on linux is also possible!
+			please read the "VERY IMPORTANT" section below when going for this step.
 
-			D) using linux 'mount' tool is also possible:
-				#mount /tmp/fdimage /mnt/fdimage -t vfat -o loop=/dev/loop3 --mkdir
-
-			^ using the -o loop=/dev/loop3 argument is not mandatory.
-			it can be used as this below:
-				#mount -o loop,uid=$UID disk.ima /mnt/fdimage --mkdir
-				^ Check Solution A) for PC-98 Floppy Disk Images
 
 		DOSBox-X supports mounting diskette (aka Floppy) images in the following formats:
 
@@ -25693,7 +25781,7 @@ HOW TO DOSBOX-X
 	RUNNING DOSBOX-X AS PC-9800
 
 		Type on terminal:
-			$dosbox-x -set machine=pc98
+			$ dosbox-x -set machine=pc98
 
 		^ it's also possible to set this at dosbox-x's configuration file,
 		check section "ABOUT CONFIGURATION FILE".
@@ -26356,6 +26444,20 @@ PROPERLY USING 'MV' AND 'AWK' FOR MOVING FILES AND SUB-DIRECTORIES
 	Same as 'cp', moving files and sub-directories without moving the parent folder
 around requires the use of 'awk'.
 
+	VERY IMPORTANT: Mind you, the sole purpose of 'mv' is to move files, as such it's unable to merge directories under the same name 
+	when files exist on the destination directory.
+		Example: Consider "Folder A" exists in two different places on your hard disk, both of them containning different files,
+		and you want to move "Folder A" into the another "Folder A" that's supposed to be destination folder, in this case, the command
+		below would fail if the destination contain other folders/files under it's existing "Folder A":
+					$ mv ~/Folder\ A /path\ to\ dir/
+
+		Like stated before, supposing that the destination dir /path\ to\ dir/ has a child dir called "Folder A" containning files
+		or other directories, the command above will fail, even when using arguments like '-f' to force the moving of folders.
+
+		As a side note, only use 'mv' for moving files, never for replacing/overwriting/updating new files in another directory.
+		If you need replacing, consider using 'cp' instead. Only use 'mv' for moving directories that actually do not exist.
+		
+
 	ls <source_dir> | sudo awk '{system("mv \"<source_dir>/"$0"\" \"<target_dir>\"")}'
 
 	Note: only the contents will be moved to <target_dir>.
@@ -26690,7 +26792,7 @@ and the user may set it to zero if he wants. Do this for all users if you don't 
 	
 		Read more on "FIREJAIL INTRODUCTION" and "FIREJAIL COMMANDS"
 
-	SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER
+	SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER | LIST OF UNSAFE DIRECTORIES
 		Some directories in your linux system may store data that one may want to keep hidden from intrusers.
 	You may want to copy these dirs to an fscrypted directory and bind mount them upon decryption only:
 
@@ -26716,6 +26818,7 @@ and the user may set it to zero if he wants. Do this for all users if you don't 
 								may contain server connection data lists here.
 		~/.thumbnails/					#Thumbs! :D *
 		~/.thunderbird/					#EMAIL Client
+		~/.mozilla/					#Firefox Profiles 
 		~/.irssi/					#IRC Client, same reason as ~/.config dir
 
 
@@ -26733,6 +26836,7 @@ and the user may set it to zero if he wants. Do this for all users if you don't 
 			~/.cache/clementine/			#Clementine player cache data *
 			~/.cache/kdenlive/			#Kdenlive Cache data *
 			~/.cache/mozilla/			#Mozilla Web-Browser *
+			~/.mozilla/ 				#Firefox Profiles
 			~/.cache/opera/				#Opera Web-Browser *
 			~/.cache/qutebrowser/			#Qutebrowser web browser *
 			~/.cache/shotwell/			#Shotwell Image Viewer *
@@ -27794,8 +27898,8 @@ CUSTOM IPTABLES RULES
 		-A FORWARD -m mac --mac-source cc:ed:21:87:02:50 -j LOG_DROP
 		-A INPUT -m mac --mac-source cc:ed:21:87:02:50 -j LOG_DROP
 		#-A INPUT -m mac --ipv4 --mac-destination cc:ed:21:87:02:50 -j DROP
-		-A INPUT --ipv6 -s fe80::1 -j LOG_DROP
-		-A INPUT --ipv6 -d fe80::1 -j LOG_DROP
+		#-A INPUT --ipv6 -s fe80::1 -j LOG_DROP
+		#-A INPUT --ipv6 -d fe80::1 -j LOG_DROP
 
 		##This has also been used as destination address after 1h on full-block.
 		-A INPUT --ipv6 -s 2804:0d49:44db:9300:d472:070f:2346:6d9b -j LOG_DROP
@@ -27992,6 +28096,7 @@ CUSTOM IPTABLES RULES
 
 		COMMIT
 		# Completed on Wed Feb 28 23:43:58 2024
+
 	[/file]
 
 	BLOCK ALL CONNECTIONS
@@ -28003,11 +28108,20 @@ CUSTOM IPTABLES RULES
 		:INPUT DROP [0:0]
 		:FORWARD DROP [0:0]
 		:OUTPUT DROP [0:0]
+		# Completed on Thu Mar  7 13:49:00 2024
+
+		#PIPEWIRE CONFIGURATION FOR ALLOWING MULTIPLE USERS TO HAVE ACCESS TO AUDIO AT THE SAME TIME
+		-A INPUT --ipv4 -p tcp -s 127.0.0.1 --sport 4713 -j ACCEPT
+		-A INPUT --ipv4 -p tcp -d 127.0.0.1 --dport 4713 -j ACCEPT
+		-A OUTPUT --ipv4 -p tcp -s 127.0.0.1 --sport 4713 -j ACCEPT
+		-A OUTPUT --ipv4 -p tcp -d 127.0.0.1 --dport 4713 -j ACCEPT
+
 		-A INPUT -j DROP
 		-A FORWARD -j DROP
 		-A OUTPUT -j DROP
+
 		COMMIT
-		# Completed on Thu Mar  7 13:49:00 2024
+
 	[/file]
 
 LISTING CONNECTED IP ADDRESSES AND CURRENT OPEN DOORS ON THE SYSTEM
@@ -28777,7 +28891,7 @@ HOW TO FETCH FILE DESCRIPTORS
 -------------------
 -------------------
 -------------------
-MAKE TOPIC ON DISABLING OOM(OUT-OF-MEMORY) KILLER
+DISABLING OOM(OUT-OF-MEMORY) KILLER
 	This is the command used for disabling OOM Killer on linux:
 		# sysctl -w vm/overcommit_memory=0
 
@@ -29914,6 +30028,8 @@ installed on the system, causing no issues with current system libraries located
 
 Because of this nature, flatpak also allows you to run applications that may not be available on your linux operating system yet.
 
+Flatpack applications are usually located on "/var/lib/flatpak" for system wide apps, and ~/.local/share/flatpak for user installed apps.
+
 	DEFAULT FLATPAK SETTINGS
 		source: https://docs.flatpak.org/en/latest/sandbox-permissions.html
 
@@ -30707,6 +30823,231 @@ HOW TO USE THE 'LESS' COMMANDLINE TOOL
 ---------------------
 ---------------------
 ---------------------
+FRAME INTERPOLATION
+	Frame Interpolation / Motion interpolation uses AI to generate +1 frame between 2 different frames.
+This increases perceived frame-rate when playing videos with lower framerate than the one offered by the monitor.
+
+	A Display capable of 60Hz(60 Frames per second) will run 30fps content(games/movies/videos) at 30 framerate per second,
+Frame interpolation / motion interpolation would then insert an extra frame for every existing frame, allowing it to run at display capable framerate instead (on this case).
+
+	Example: 1) Nvidia Smooth Motion.
+			Meant for DX11 and DX12 games only.
+		 2) Elise-ng
+		 	https://fly.elise-ng.net/news/fly-elise-ng-6-2-1-software-release/
+		 3) SVP Project
+		 	Meant for video play.
+			On archlinux, you can install it under 'svp-bin'.
+
+---------------------
+---------------------
+---------------------
+---------------------
+MIPMAPPING
+	Mimapping allows textures to be changed depending on far the player is from the obejct. 
+This way objects that are 'far away' will load a different texture that looks better from far away and also uses less resources.
+When this same object is closer, then the texture is replaced with a higher quality one, to make it look better upclose.
+
+Mimapping has to be built on a per game basis.
+---------------------
+---------------------
+---------------------
+---------------------
+USING RAMDISK UTILITY IN LINUX | ZICRORAM
+	Zicroram is available via github for those under GNU Linux distributions :
+		https://github.com/srmfx/Zicroram
+	
+	0) Read the Manual Page for the program, it contains helpful info and extra commands:
+		$ man zicroram
+		note: it's advised to read the manual before using the program.
+			
+	1) After downloading it, install the program using the following command:
+		$ zicroram --install-wizard
+
+	2) Adding program/directories is as simple as:
+		$ zicroram --add <path_to_data>
+			or
+		$ zicroram -a <path_to_data>
+
+		Note: this will create a symlink to the program in /usr/bin/, read man pages carefully.
+	
+	3) Removing programs from RAMDISK can be simply done as this:
+		$ zicroram --remove
+			or
+		$ zicroram --remove <some_program>
+			or
+		$ zicroram -r
+	
+	4) Data Backups can be done from RAM to DISK using the following:
+		$ zicroram --mbackup
+			or
+		$ zicroram -mb
+	
+	5) Automatic Data Backups can be done using the following:
+		$ zicroram -mtbackup
+			or
+		$ zicroram -mtbackup <program_name>
+			or
+		$ zicroram -mt
+	
+	6) Restoring data after power blackouts or any forced shutdown:
+		$ zicroram --restore
+
+		Note: This will simply move the data back to it's original place/name in disk.
+
+	CREATING .ZICRORAM FILES
+		source: https://github.com/srmfx/Zicroram?tab=readme-ov-file#creating-zicroram-files
+		
+		A file with a .zicroram extension can be optionally created to make it easy adding programs and/or group of programs into ram 
+		in such a way the user doesn't have to worry about creating a shell(bash/zsh) script.
+
+		To do this, simply create a file with an extension called '.zicroram', then make sure each line corresponds to a directory or 
+		file of your choice; you can then add as much data(ex.: pictures, songs, etc..) as you want in this single file. example:
+
+			[file: ~/my_programs.zicroram]
+			    #GIMP - Image Editor:
+				/usr/share/gimp
+				
+			    #GVIM - Text Editor:
+				/usr/share/gvim
+
+			    #Personal Files/Documents:
+				~/Music
+				~/Pictures    #My Pictures
+				~/Documents    #My Documents
+			[/file]
+			Note: you SHOULD NOT have to use the notation for file that is located between brackets: '[' and ']'. 
+			The brackets are only meant so that the user understands those are the pertaining contents of a given file.
+
+		Now you can add all data using a single command:
+			$ ./zicroram --add ~/my_programs.zicroram
+
+		RULES FOR IDENTATION AND COMMENTS IN .ZICRORAM FILES
+			source: https://github.com/srmfx/Zicroram?tab=readme-ov-file#rules-for-identation-and-comments-in-zicroram-files
+
+			As you have seen in the example above, you can add comments to lines, create comment lines and make use of text-ident
+			for better readability and maintainability of the .zicroram files; for doing this you need to follow these simple rules below.
+
+			1 - You can create text identation using Tabulation(Tab) Key or white(blank) space key.
+
+			2 - For creating a comment line, you can add '#' character at the start of a line.
+
+			3 - To create a comment line at the same line as an existing data, you can use Tabulation(Tab) Key and '#' character.
+
+	ADDING PROGRAMS/DATA TO RAM DURING SYSTEM STARTUP USING ZICRORAM
+		source: https://github.com/srmfx/Zicroram?tab=readme-ov-file#adding-programsdata-to-ram-during-system-startup
+
+		Adding programs into ram in this specific case can be achieved by adding 'zicroram --boots ..' inside your .bash_profile( for bash users ) 
+		or .zprofile ( for zsh users ) file:
+
+			Note: The system-winde configuration files will make sure all users under the specific shell,
+			while user configuration files will make sure programs are added to ram for that one user under the specific shell.
+
+			for ZSH users:
+				A) system-wide configuration file:
+					[file: /etc/zsh/zprofile]
+						zicroram --boots ~/my_programs.zicroram
+					[/file]
+
+				B) user configuration file:
+					[file: ~/.zprofile]
+						zicroram --boots ~/my_programs.zicroram
+					[/file]
+
+			for BASH users:
+				A) system-wide configuration file:
+					[file: /etc/profile]
+						zicroram --boots ~/my_programs.zicroram
+					[/file]
+
+				B) user configuration file:
+					[file: ~/.bash_profile]
+						zicroram --boots ~/my_programs.zicroram
+					[/file]
+
+			Note that you do not have to use the notation for file that is located between brackets: '[' and ']'. 
+			The brackets are only meant here so that the user understands this is the contents of a file.
+
+		The --boots instruction outputs to screen a copy-to-ram progress and makes the user wait for the whole process to finish, 
+		however depending on the program and/or how fast your hard drive is, it's possible to bypass this step and avoid all the 'waiting' during system startup; 
+		if such is the case, then use --bootsc instead of --boots - However, currently it's not possible to check copy progress after bypassing it with such option.
+
+		Check the manual after installing for more information on --boots and --bootsc:
+
+			$ man zicroram
+			    or
+			$ zicroram --help-program
+
+		Note for non-bash and non-zsh users:
+			If you use something other than 'bash' and 'zsh', like 'tcsh' you'll have to search for it's system/user configuration file(s) 
+			and do the same described here.
+
+	WORKAROUND FOR FIREFOX IN RAMDISK
+		After adding mozilla firefox using:
+			$ zicroram --add /usr/lib/firefox
+
+		Firefox for some reason either creates or uses an alternate empty profile after being moved/copied to Ramdisk and executed from there.
+	The workaround is to execute firefox using the following argument from commandline and then selecting the profile you want to use:
+				$ firefox -P
+	
+---------------------
+---------------------
+---------------------
+---------------------
+USING CDPARANOIA TO EXTRACT AUDIO FROM .BIN .CUE FILES | EXTRACTING AUDIO FROM CD-ROM CONTAINNING CDDA LAYER
+	This only works if you own the .cue file for the .bin image and the .bin file also contains audio tracks 
+under a CDDA(Compact Disc Digital Audio) layer.
+
+	1 (Optional) - (Mandatory if you're working  with .bin .cue files): 
+		First, you'll need to mount the .cue file you own, by following the instructions mentioned on following topic:
+			MOUNTING .CUE AND .BIN FILES USING CDEMU
+
+	2 (Optional) Install 'cdparanoia' if you don't own it
+		# pacman -S cdparanoia
+
+	3 - Make a new folder for extracting audio, change directory to it and execute 'cdparanoia'
+		$ mkdir ~/audio_extract/ && cd ~/audio_extract && cdparanoia -B	
+			or
+		$ mkdir ~/audio_extract/ && cd ~/audio_extract && cdparanoia -d /dev/sr0 -B
+
+
+---------------------
+---------------------
+---------------------
+---------------------
+7Z ZIP RAR TAR CHEAT SHEET
+	7Z
+		Extracting:
+			$ 7z x <file_to_extract>.7z -o<destination_directory>
+
+			Example 1 - Extract into current directory:
+				$ 7z x File.7z -o./Folder\ for\ extraction
+
+		Listing Contents:
+			7z l <file_to_extract>.7z
+	
+	ZIP
+		Extracting:
+			$ unzip <file_to_extract>.zip -d <destination_directory>
+
+		Listing contents:
+			$ unzip -l <file_to_extract>.zip
+				or
+			$ zip -sf <file_to_extract.zip>
+
+	TAR
+		Extracting:
+			$ tar xvf <file_to_extract>.tar --directory=<destination_directory>
+
+		Listing contents:
+			$ tar vtf <file_to_extract>.tar
+				or
+			$ tar tvf <file_to_extract>.tar
+		
+
+---------------------
+---------------------
+---------------------
+---------------------
 USING CUPS FOR HANDLING PRINTERS AND PRINTING DOCUMENTS ON LINUX
 	CUPS - THE COMMON UNIX SYSTEM PRINTER
 		Most recent printers support driverless usage by implementing 'AirPrint' and 'IPP Everywhere' technology.
@@ -30808,7 +31149,7 @@ USING CUPS FOR HANDLING PRINTERS AND PRINTING DOCUMENTS ON LINUX
 			$ lpinfo -m | less
 
 			Read topic if you don't know how to use the 'less' tool:
-				"HOW TO USE 'LESS' COMMANDLINE TOOL"
+				"HOW TO USE THE 'LESS' COMMANDLINE TOOL"
 
 		Once you have the Device URI and Driver Name you can add the printer using:
 			# lpadmin -p <PRINTER_ALIAS> -E -v "<DEVICE_URI>" -m <DRIVER_NAME>
@@ -31727,12 +32068,12 @@ capsh use capsh --print for printing current capabilities.
 
 TEMPORARY 2:
 1 - Save easyeffects configuration files
-2 - List all nvidia required packages for 2025
+2 - List all nvidia required packages
 	libva-nvidia-driver: Allows VA-API Hardware Video Acceleration
-3 - Explain how to setup custom startup resolution
-4 - save new firewall settings, since it allows pipewire server's ip to be used locally.
-5 - Using real time audio profile messes up microphone input on games, even tho apparently it works fine when testing under 'ffmpeg' and 'pw-record'
-	$ pactl set-card-profile <tab-key> <tab-key>
+3 - Explain how to setup custom startup resolution using nvidia
+	check on /etc/X11/xorg.conf
+4 - Explain how to apply 'clock.force-quantum' and 'clock.force-rate' on an application basis and also on a device basis:
+	check on /etc/pipewire/pipewire-pulse.conf
 
 ---
 VERY IMPORTANT/TASK  LOGS:
@@ -31747,14 +32088,8 @@ on /etc/modprobe.d/nvidia.conf file i just disabled Nvidia GSP Firmware, since '
 
 Furtherover, the reason you shouldn't completely disable EDID is because TTY only supports EDID resolutions. 
 -----
-TEMPORARY 2:
-I've patched /etc/pipewire/pipewire.conf to work without relying on "pw-metadata -n settings 0 clock.force-quantum 2000"
-requires testing to see how it'll roll.
-
-TEMPORARY3:
-describe differences between 7z, tar, zip/unzip, bzip2
-
 ----
 Temporary 3:
 Custom Modeline 70hz:
 "1280x768_70n" 73.685 1280 1288 1320 1360 768 780 788 794 +HSync -VSync
+----
