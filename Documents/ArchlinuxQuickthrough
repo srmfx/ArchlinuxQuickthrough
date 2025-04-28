@@ -300,7 +300,9 @@ USE LICENSE:
 
 		USING CDPARANOIA TO EXTRACT AUDIO FROM .BIN .CUE FILES | EXTRACTING AUDIO FROM CD-ROM CONTAINNING CDDA LAYER
 
-		7Z ZIP RAR TAR CHEAT SHEET
+		DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, RAR, ZIP, COMPRESS AND BZZ
+			7Z ZIP RAR TAR CHEAT SHEET
+
 		HOW TO USE THE 'LESS' COMMANDLINE TOOL
 		USING CUPS FOR HANDLING PRINTERS AND PRINTING DOCUMENTS ON LINUX
 			CUPS - THE COMMON UNIX SYSTEM PRINTER
@@ -500,7 +502,15 @@ USE LICENSE:
 			HOW TO COMPILE YOUR PROGRAMS THROUGH YAY AND PACMAN FOR PERFORMANCE GAINS
 			SOMETHING ABOUT COMPILE, DEBUG, TEST AND RELEASE
 		CREATING FILE ARCHIVES USING AR
-		CREATING ARCHIVE FILES USING TAR, LIBARCHIVE, BSDTAR, PAX
+
+		CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
+			7Z ZIP RAR TAR CHEAT SHEET
+			GNU TAR EXAMPLES
+				EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
+				EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
+					EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
+					EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
+					EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
 
 	---BASICS:
 		FINDING OUT IF COMMAND IS A BINARY EXECUTABLE OR A SHELL BUILT IN COMMAND
@@ -879,9 +889,15 @@ USE LICENSE:
 		PERMANENT SETTINGS
 	DISABLING IPV6 TEMPORARILY
 	USING GAMECONQUEROR  ON GAMES
-	CREATING ARCHIVE FILES USING TAR, LIBARCHIVE, BSDTAR, PAX
-		COMPRESSION FORMATS FOR TAR
-		NEW EXAMPLES
+	CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
+		7Z ZIP RAR TAR CHEAT SHEET
+		COMPRESSION ALGORITHMS/FORMATS FOR GNU TAR
+		GNU TAR EXAMPLES
+			EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
+			EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
+				EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
+				EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
+				EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
 	NSCDE HOTKEYS
 	PAL VS NTSC GAMES
 	IMPROVING GRAPHICS ON LINUX
@@ -22301,7 +22317,7 @@ $ ar -pl <archive> -L./ -l<library>			#Creates/Specifies library dependency for 
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
-CREATING ARCHIVE FILES USING TAR, LIBARCHIVE, BSDTAR, PAX
+CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
 	Allows creating archive from files and directory. Tar is also formely known as bsdtar
 and is part of libarchive package on linux distros.
 
@@ -22313,17 +22329,18 @@ and is part of libarchive package on linux distros.
 		extracting the data, accoriding to system policy.
 
 		This is very useful, since other tools like 7z don't save nor restore 
-		neither permission set nor ownership of the data.
+		neither permission set nor ownership on the extracted data.
 
 		When downloading someone else's 'tar' file, always make sure to extract it as 'root'
-		as it'll preserve the desired permissions and ownership of the residing data. 
+		as it'll preserve the desired permissions and ownership of the extracted data.
 
-	VERY IMPORTANT 2:
+	VERY IMPORTANT 2 - very old, not important, do not use -k - :
 		By default, 'tar' has the ability of overwritting important system files as well as 
 		user personal data; it can also overwrite directory metadata like permissions, ownership and ACLs
 		if they already exist on the system as well as the data/files they might overwrite. 
 
 		Because of this: FOR SAFETY, ALWAYS EXTRACT 'TAR' FILES WITH THE '-k' OPTION.
+		-k option isn't mandatory, it just prevents older files from being overwritten.
 	
 	VERY IMPORTANT 3:
 		In general, avoid extracting 'tar' files if permissions and ownership of the data isn't
@@ -22392,24 +22409,34 @@ GNU-STYLE USAGE
 
 ---
 ---
-COMPRESSION FORMATS FOR TAR
-Compressor 		Long 			Short
-bzip2 			.tar.bz2 		.tb2, .tbz, .tbz2, .tz2
-gzip 			.tar.gz 		.taz, .tgz
-lzip 			.tar.lz 		------------
-lzma 			.tar.lzma 		.tlz
-lzop 			.tar.lzo 		------------
-xz 			.tar.xz 		.txz
-compress 		.tar.Z 			.tZ, .taZ
-zstd 			.tar.zst 		.tzst 
+COMPRESSION ALGORITHMS/FORMATS FOR GNU TAR
+	Using one of the compression algorithms/formats will require you to have it's tools installed on your system,
+	GNU TAR will usually complain when the tools fail to exist.
 
+	Compressor 		Long 			Short
+	bzip2 			.tar.bz2 		.tb2, .tbz, .tbz2, .tz2
+	gzip 			.tar.gz 		.taz, .tgz
+	lzip 			.tar.lz 		------------
+	lzma 			.tar.lzma 		.tlz
+	lzop 			.tar.lzo 		------------
+	xz 			.tar.xz 		.txz
+	compress 		.tar.Z 			.tZ, .taZ
+	zstd 			.tar.zst 		.tzst 
 
+	NOTE: 'xz' has the most compression rate of these algorithms, however it takes a very long time to compress and decompress 'xz' files.
+	'lz' is definitively the fastest one, offering both decent compression rate and very fast speeds.
+	'zstd' is the midterm between 'xz' and 'lz', it falls on speed regarding 'lz' algorithm, but it's still faster than 'xz'; 
+	'zstd' offers midterm compression rate between both 'xz' and 'lz'.
 ---
-NEW EXAMPLES
+GNU TAR EXAMPLES
 
-EXAMPLE #0 - EXTRACTING TAR FILE ON A GIVEN DIRECTORY
+EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
+	NOTE:
+		Using one of the compression algorithms/formats will require you to have it's tools installed on your system,
+		GNU TAR will usually complain when the tools fail to exist.
+
 	Tar requires '--directory'(or '-C') to be used when extracting in a directory
-different than the current one, ex:
+	different than the current one, ex:
 
 		# tar xvf ~/my_tar_file.tar.gzip	--directory=/usr/share/
 
@@ -22418,7 +22445,7 @@ different than the current one, ex:
 		Not using -C (or --directory) will result in files being extracted in './' instead by default.
 
 	OBS2: 
-		Always use 'sudo' for extracting with root permissions, this allows extracted files 
+		Always use 'sudo' or 'run0' for extracting as root, this allows extracted files 
 	and directories to keep the same permissions/ownership set inside the .tar file.
 
 	You can see permission set by typing: 
@@ -22432,7 +22459,7 @@ different than the current one, ex:
 
 
 
-EXAMPLE #1 - CREATING, UPDATING AND APPENDING TO ARCHIVE
+EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
 	$ tar cf ./my_filename.tar ./file_1 		# [C]reates TAR archive called 'my_filename'
 							and adds 'file_1' to it.
 							^ obs: it's not possible to create empty archive files
@@ -22456,7 +22483,7 @@ EXAMPLE #1 - CREATING, UPDATING AND APPENDING TO ARCHIVE
 							file is extracted, older versions are kept in the archive.
 
 
-EXAMPLE 1.2 - DELETING
+EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
 	$ tar --delete -f ./my_filename.tar ./file_1	# Deletes data from archive
 							^ can not delete from compressed archives
 							^ it's note possible to use both UNIX and GNU Style together:
@@ -22465,11 +22492,11 @@ EXAMPLE 1.2 - DELETING
 							^ when going for UNIX Style, all options have to be given
 							in UNIX-STYLE; same happens for GNU-STYLE.
 
-EXAMPLE 1.3 - AUTO COMPRESSING
+EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
 	$ tar caf ./my_filename.tar.gz ./my_filename.tar		#[A]uto-compresses my_filename.tar into gzip format
 
 
-EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE
+EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
 	$ tar xkf path/to/source.tar --wildcards "*.html"		#Extracts only .html files/dirs
 
 
@@ -30856,43 +30883,52 @@ USING RAMDISK UTILITY IN LINUX | ZICRORAM
 	Zicroram is available via github for those under GNU Linux distributions :
 		https://github.com/srmfx/Zicroram
 	
-	0) Read the Manual Page for the program, it contains helpful info and extra commands:
-		$ man zicroram
-		note: it's advised to read the manual before using the program.
 			
-	1) After downloading it, install the program using the following command:
+	0) After downloading it, install the program using the following command:
 		$ zicroram --install-wizard
 
-	2) Adding program/directories is as simple as:
+	1) Read the Manual Page for the program, it contains helpful info and extra commands:
+		$ man zicroram
+
+		Note: always read the manual before using the program.
+
+	2) Listing full commands from the program:
+		$ zicroram --help
+
+	3) Adding program/directories is as simple as:
 		$ zicroram --add <path_to_data>
 			or
 		$ zicroram -a <path_to_data>
 
 		Note: this will create a symlink to the program in /usr/bin/, read man pages carefully.
 	
-	3) Removing programs from RAMDISK can be simply done as this:
+	4) Removing programs from RAMDISK can be simply done as this:
 		$ zicroram --remove
 			or
 		$ zicroram --remove <some_program>
 			or
 		$ zicroram -r
 	
-	4) Data Backups can be done from RAM to DISK using the following:
+	5) Data Backups can be done from RAM to DISK using the following:
 		$ zicroram --mbackup
 			or
 		$ zicroram -mb
 	
-	5) Automatic Data Backups can be done using the following:
+	6) Automatic Data Backups can be done using the following:
 		$ zicroram -mtbackup
 			or
 		$ zicroram -mtbackup <program_name>
 			or
 		$ zicroram -mt
 	
-	6) Restoring data after power blackouts or any forced shutdown:
+	7) Restoring data back to disk after power blackouts or any forced shutdown:
 		$ zicroram --restore
 
 		Note: This will simply move the data back to it's original place/name in disk.
+
+	8) Re-adds data to RAM after power blackouts or any forced shutdown (if you haven't used --restore yet):
+		$ zicroram --re-adds
+
 
 	CREATING .ZICRORAM FILES
 		source: https://github.com/srmfx/Zicroram?tab=readme-ov-file#creating-zicroram-files
@@ -31014,35 +31050,126 @@ under a CDDA(Compact Disc Digital Audio) layer.
 ---------------------
 ---------------------
 ---------------------
-7Z ZIP RAR TAR CHEAT SHEET
-	7Z
-		Extracting:
-			$ 7z x <file_to_extract>.7z -o<destination_directory>
+DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, RAR, ZIP, COMPRESS AND BZZ
+	GNU TAR, RAR, 7Z, BZIP2 and ZIP are both Archiving and Compression tools.
+While TAR originally was only meant as an archiving tool, GNU TAR allows it to use compression algorithms like 'bz' and 'gz'.
 
-			Example 1 - Extract into current directory:
-				$ 7z x File.7z -o./Folder\ for\ extraction
+Gunzip, Compress and Bzz in the other hand are 'compression algorithms' that can be both used as compression tool and compression algorithm for other
+programs like GNU Tar for example.
 
-		Listing Contents:
-			7z l <file_to_extract>.7z
-	
-	ZIP
-		Extracting:
-			$ unzip <file_to_extract>.zip -d <destination_directory>
+However, 'Compression Algorithms/Tools' lack the ability that 'Archiving Tools' have for Archiving and Compressing multiple files together into one single file.
+In the other hand, Archiving Tools like the ones described above have the ability to use several compression algorithms to achieve the goal of compressing data 
+when needed.
 
-		Listing contents:
-			$ unzip -l <file_to_extract>.zip
-				or
-			$ zip -sf <file_to_extract.zip>
+	7Z ZIP RAR TAR CHEAT SHEET
+		TAR
+			Compressing:
+				Tar has the ability to use filename extension to determine the compression algorithm to be used by passing the 'a' argument.
+				Tar also has the ability to store file/data permission and ownership.
 
-	TAR
-		Extracting:
-			$ tar xvf <file_to_extract>.tar --directory=<destination_directory>
+				Syntax:
+					$ tar caf <filename>.tar.<compression_algorithm> <path_to_data1> <path_to_data2> <path_to_data3>
 
-		Listing contents:
-			$ tar vtf <file_to_extract>.tar
-				or
-			$ tar tvf <file_to_extract>.tar
+				RECOMMENDED TOPICS: 
+					CREATING FILE ARCHIVES USING AR
+					CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
+						GNU TAR EXAMPLES
+							EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
+							EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
+								EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
+								EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
+								EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
+					COMPRESSION ALGORITHMS/FORMATS FOR GNU TAR
+					GNU TAR EXAMPLES
+
+				NOTE:
+					Using one of the compression algorithms/formats will require you to have it's tools installed on your system,
+					GNU TAR will usually complain when the tools fail to exist.
+
+				Practical example - using long name extensions:
+					$ tar caf ~/my\ filename.tar.xz ~/{file1,file2,file3}
+						or
+					$ tar caf ~/my\ filename.tar.lz ~/{file1,file2,file3}
+						or
+					$ tar caf ~/my\ filename.tar.zst ~/{file1,file2,file3}
+						or
+					$ tar caf ~/my\ filename.tar.gz ~/{file1,file2,file3}
+				
+				Practical example - using short name extensions:
+					$ tar caf ~/my\ filename.txz ~/{file1,file2,file3}
+						or
+					$ tar caf ~/my\ filename.tlz ~/{file1,file2,file3}
+						or
+					$ tar caf ~/my\ filename.tzst ~/{file1,file2,file3}
+						or
+					$ tar caf ~/my\ filename.tgz ~/{file1,file2,file3}
+
+			Extracting:
+				If you intend to preserve file permission and ownership when extracting files, you need to run 'tar' as root:
+					# tar xvf <file_to_extract>.tar --directory=<destination_directory>
+
+				If running 'tar' as a regular user when extracting the files, then 'tar' will extract files using default system permission/ownership
+				when extracting them:
+					$ tar xvf <file_to_extract>.tar --directory=<destination_directory>
+
+				VERY IMPORTANT: Most of the time, when a program is distributed in .tar format, it's distributed this way to preserve data permission and 
+				ownership. Because of this, it's recommended to always extract .tar files as root.
+
+			Listing Contents:
+				$ tar vtf <file_to_extract>.tar
+					or
+				$ tar tvf <file_to_extract>.tar
+				
+		------------------------
+		7Z
+			NOTE: While '7z' does support the creation and extraction of .tar archives, it's not possible to extract - under a single command - .tar files that 
+		have been compressed under compression algorithms (ex.: tar.gz, tar.zst, tar.lz, ... ); this task has to be done programmatically using multiple commands.
+
+		The same has to be done if you want to create a .tar archive and compress it using a 'compression algorithm', this task has to be done programmatically
+		See 'Practical Example 3' for both Compression and Extracting below:
+
+			Compressing:
+				Syntax:
+					$ 7z a <filename>.7z <data_1> <data_2> <data_3>
+
+				Practical Example 1:
+					$ 7z a ~/My\ Filename.7z ~/{data_1,data_2,data_3}
+				
+				Practical Example 2 - Creating .tar Archive - :
+					$ 7z a -ttar ~/My\ Filename.tar ~/{data_1,data_2,data_3}
+
+				Practical Example 3 - Creating .tar.gz archive - :
+					$ 7z a -ttar ~/My\ Filename.tar ~/{data_1,data_2,data_3} &&
+					$ 7z a -tgzip ~/My\ Filename.tar.gz ~/My\ Filename.tar &&
+					$ rm ~/My\ Filename.tar
+
+			Extracting:
+				$ 7z x <file_to_extract>.7z -o<destination_directory>
+
+				Practical Example 1 - Extract Into Current Directory - :
+					$ 7z x File.7z -o./Folder\ for\ extraction
+
+				Practical Example 2 - Extracting .tar Archive - :
+					$ 7z x File.tar -o./Folder\ for\ extraction
+
+				Practical Example 3 - Extracting .tar.gz Archive - :
+					$ 7z x File.tar.gz -o./Folder\ for\ extraction/ &&
+					$ 7z x File.tar -o./Folder\ for\ extraction/decompressed/;
+
+			Listing Contents:
+				7z l <file_to_extract>
 		
+		------------------------
+		ZIP
+			Extracting:
+				$ unzip <file_to_extract>.zip -d <destination_directory>
+
+			Listing contents:
+				$ unzip -l <file_to_extract>.zip
+					or
+				$ zip -sf <file_to_extract.zip>
+
+			
 
 ---------------------
 ---------------------
@@ -32074,6 +32201,16 @@ TEMPORARY 2:
 	check on /etc/X11/xorg.conf
 4 - Explain how to apply 'clock.force-quantum' and 'clock.force-rate' on an application basis and also on a device basis:
 	check on /etc/pipewire/pipewire-pulse.conf
+5 - Explain how to use openssl and gpg for encrypt/decrypting archives and normal files
+	encrypting:
+		$ tar cz ./path\ to\ data  | openssl enc -aes-256-cbc -p<password> -iter 100000 -e > <filename>.tar.gz.enc
+			or
+		$ openssl aes-256-cbc -a -salt -p<password> -in <filename>.txt -out <filename>.txt.enc
+
+	decrypting:
+		$ openssl enc -aes-256-cbc -d -in <filename>.tar.gz.enc | tar xz
+			or
+		$ openssl aes-256-cbc -d -a -p<password> -in <filename>.txt.enc -out <filename>.txt.new
 
 ---
 VERY IMPORTANT/TASK  LOGS:
