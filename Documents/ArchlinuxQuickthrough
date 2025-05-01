@@ -1045,10 +1045,10 @@ USE LICENSE:
 ========================================INDEX SYNTAX / SYNTAX CONVENTION========================================
 -REMOVE			#PARTS THAT NEED TO BE REMOVED BEFORE UPLOADING .
 NOT ON INDEX		#Topics that haven't been set on Index.
-S-INDEX			#When queried/searched will show the the beginning of this Document Index.
-END INDEX		#Indicates the End of the Index.
-SYNTAX INDEX		#Will display this section here.
-[INDEX: ...TEXT...]	#This will indicate a topic or group of topics that can be found in the Document INDEX.
+S-INDEX			#When queried/searched it will show the the beginning of this document Index.
+END INDEX		#Indicates the End of this document Index.
+SYNTAX INDEX		#When queried/searched it Will display this section here.
+[INDEX: ...TEXT...]	#This will indicate a topic or group of topics that can be found in this document INDEX.
 
 IMPORTANT		#INDICATES VERY IMPORTANT NOTES ACROSS THE DOCUMENT.
 VERY IMPORTANT		#Same thing as above.
