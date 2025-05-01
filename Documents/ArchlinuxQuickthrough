@@ -1,5 +1,5 @@
 {USE LICENSE}
-{INDEX}
+{S-INDEX, [INDEX], INDEX SYNTAX}
 {STACK OF  THINGS DONE}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
 {OPTIMIZATION, TWEAK}
@@ -44,7 +44,7 @@ USE LICENSE:
 9 - Most important, if you don't agree with this 'use license', then you'll not use, modify nor distribute any of the contents provided here neither in it's full form nor sub-parts.
 
 ---
-========================================INDEX========================================
+========================================S-INDEX========================================
 --LINUX:
 	USING RAMDISK UTILITY IN LINUX | ZICRORAM
 		CREATING .ZICRORAM FILES
@@ -300,8 +300,23 @@ USE LICENSE:
 
 		USING CDPARANOIA TO EXTRACT AUDIO FROM .BIN .CUE FILES | EXTRACTING AUDIO FROM CD-ROM CONTAINNING CDDA LAYER
 
-		DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, RAR, ZIP, COMPRESS AND BZZ
-			7Z ZIP RAR TAR CHEAT SHEET
+		[INDEX: COMPRESSING AND UNCOMPRESSING FILES & DATA]
+			CREATING FILE ARCHIVES USING AR
+			DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, ZIP, COMPRESS AND BZZ
+			CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
+				7Z ZIP TAR CHEAT SHEET
+					PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
+				GNU TAR EXAMPLES
+					EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
+					EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
+						EXAMPLE 1.0 - EXTRACTING ARCHIVES FROM UNTRUSTED SOURCES
+						EXAMPLE 1.1 - DELETING FROM TAR ARCHIVE
+						EXAMPLE 1.2 - AUTO COMPRESSING TAR ARCHIVE
+						EXAMPLE 1.3 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
+						EXAMPLE 1.4 - SPLITTING A LARGE FILE INTO MANY DIFFERENT FILES | SPLITTING A FILE INTO DIFFERENT CHUNKS USING TAR
+						EXAMPLE 1.5 - EXTRACTING SPLIT FILES USING TAR
+				IMPORTANT TAR RESOURCE LINKS
+				COMPRESSION ALGORITHMS/FORMATS FOR GNU TAR
 
 		HOW TO USE THE 'LESS' COMMANDLINE TOOL
 		USING CUPS FOR HANDLING PRINTERS AND PRINTING DOCUMENTS ON LINUX
@@ -501,16 +516,6 @@ USE LICENSE:
 			IMPROVING PYTHON PACKAGES PERFORMANCE
 			HOW TO COMPILE YOUR PROGRAMS THROUGH YAY AND PACMAN FOR PERFORMANCE GAINS
 			SOMETHING ABOUT COMPILE, DEBUG, TEST AND RELEASE
-		CREATING FILE ARCHIVES USING AR
-
-		CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
-			7Z ZIP RAR TAR CHEAT SHEET
-			GNU TAR EXAMPLES
-				EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
-				EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
-					EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
-					EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
-					EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
 
 	---BASICS:
 		FINDING OUT IF COMMAND IS A BINARY EXECUTABLE OR A SHELL BUILT IN COMMAND
@@ -889,15 +894,6 @@ USE LICENSE:
 		PERMANENT SETTINGS
 	DISABLING IPV6 TEMPORARILY
 	USING GAMECONQUEROR  ON GAMES
-	CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
-		7Z ZIP RAR TAR CHEAT SHEET
-		COMPRESSION ALGORITHMS/FORMATS FOR GNU TAR
-		GNU TAR EXAMPLES
-			EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
-			EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
-				EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
-				EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
-				EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
 	NSCDE HOTKEYS
 	PAL VS NTSC GAMES
 	IMPROVING GRAPHICS ON LINUX
@@ -1047,32 +1043,41 @@ USE LICENSE:
 	OLD KERNELS
 ========================================END INDEX ========================================
 ========================================INDEX SYNTAX / SYNTAX CONVENTION========================================
--REMOVE			#PARTS THAT NEED TO BE REMOVED BEFORE UPLOADING 
-NOT ON INDEX		#Topics that haven't been set on Index
+-REMOVE			#PARTS THAT NEED TO BE REMOVED BEFORE UPLOADING .
+NOT ON INDEX		#Topics that haven't been set on Index.
+S-INDEX			#When queried/searched will show the the beginning of this Document Index.
+END INDEX		#Indicates the End of the Index.
+SYNTAX INDEX		#Will display this section here.
+[INDEX: ...TEXT...]	#This will indicate a topic or group of topics that can be found in the Document INDEX.
 
-IMPORTANT		#INDICATES VERY IMPORTANT NOTES ACROSS THE DOCUMENT
-VERY IMPORTANT		#Same thing as above
+IMPORTANT		#INDICATES VERY IMPORTANT NOTES ACROSS THE DOCUMENT.
+VERY IMPORTANT		#Same thing as above.
+NOTE:			#Will indicate minor notes throughout the document.
 
-WARNING			#INDICATES VERY DANGEROUS COMMAND THAT COULD MAKE YOUR COMPUTER DEFFECTIVE
+WARNING			#INDICATES VERY DANGEROUS COMMAND THAT COULD MAKE YOUR COMPUTER DEFFECTIVE.
 
-TODO LATER		#THINGS THAT NEED TO BE DONE IN THIS DOCUMENTATION
-CHECK LATER		^ Same as Above
+TODO LATER		#THINGS THAT NEED TO BE DONE IN THIS DOCUMENTATION.
+CHECK LATER		^ Same as Above.
 
-CHECK			#INDICATES INFORMATION THAT NEEDS TO BE CHECKED / RE-CHECKED TO MAKE SURE IT WORKS OR IS NOT A MISTAKE
+CHECK			#INDICATES INFORMATION THAT NEEDS TO BE CHECKED / RE-CHECKED TO MAKE SURE IT WORKS OR IS NOT A MISTAKE.
 
 [code]
-	...		#MEANS EVERYTHING INSDIE THIS TAG IS A CODE
+	...		#MEANS EVERYTHING INSDIE THIS TAG IS A CODE.
 [/code]
 
--T			#MARKUP TAG I USE TO READ THINGS LATER
+[file]
+	...		#INDICATES THE CONTENTS OF A FILE.
+[/file]
 
-=======			#WILL USUALLY SEPARATE UNRELATED SECTIONS FROM ONE ANOTHER
+-T			#MARKUP TAG I USE TO READ THINGS LATER.
+
+=======			#WILL USUALLY SEPARATE UNRELATED SECTIONS FROM ONE ANOTHER.
 
 -------			#WILL SEPARATE SUB-SECTIONS WHO ARE STILL RELATED TO EACH OTHER OR STILL RELATED TO THE MAIN SECTION
 			Note: Throughout multiple parts of this document, I'll use multiple lines '-----' to indicate complete different sections.
 
 
-^			#The '^' character will be usually used to describe the upper line content.
+^			#The '^' character will be usually used to describe the upper line content. This is only meant for readibility.
 
 
 New Syntax(2023):
@@ -18247,9 +18252,9 @@ to run it from a file, type bash <file.sh>
 Another important part of the while loop is i=$(($i+1)) or (($i++)) which increments the counter until the test condition becomes false.
 
 8 - MONITORING LOG FILES IN REAL TIME
-#tail -f /var/log/apache2/access.log
-	or
-#tailf /var/log/apache2/access.log
+	# tail -f /var/log/apache2/access.log
+		or
+	# tailf /var/log/apache2/access.log
 
 Usually, the log files are rotated frequently on a Linux server by the logrotate utility. 
 TO WATCH LOG FILES THAT GET ROTATED ON A DAILY BASE you can use the -F flag to tail command.
@@ -22483,7 +22488,7 @@ EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
 							file is extracted, older versions are kept in the archive.
 
 
-EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
+EXAMPLE 1.1 - DELETING FROM TAR ARCHIVE
 	$ tar --delete -f ./my_filename.tar ./file_1	# Deletes data from archive
 							^ can not delete from compressed archives
 							^ it's note possible to use both UNIX and GNU Style together:
@@ -22492,13 +22497,41 @@ EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
 							^ when going for UNIX Style, all options have to be given
 							in UNIX-STYLE; same happens for GNU-STYLE.
 
-EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
+EXAMPLE 1.2 - AUTO COMPRESSING TAR ARCHIVE
 	$ tar caf ./my_filename.tar.gz ./my_filename.tar		#[A]uto-compresses my_filename.tar into gzip format
 
 
-EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
+EXAMPLE 1.3 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
 	$ tar xkf path/to/source.tar --wildcards "*.html"		#Extracts only .html files/dirs
 
+EXAMPLE 1.4 - SPLITTING A LARGE FILE INTO MANY DIFFERENT FILES | SPLITTING A FILE INTO DIFFERENT CHUNKS USING TAR
+	A) Example 1.5.1 - Non-GNU Tar - :
+		NOTE: This will not work on GNU Version of Tar:
+		This will split a larger file called 'myfile' in chunks of 1MB and name them as my_archive using numbering from 0 to 50:
+			$ tar -cav -M --tape-length=1M --file=my_archive-{00..50}.tar.gz ./myfile
+
+	B) Example 1.5.2 - GNU Tar - :
+		Using the 'split' tool is required for the GNU version of Tar:
+			$ tar cvzf - ./myfile | split -b 10M - ./myfile.backup.tar.gz.
+				or
+			$ tar cvzf - ./myfile | split --bytes=10MB - ./myfile.backup.tar.gz.
+
+		Note 1: -z creates 'gz' compressed file; -J creates 'xz' compressed file; check tar manual(man tar) for more options.
+		Note 2: files will be split using letters.
+
+EXAMPLE 1.5 - EXTRACTING SPLIT FILES USING TAR 
+	 This will extract all files named 'myfile.backup.tar.gz' into the current dir:
+		$ cat myfile.backup.tar.gz.* | tar xzvf - 
+			or
+		$ mkdir ./extracted && cat myfile.backup.tar.gz.* | tar xzv --directory=./extracted -f -
+
+		Note 1: -z extracts 'gz' compressed files; -J extracts 'xz' compressed files; check tar manual(man tar) for more options.
+
+
+IMPORTANT TAR RESOURCE LINKS: 
+	https://www.gnu.org/software/tar/manual/html_section/tar_toc.html#SEC_Contents
+	https://www.gnu.org/software/tar/manual/html_section/Styles.html#Styles
+	https://www.gnu.org/software/tar/manual/html_section/extract.html#extracting-untrusted-archives
 
 ---
 VERY IMPORTANT: TAR defaults to overwritting files on the disk, so becareful with TAR BOMBS who 
@@ -31050,8 +31083,8 @@ under a CDDA(Compact Disc Digital Audio) layer.
 ---------------------
 ---------------------
 ---------------------
-DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, RAR, ZIP, COMPRESS AND BZZ
-	GNU TAR, RAR, 7Z, BZIP2 and ZIP are both Archiving and Compression tools.
+DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, ZIP, COMPRESS AND BZZ
+	GNU TAR, 7Z, BZIP2 and ZIP are both Archiving and Compression tools.
 While TAR originally was only meant as an archiving tool, GNU TAR allows it to use compression algorithms like 'bz' and 'gz'.
 
 Gunzip, Compress and Bzz in the other hand are 'compression algorithms' that can be both used as compression tool and compression algorithm for other
@@ -31061,7 +31094,7 @@ However, 'Compression Algorithms/Tools' lack the ability that 'Archiving Tools' 
 In the other hand, Archiving Tools like the ones described above have the ability to use several compression algorithms to achieve the goal of compressing data 
 when needed.
 
-	7Z ZIP RAR TAR CHEAT SHEET
+	7Z ZIP TAR CHEAT SHEET
 		TAR
 			Compressing:
 				Tar has the ability to use filename extension to determine the compression algorithm to be used by passing the 'a' argument.
@@ -31071,16 +31104,7 @@ when needed.
 					$ tar caf <filename>.tar.<compression_algorithm> <path_to_data1> <path_to_data2> <path_to_data3>
 
 				RECOMMENDED TOPICS: 
-					CREATING FILE ARCHIVES USING AR
-					CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
-						GNU TAR EXAMPLES
-							EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
-							EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
-								EXAMPLE 1.2 - DELETING FROM TAR ARCHIVE
-								EXAMPLE 1.3 - AUTO COMPRESSING TAR ARCHIVE
-								EXAMPLE 1.4 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
-					COMPRESSION ALGORITHMS/FORMATS FOR GNU TAR
-					GNU TAR EXAMPLES
+					[INDEX: COMPRESSING AND UNCOMPRESSING FILES & DATA]
 
 				NOTE:
 					Using one of the compression algorithms/formats will require you to have it's tools installed on your system,
@@ -31128,6 +31152,9 @@ when needed.
 		The same has to be done if you want to create a .tar archive and compress it using a 'compression algorithm', this task has to be done programmatically
 		See 'Practical Example 3' for both Compression and Extracting below:
 
+			RECOMMENDED TOPICS: 
+				[INDEX: COMPRESSING AND UNCOMPRESSING FILES & DATA]
+
 			Compressing:
 				Syntax:
 					$ 7z a <filename>.7z <data_1> <data_2> <data_3>
@@ -31142,6 +31169,30 @@ when needed.
 					$ 7z a -ttar ~/My\ Filename.tar ~/{data_1,data_2,data_3} &&
 					$ 7z a -tgzip ~/My\ Filename.tar.gz ~/My\ Filename.tar &&
 					$ rm ~/My\ Filename.tar
+
+				Practical Example 5 - Appending Multiple files - :
+					$ 7z a ~/My\ Filename.7z ~/file\ 1;
+					$ 7z a ~/My\ Filename.7z ~/file\ 2;
+					$ 7z a ~/My\ Filename.7z ~/file\ 3;
+
+				Practical Example 6 - Adding Header Encryption -:
+					Header Encryption prevents compressed files from being listed:
+						7z a -mhe=on archive.7z ~/{data_1,data_2,data_3}
+
+					ex. typing this command will not work:
+						$ 7z l archive.7z
+
+			       Practical Example 7 - Protecting compressed archive with Password -:
+					7z a -p<password> <archive>.7z <data_to_compress>
+					
+					Example:
+						7z a -pmy_password archive.7z ~/{data_1,data_2,data_3}
+
+				Practical Example 8 - Adding both Header Encryption and Password - :
+					7z a -mhe=on -p<password> <archive>.7z <data_to_compress>
+				
+					Example:
+						7z a -mhe=on -pmy_password archive.7z ~/{data_1,data_2,data_3}
 
 			Extracting:
 				$ 7z x <file_to_extract>.7z -o<destination_directory>
