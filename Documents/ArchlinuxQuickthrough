@@ -5473,10 +5473,15 @@ CLEANING COMMIT HISTORY FROM MAIN BRANCH:
 			1.7 - Erasing the orphan branch created at #1.2, since there's no need for it:
 				$ git branch -df <branch_name_from_step_1.2>
 
-			1.8 - (Optional) If you really don't want to keep the history around you can completely 
+			1.8 - Set new upstream branch
+				Even under the same name, git will complain about new upstream branch not being set.
+					$ git push --set-upstream origin main 
+
+			1.9 - (Optional) If you really don't want to keep the history around you can completely 
 			throw away the branch created on step #1.1f:
 				$ git branch -df <branch_name_from_step_1>
 
+		
 			CLEANING REFERENCE LOGS
 				1 - (Optional) reference logs are still kept even after deleting a branch
 				you can check using the following command:
