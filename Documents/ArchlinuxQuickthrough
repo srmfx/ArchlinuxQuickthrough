@@ -31196,22 +31196,22 @@ when needed.
 
 				Practical Example 6 - Adding Header Encryption -:
 					Header Encryption prevents compressed files from being listed:
-						7z a -mhe=on archive.7z ~/{data_1,data_2,data_3}
+						$ 7z a -mhe=on archive.7z ~/{data_1,data_2,data_3}
 
 					ex. typing this command will not work:
 						$ 7z l archive.7z
 
 			       Practical Example 7 - Protecting compressed archive with Password -:
-					7z a -p<password> <archive>.7z <data_to_compress>
+					$ 7z a -p<password> <archive>.7z <data_to_compress>
 					
 					Example:
-						7z a -pmy_password archive.7z ~/{data_1,data_2,data_3}
+						$ 7z a -pmy_password archive.7z ~/{data_1,data_2,data_3}
 
 				Practical Example 8 - Adding both Header Encryption and Password - :
-					7z a -mhe=on -p<password> <archive>.7z <data_to_compress>
+					$ 7z a -mhe=on -p<password> <archive>.7z <data_to_compress>
 				
 					Example:
-						7z a -mhe=on -pmy_password archive.7z ~/{data_1,data_2,data_3}
+						$ 7z a -mhe=on -pmy_password archive.7z ~/{data_1,data_2,data_3}
 
 			Extracting:
 				$ 7z x <file_to_extract>.7z -o<destination_directory>
@@ -31227,7 +31227,7 @@ when needed.
 					$ 7z x File.tar -o./Folder\ for\ extraction/decompressed/;
 
 			Listing Contents:
-				7z l <file_to_extract>
+				$ 7z l <file_to_extract>
 		
 		------------------------
 		ZIP
