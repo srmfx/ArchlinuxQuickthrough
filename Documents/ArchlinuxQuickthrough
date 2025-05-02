@@ -299,6 +299,7 @@ USE LICENSE:
 			WORKAROUND FOR FIREFOX IN RAMDISK
 
 		USING CDPARANOIA TO EXTRACT AUDIO FROM .BIN .CUE FILES | EXTRACTING AUDIO FROM CD-ROM CONTAINNING CDDA LAYER
+		HOW TO USE KEXEC FOR EXECUTING A FAST SYSTEM REBOOT
 
 		[INDEX: COMPRESSING AND UNCOMPRESSING FILES & DATA]
 			CREATING FILE ARCHIVES USING AR
@@ -25238,7 +25239,7 @@ SOLVING STEAM FILE PICKING ISSUE / STEAM FILE PICKER NOT WORKING
 			kdegraphics-thumbnailers (optional)
 
 	Make sure xdg-desktop-portal-kde is running before restarting the xdg-desktop-portal service:
-		$systemctl restart --user xdg-desktop-portal
+		$ systemctl restart --user xdg-desktop-portal
 	
 	hint: ^ /usr/lib/xdg-desktop-portal-kde needs to be run before restarting the service above. 
 	pacman -Ql xdg-desktop-portal-kde if it's not located in /usr/lib/.
@@ -30529,39 +30530,12 @@ TODO #40:
 
 	Only use this if the system is 100% okay and if it's not okay, do a full-system restart.
 
-TODO #41:
-	Explain how 'systemctl kexec' can be used to quickly restart the system into another 
-	or same kernel after an installation/update.
 
-	example:
-		# kexec -l /boot/vmlinuz-linux --initrd=/boot/initramfs-linux.img --reuse-cmdline
-		# systemctl kexec
-
-
-	To simply reboot on same kernel after a kernel update, you might type, as long as kexec -l has not been used:
-		# systemctl kexec
-
-	VERY IMPORTANT: 
-		A) Warning: Running kexec -e directly will not unmount active filesystems or terminate any running services gracefully.
-		B) Using KEXEC is not very recommended, because disks may fail to unmount causing data corruption.
-
-		C) kexec skips all the firmware and bootloader stuff that might have been upgraded with the system, 
-		which is what takes most of the time during boot proccess.
-
-		D) if /boot/ is on a different filesystem, it may not be mounted/unmounted first,
-		causing data corruption.
-
-		E) As a recommendation, avoid using this, do a full-system reboot after each kernel update.
-		if you still need a fast reboot, go for ssystemctl soft-reboot which restarts only userspace and poses
-		no danger.
-
-	source: https://wiki.archlinux.org/title/Kexec
-
-TODO #42 - DONE:
+TODO #40 - DONE:
 	Is switching wine prefix graphic's renderer from opengl to vulkan safe through winetricks?
 	ANSWER: NO!
 
-TODO #43:
+TODO #41:
 	WHAT IS DXVK AND VKD3D?
 		DXVK_HUD=full it's just used to show data on HUD about framerate and other stuff for DXVK games.
 		the DXVK_HUD is only meant for displaying HUD Data on screen about DXVK.
@@ -30572,14 +30546,14 @@ TODO #43:
 
 
 		VKD3D is the same thing as DXVK but translates Directx 12 to vulkan.
-TODO #44:
+TODO #42:
 	explain bootctl
 
-TODO #45
+TODO #43
 	yay -P --stats
 
 
-TODO #47:
+TODO #44:
 	NEW HARD DRIVE TOOL:
 	udiskctl can be used to mount removable medias, udiskie to automount them.
  	Udisks2 is a Daemon, tools and libraries to access and manipulate disks, storage devices and technologies
@@ -30612,12 +30586,12 @@ TODO #47:
 
 		How to find logs by date in case they get corrupted?
 			ls -laR /var/log/journal/1aff91d6b7cb44acb83ed4c3a6493abb | grep "Jan..7"
-TODO #48:
+TODO #45:
 	Checking system crashes:
 		journalctl -u <tab-key>
 
 		usually systemd-coredump@ files can be checked in search for a possible system/program crashes.
-TODO #49:
+TODO #46:
 	Learn to use SED, example:
 		$sed -i "s/\[\"api.alsa.period-size\"\] = [[:digit:]]*/\[\"api.alsa.period-size\"\] = 2024/" ~/.config/wireplumber/main.lua.d/50-alsa-config.conf
 sed -i "s/\[\"api.alsa.headroom\"\] = [[:digit:]]*/\[\"api.alsa.headroom\"\] = 22192/" ~/.config/wireplumber/main.lua.d/50-alsa-config.conf
@@ -30625,7 +30599,7 @@ sed -i "s/\[\"api.alsa.headroom\"\] = [[:digit:]]*/\[\"api.alsa.headroom\"\] = 2
 
 	sed will replace the default values with the given new values above in the given text file.
 
-TODO #50:
+TODO #47:
 As of 2023, There is a known systemd bug that automounts efi:
 https://bbs.archlinux.org/viewtopic.php?id=287760 
 
@@ -30638,7 +30612,7 @@ https://man.archlinux.org/man/core/systemd/systemd-gpt-auto-generator.8.en
 /run/systemd/generator.late/efi.autmount	#Why does it automounts? Probably a bug.
 
 
-TODO #51:
+TODO #48:
 	MOUNTING A BIN/ISO IMAGE
 		Install fuseiso and do as follow:
 			1) Mounting the image:
@@ -30647,24 +30621,24 @@ TODO #51:
 			2) Umounting:
 				$umount <mount_point>
 
-TODO #52:
+TODO #49:
 	Talk about how 'env' runs a program with modified environment variables.
 
-TODO #53:
+TODO #50:
 	Talk about $umount --lazy <mount_point> to force umount of filesystems, this requires an immediate system reboot
 	to prevent issues.
 
-TODO #54:
+TODO #51:
 	dm-crypt allows loop-devices to be encrypted at block-device level.
 	this is a good approach for encrypting certain parts of the system,
 	source: https://wiki.archlinux.org/title/Security
 	^ read data-at-rest encryption
 
-TODO #55:
+TODO #52:
 	lists open ports on the system:
 		#ss -lpntu
 
-TODO #56:
+TODO #53:
 	Tell the difference between wine, wine-ge, proton, proton-ge, lutris-ge. 
 	
 	wine-ge is a fork of wine, it's meant to be a bleeding edge version of wine,
@@ -30691,11 +30665,11 @@ TODO #56:
 	Games folder for steam:
 		 ~/.steam/steam/steamapps/common/
 	
-TODO #57:
+TODO #54:
 	Explain how to protect the /.fscrypt dir using GPG Signing Keys.
 	make a reference to "ENCRYPTING DIRECTORIES WITH SECURITY KEY INSTEAD OF PASSWORD | 2024"
 	
-TODO #58:
+TODO #55:
 	When writing scripts for unlocking key secured directories, tell the scripts
 	to use a temporary directory like /tmp/. and before running the script copy or symlink the key MANUALLY.
 
@@ -30703,13 +30677,13 @@ TODO #58:
 		1. This will avoid storing the key's location on the actual script.
 		2. You can easily change the location of the actual key without changing the whole script. 
 
-TODO #59:
+TODO #56:
 	Update program version on the zicroram manual
 
-TODO #60:
+TODO #57:
 	Talk about iptables and how to use it instead of firewalld.
 
-TODO #61:
+TODO #58:
 	WHAT ARE THE BOOTPC, BOOTPS SYSTEM PORTS THAT STEAM USES?
 	if you run 'ss -lsptu' on your linux system while running steam, you'll notice a bootpc port name
 	and if you run 'ss -lsnptu' you'll see it's number.
@@ -30733,19 +30707,19 @@ Note that to some extent this replaced the earlier RARP (reverse ARP) protocol, 
 
 The full lineage of this starts with RFC 903 (RARP) and RFC 906 (TFTP Boot) in 1984, then RFC 951 (BOOTP) in 1985, then RFC 2131 (DHCP) in 1997." SOURCE: https://www.quora.com/Why-are-port-67-and-68-registered-as-BOOTPS-and-not-DHCP | access: Feb 27 2024
 
-TODO #63:
+TODO #59:
 	Talk about syslog and rsyslog.
 
-TODO #64:
+TODO #60:
 	more find, awk and grep solutions
 
-TODO #65:
+TODO #61:
 	BlendOS as replacement for archlinux; is it good or just bloat tho?
 
-TODO #66:
+TODO #62:
 	Read and write something about 'homectl', 'man systemd-homed' and 'userdbctl'
 
-TODO #67:
+TODO #63:
 	Write something about:
 		# cpupower frequency-set -g performance
 			and
@@ -31083,6 +31057,46 @@ under a CDDA(Compact Disc Digital Audio) layer.
 			or
 		$ mkdir ~/audio_extract/ && cd ~/audio_extract && cdparanoia -d /dev/sr0 -B
 
+---------------------
+---------------------
+---------------------
+---------------------
+HOW TO USE KEXEC FOR EXECUTING A FAST SYSTEM REBOOT
+	WARNING: It's advisable not to use this, unless you're using a virtual machine and you're trying to buy time for testing stuff.
+	SOURCES: https://wiki.archlinux.org/title/Kexec ; https://access.redhat.com/solutions/7046293
+
+	Note: Read 'Very Important' sections below before using any of this:
+		Requirement:
+			'kexec-tools' must be installed on your system.
+
+		Steps:
+			# systemctl stop dbus-broker.service
+			# kexec -l /boot/vmlinuz-linux --initrd=/boot/initramfs-linux.img --reuse-cmdline
+			# systemctl kexec.target
+
+		Optional:
+			Read 'VERY IMPORTANT' notes below before using this:
+				Reboot with: # kexec -e
+
+		To simply reboot on same kernel after a kernel update, you might type, as long as kexec -l has not been used:
+			# systemctl start kexec
+
+VERY IMPORTANT 2: 
+	A) Warning: Running kexec -e directly will not unmount active filesystems or terminate any running services gracefully.
+	B) Using KEXEC is not very recommended, because disks may fail to unmount causing data corruption.
+
+	C) kexec skips all the firmware and bootloader stuff that might have been upgraded with the system, 
+	which is what takes most of the time during boot proccess.
+
+	D) if /boot/ is on a different filesystem, it may not be mounted/unmounted first,
+	causing data corruption.
+
+	E) As a recommendation, avoid using this, do a full-system reboot after each kernel update.
+	if you still need a fast reboot, go for systemctl soft-reboot which restarts only userspace and poses
+	no danger.
+
+	D) NO GPU: The graphics driver needs to be unloaded before a kexec, or the next kernel will not be able to gain exclusive control of the device. 
+	This is difficult to achieve manually because any programs which need exclusive control over the GPU (Xorg, display managers) must not be running. 
 
 ---------------------
 ---------------------
