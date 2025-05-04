@@ -2,7 +2,7 @@
 {S-INDEX, [INDEX], INDEX SYNTAX}
 {STACK OF  THINGS DONE}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
-{OPTIMIZATION, TWEAK}
+{OPTIMIZATION, TWEAK, PERFORMANCE, [PERFORMANCE]}
 {PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
 
 NOTES:
@@ -46,7 +46,7 @@ USE LICENSE:
 ---
 ========================================S-INDEX========================================
 --LINUX:
-	USING RAMDISK UTILITY IN LINUX | ZICRORAM
+	USING RAMDISK UTILITY IN LINUX | ZICRORAM | [PERFORMANCE]
 		CREATING .ZICRORAM FILES
 			RULES FOR IDENTATION AND COMMENTS IN .ZICRORAM FILES
 		ADDING PROGRAMS/DATA TO RAM DURING SYSTEM STARTUP USING ZICRORAM
@@ -292,7 +292,7 @@ USE LICENSE:
 		INCREASING SSD LIFETIME
 
 	---VERY BASIC:
-		USING RAMDISK UTILITY IN LINUX | ZICRORAM
+		USING RAMDISK UTILITY IN LINUX | ZICRORAM | [PERFORMANCE]
 			CREATING .ZICRORAM FILES
 				RULES FOR IDENTATION AND COMMENTS IN .ZICRORAM FILES
 			ADDING PROGRAMS/DATA TO RAM DURING SYSTEM STARTUP USING ZICRORAM
@@ -305,6 +305,13 @@ USE LICENSE:
 			CREATING FILE ARCHIVES USING AR
 			DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, ZIP, COMPRESS AND BZZ
 			CREATING ARCHIVE FILES USING GNU TAR, LIBARCHIVE, BSDTAR, PAX
+				COMPRESSION ALGORITHM TOOLS
+					GZ CHEAT SHEET
+						RUNNING/EXECUTING .GZ COMPRESSED BINARY FILES - [PERFORMANCE]
+					XZ CHEAT SHEET
+					ZSTD CHEAT SHEET
+					BROTLI CHEAT SHEET
+					OTHER COMPRESSION ALGORITHM TOOLS
 				7Z ZIP TAR CHEAT SHEET
 					PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
 				GNU TAR EXAMPLES
@@ -30891,7 +30898,7 @@ Mimapping has to be built on a per game basis.
 ---------------------
 ---------------------
 ---------------------
-USING RAMDISK UTILITY IN LINUX | ZICRORAM
+USING RAMDISK UTILITY IN LINUX | ZICRORAM | [PERFORMANCE]
 	Zicroram is available via github for those under GNU Linux distributions :
 		https://github.com/srmfx/Zicroram
 	
@@ -31102,16 +31109,317 @@ VERY IMPORTANT 2:
 ---------------------
 ---------------------
 ---------------------
-DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GUNZIP, ZIP, COMPRESS AND BZZ
+DIFFERENCE BETWEEN GNU TAR, 7Z, BZIP2, GZ, ZIP, COMPRESS, BZZ AND PACK
 	GNU TAR, 7Z, BZIP2 and ZIP are both Archiving and Compression tools.
 While TAR originally was only meant as an archiving tool, GNU TAR allows it to use compression algorithms like 'bz' and 'gz'.
 
-Gunzip, Compress and Bzz in the other hand are 'compression algorithms' that can be both used as compression tool and compression algorithm for other
+GZ, Compress, Bzz and Pack in the other hand are 'compression algorithms' that can be both used as compression tool and compression algorithm for other
 programs like GNU Tar for example.
 
 However, 'Compression Algorithms/Tools' lack the ability that 'Archiving Tools' have for Archiving and Compressing multiple files together into one single file.
 In the other hand, Archiving Tools like the ones described above have the ability to use several compression algorithms to achieve the goal of compressing data 
 when needed.
+
+
+	COMPRESSION ALGORITHM TOOLS
+		VERY IMPORTANT: If you want to archive multiple files and be able to extract them separately, use TAR in conjunction with one of the compression algorithms!
+	GNU TAR is capable of using these compression algorithm tools on it's own, so you likely don't have to use this step.
+	
+	However, it's possible to use different arguments than the default ones that GNU Tar uses, so using these is still an option,
+	for example, 'xz' tool allows using many different options for compression on .tar files: $ man tar
+
+	NOTE: Reminder that any person who wants to uncompress any of the compressed files created in this section must have the related capable tools 
+	installed on their system.
+
+		GZ CHEAT SHEAT
+			'GZ' has the best compatibility when it comes to running support on different operating system. On windows, it can be compressed/decompressed
+			by WINZIP and 7Z.
+
+			List of Tools: 
+				gzip, gunzip, gzexe, zcat, zmore, zless, zcmp, zdiff, zforce and znew.
+
+			1 - Compressing files to a single compressed .gz file:
+				NOTE: This will concatenate multiple files INTO ONE SINGLE FILE:
+					$ gzip -c ./file\ 1 ./file\ 2 >> file.gz;
+						or
+					$ gzip -c ./file\ 1 >> file.gz;
+					$ gzip -c ./file\ 2 >> file.gz;
+
+			2 - Integrity Test for compressed .gz file:
+				$ gzip -tv ./file.gz
+
+			3 - Compressing directory into a single compressed .gz file :
+				NOTE: This will concatenate all files from a given directory into ONE SINGLE FILE.
+					$ gzip -rc ./TEST\ FOLDER >> ./file.gz;
+
+			4 - Decompressing/Extracting file from compressed .gz file into the current folder:
+				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
+				$ gzip -dk ./file.gz 
+					or
+				$ gunzip -k ./file.gz
+				NOTE: the word 'gunzip' comes from the conjunction of 'g' letter and 'unzip', therefore 'gunzip' works the same way as 'unzip' does.
+
+			5 - Listing contents from compressed .gz file:
+				$ gzip -lv ./file.gz
+
+			6 - Directly Reading file from compressed .gz file:
+				NOTE: this will output the contents of a compressed file to the screen.
+					$ zcat ./file.gz
+
+					Practical example:
+						$ zcat /proc/config.gz
+
+			7 - Using zless for reading file from compressed .gz file: 
+				NOTE: this will output the contents of a compressed file to the screen.
+					$ zless /file.gz
+
+					Practical Example:
+						$ zless /proc/config.gz
+
+			8 - Comparing .gz files:
+				$ zcmp ./file\ 1.gz ./file\ 2.gz
+
+			9 - Displaying differences between two compressed .gz files:
+				$ zdiff ./file\ 1.gz ./file\ 2.gz
+
+			10 - RUNNING/EXECUTING .GZ COMPRESSED BINARY FILES - [PERFORMANCE]:
+				NOTE: 'gzexe' utility allows you to compress executables in place and have them automatically uncompress and execute when you run them.
+				NOTE: At current state of modern systems and linux, this will give you a performance boost.
+
+					# gzexe /usr/bin/your\ program
+
+					Practical Example:
+						# gzexe /usr/bin/firefox
+
+						Note: The original uncompressed file will be renamed to /usr/bin/firefox~
+
+					READ MORE ON:
+						https://en.wikipedia.org/wiki/Executable_compression
+
+		--------
+		--------
+		XZ CHEAT SHEAT
+			VERY IMPORTANT: Some people advocate against the use of 'XZ', due to XZ not being future proof, which means some XZ compressed files might not be 
+			recoverable/decompresed when using future versions of the tools available for 'XZ'.
+
+			List of Tools:
+				xz, xzcat, xzcmp, xzdiff, xzdec, xzegrep, xzfgrep, xzgrep, xzless and xzmore
+
+			1 - Compressing file into a single .xz file in the current folder:
+				NOTE: This will compress 'file 1' and 'file 2' into 'file 1.xz' and 'file 2.xz' respectively.
+				NOTE: -k option will prevent original uncompressed files from being deleted after compression.
+				NOTE: -f option will overwrite any compressed .xz file if they already exist
+
+					$ xz -k ./file\ 1 ./file\ 2
+						or
+					$ xz ./file\ 1 ./file\ 2
+
+				NOTE: See 'xz -lv' below
+
+				1.1 - Compressing file using Compression level:
+					NOTE: -k option will prevent original files from being deleted after compression.
+					NOTE: -f option will overwrite any compressed .xz file if they already exist
+
+					1.1.1 - Fastest Compression level:
+						$ xz -kf0 ./file\ 1
+							or
+						$ xz -0 -fk ./file\ 1
+
+					1.1.2 - Slowest & Best Compression:
+						$ xz -kf9 ./file\ 1
+							or
+						$ xz -9 -fk ./file\ 1
+
+			2 - Integrity Test of Compressed .xz file:
+				$ xz -t ./file.xz 
+
+			3 - Decompressing/Extract file from .xz compressed file:
+				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
+				NOTE: -k option will prevent original files from being deleted after decompression/extraction.
+
+					$ xz -dk ./file.xz
+						or
+					$ xz -d ./file.xz
+						or
+					$ xzdec ./file.xz >> ./file
+
+			4 - Listing contents from compressed .xz file:
+				NOTE: this will output the contents of a compressed file to the screen.
+					$ xz -lv ./file.xz
+
+			5 - Directly reading file from .xz file:
+				$ xzcat ./file.xz
+
+			6 - Using xzless for reading file from compressed .xz file: 
+				NOTE: this will output the contents of a compressed file to the screen.
+				$ xzless ./file.xz
+
+			7 - Comparing content of two different compressed .xz files:
+				$ xzcmp ./file\ 1.xz ./file\ 2.xz
+
+			8 - Displaying content differences between two compressed .xz files:
+				$ xzdiff ./file\ 1.xz ./file\ 2.xz
+
+		--------
+		--------
+		ZSTD CHEAT SHEET
+			ZSTD has support for multi-threading for compression and decompression; this allows it to take advantage of most modern CPUs 
+			for both speed and compression.
+
+			List of Tools:
+				zstd, zstdcat, zstdgrep, zstdless and zstdmt.
+
+			1 - Compressing file into a single .zst file in the current folder:
+				NOTE: This will compress 'file 1' and 'file 2' into 'file 1.zst' and 'file 2.zst' respectively.
+				NOTE: -f option will overwrite any compressed .zst file if they already exist
+
+					$ zstd -zf ./file\ 1 ./file\ 2
+						or
+					$ zstd -z ./file\ 1 ./file\ 2
+					
+				1.1 - Compressing and  Spliting files into blocks of bytes size 
+					$ zstd -zf -B10 ./file\ 1
+						or
+					$ zstd -zfB10 ./file\ 1
+
+				1.2 - Compressing into a different directory:
+					$ mkdir ./newfolder;  zstd -zf ./file\ 1 -o ./newfolder/file1.zst
+
+				1.3 - Compressing file using Compression level:
+					Just listing a few of the many options available in the 'zstd' man page.
+					Check 'ADVANCED COMPRESSION OPTIONS' on zstd's man page for more options.
+
+					NOTE: Compression Level defaults to '3' whenever unspecified.
+					NOTE: -f option will overwrite any compressed .zst file if they already exist
+					NOTE: -T0 allows to use multi-thread, '0' automatically attempts to detect how many physical CPU cores are available.
+					NOTE: Ultra allows to increase Compression level beyond 19(level 20 to level 22).
+					NOTE: --auto-threads={physical,logical} only applied when using -T0, it allows to detect available CPU physical or logical cores
+					NOTE: --adapt[=min=#,max=#] allows zstd to adapt compression levels to perceived I/O conditions. Compression Level adaptation can
+					be observed with '-v' passed as argument. This works only with multi-threading and '--long'. (check 'man' page)
+
+
+					1.3.1 - Fastest Compression level:
+						$ zstd -zf -1 ./file\ 1
+							or
+						$ zstd -1zf ./file\ 1
+
+						1.3.1.1 - Using Multiple Cores:
+							$ zstd -zf -1 -T0 ./file\ 1
+								or
+							$ zstd -1zfT0 ./file\ 1
+
+					1.3.2 - Slowest & Best Compression:
+						$ zstd -zf -19 ./file\ 1
+							or
+						$ zstd -19zf ./file\ 1
+
+						1.3.2.1 - Using Multiple Physical Cores:
+							$ zstd -zf -19 -T0 ./file\ 1
+								or
+							$ zstd -19zfT0 ./file\ 1
+
+					1.3.3 - Using Ultra Compression:
+						$ zstd -zf --ultra -22 ./file\ 1
+							or
+						$ zstd -22zf --ultra ./file\ 1 
+							
+						1.3.3.1 - Using Multiple Physical cores:
+							$ zstd -zf --ultra -22 -T0 ./file\ 1
+								or
+							$ zstd -22zfT0 --ultra ./file\ 1
+
+					1.3.4 - Using Available Logical Cores:
+						$ zstd -zf -19 --auto-threads=logical -T0 ./file\ 1
+							or
+						$ zstd -19zfT0 --auto-threads=logical ./file\ 1
+
+			2 - Integrity Test of Compressed .zst file:
+				$ zstd -t ./file.zst
+
+			3 - Decompressing/Extract file from .zst compressed file:
+				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
+
+					$ zstd -fd ./file.zst
+						or
+					$ unzstd -f ./file.zst
+
+			4 - Listing contents from compressed .zst file:
+				NOTE: this will output the contents of a compressed file to the screen.
+					$ zstd -lv ./file.zst
+						or
+					$ zstd -l ./file.zst
+
+			5 - Directly reading file from .zst file:
+				$ zstdcat ./file.zst
+					or
+				$ zstd -dcf ./file.zst
+
+			6 - Using xzless for reading file from compressed .zst file: 
+				NOTE: this will output the contents of a compressed file to the screen.
+					$ zstdless ./file.zst
+
+			7 - Comparing content of two different compressed .zst files:
+				$ cmp ./file\ 1.zst ./file\ 2.zst
+
+			8 - Displaying content differences between two compressed .zst files:
+				$ diff ./file\ 1.zst ./file\ 2.zst
+		--------
+		--------
+		BROTLI CHEAT SHEET
+			'Brotli' offers very fast Decompression Times, however Compression Times are very slow.
+			It's currently in use by modern web browsers - date: 03/04/2025.
+
+			List of Tools:
+				brotli.
+
+			1 - Compressing files to a single compressed .br file:
+				NOTE: This will compress 'file 1' and 'file 2' into 'file 1.br' and 'file 2.br' respectively.
+				NOTE: -f option will overwrite any compressed .br file if they already exist
+					$ brotli -f ./file\ 1 ./file\ 2
+
+				1.1 - Compressing file using Compression level:
+					NOTE: -f option will overwrite any compressed .xz file if they already exist.
+					NOTE: -q defines compression level.
+					NOTE: -w sets LZ77 Window Size. -w 0 sets window size to automatic!
+
+					1.1.1 - Fastest Compression level:
+						$ brotli -fq 0 -w 10 ./file\ 1
+
+					1.1.2 - Slowest & Best Compression:
+						$ brotli -fq 10 -w 24 ./file\ 1
+
+			2 - Integrity Test for compressed .br file:
+				$ brotli --test -v ./file\ 1.br
+
+			3 - Decompressing/Extracting file from .br compressed file into the current folder:
+				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
+				$ brotli -df ./file\ 1.br
+					or
+				$ brotli -d ./file\ 1.br
+
+			4 - Listing contents from compressed .br file:
+				$ brotli --test -v ./file1.br     
+
+			5 - Comparing content of two different compressed .br files:
+				NOTE: Currently, brotli doesn't have any tools/options for comparing compressed .br files
+					$ cmp ./file\ 1.br ./file\ 2.br
+
+			6 - Displaying content differences between two compressed .br files:
+				NOTE: Currently, brotli doesn't have any tools/options for sorting differences on compressed .br files
+					$ diff ./file\ 1.br ./file\ 2.br
+
+		--------
+		--------
+		OTHER COMPRESSION ALGORITHM TOOLS:
+			BZIP2
+			LZIP
+			PBZIP ( Multi-threaded version of BZIP2 )
+			PLZIP ( Multi-threaded version of LZIP )
+			PXZ ( Multi-threaded version of XZ )
+			PIGZ ( multi-threaded version of GZIP )
+			PACK
+			DEFLATE (libdeflate) / rarely used
+			COMPRESS
 
 	7Z ZIP TAR CHEAT SHEET
 		TAR
@@ -31209,7 +31517,7 @@ when needed.
 
 				Practical Example 8 - Adding both Header Encryption and Password - :
 					$ 7z a -mhe=on -p<password> <archive>.7z <data_to_compress>
-				
+			
 					Example:
 						$ 7z a -mhe=on -pmy_password archive.7z ~/{data_1,data_2,data_3}
 
