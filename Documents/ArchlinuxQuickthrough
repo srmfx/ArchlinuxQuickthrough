@@ -792,7 +792,7 @@ USE LICENSE:
 
 	--PERMISSION SETTINGS
 		USER AND GROUPS CREATION AND OWNERSHIP
-		SUDO AND SU DIFFERENCES
+		DIFFERENCE BETWEEN SUDO, SU AND RUN0
 		TURNING OFF / DISABLE SPECIFIC LINUX BINARY && COMMANDS
 		BACKUP FILE PERMISSIONS BEFORE CHANGING THEM
 		RESTORE FILE PERMISSIONS
@@ -889,6 +889,12 @@ USE LICENSE:
 		HOW TO CHECK GNOME SETTING
 
 --MISCALENEOUS:
+	MONITORING LOG FILES IN REAL TIME
+		MULTITAIL COMMAND – MONITOR MULTIPLE LOG FILES IN REAL TIME
+		MULTITAIL COMMAND - USING LNAV FOR THE SAME TASK ABOVE
+		MULTITAIL COMMAND - USING LESS FOR THE SAME TASK ABOVE
+	DIFFERENCE BETWEEN SUDO, SU AND RUN0
+	RUNNING COMMANDS MULTIPLE TIMES IN LINUX | ITERATIVE LOOPS | ITERATION
 	FRAME INTERPOLATION
 	HTOP HOTKEYS
 	TOP HOTKEYS
@@ -9799,7 +9805,7 @@ id <user_name>							#Lists all groups and ids that belong to that user
 
 ===========SU AND SUDO:
 su <username>							#SU allows to login as another user
-sudo <command>							#Sudo allows to run a given command as root for the requesting user, all uses are then recorded.
+sudo <command>							#Sudo allows to run a given command as root for the requesting user, all uses are logged.
 sudo su <username>						#Runs su command as a sudo,
 								 this can help when a given a user can't login as another user into the system, this will then allow them
 								 to login as another user as a sudo/root user.
@@ -18236,12 +18242,19 @@ passwd_timeout sets the threshold in minutes for password input(Default is 5mins
 4.11 - SUDO INSULTS
 In case a user types a wrong password, sudo will display insults on the terminal with the insults parameter. This will automatically turn off the badpass_message parameter.
 
-	ex.: Defaults  insults
+	ex.: Defaults insults
 
-4.12 - DIFFERENCE BETWEEN SUDO AND SU
-‘su‘ forces you to share your root password to other users whereas ‘sudo‘ makes it possible to execute system commands without root password. ‘sudo‘ lets you use your own password to execute system commands i.e., delegates system responsibility without root password.
+4.12 - DIFFERENCE BETWEEN SUDO, SU AND RUN0
+Although optional, 'sudo' can log every single user access/use, whereas 'su' doesn't.
+'sudo' also maintains a user list access of those allowed to use it; that means when a user isn't on the '/etc/sudoers' list, they can't use the 'sudo' command, 
+even if they know the password.
+
+‘su‘ forces you to share your root password to other users who might need to use it for 'root'. Whereas ‘sudo‘ uses the user's own password for executing system commands. 
+in other words, ‘sudo‘ lets you use your own password to execute system commands i.e., delegates system responsibility without root password.
 
 ‘sudo‘ is a root binary setuid, which executes root commands on behalf of authorized users and the USERS NEED TO ENTER THEIR OWN PASSWORD to execute system command followed by ‘sudo‘.
+
+'run0' acts like 'sudo', but containerizes the executed command/user for safety. 'run0' however doesn't ever logs anything.
 
 5 - TOOLS FOR SECURELY REMOVING LINUX FILES
 List of Programs: shred, wipe, secure-delete(or srm), sfill, sswap, sdmem
@@ -18254,15 +18267,23 @@ $HISTCONTROL = ignorespace 		#ignores saving bash commands when they have an whi
 						ex.: $ echo "Hello World"
 $HISTCONTROL = ignoreboth		#ignores saving all bash command history
 
-7 - RUNNING COMMANDS MULTIPLE TIMES IN LINUX
+7 - RUNNING COMMANDS MULTIPLE TIMES IN LINUX | ITERATIVE LOOPS | ITERATION
 Type this on terminal or a bash script .sh file:
-	$for x in {1..10}; do echo "Hello World # $x"; done
+	$ for x in {1..10}; do echo "Hello World # $x"; done
 
 to run it from a file, type bash <file.sh>
 
-	$i=1; while [ $i -le 10 ]; do echo "Hello World #$i";((i++)); done
+	$ i=1; while [ $i -le 10 ]; do echo "Hello World #$i"; ((i++)); done
 
 Another important part of the while loop is i=$(($i+1)) or (($i++)) which increments the counter until the test condition becomes false.
+
+The command above is the same as the one bellow:
+	i=1;\                                                                                                                                                                   
+	while [ $i -le 10 ];
+	do
+		echo "hello world #$i";      
+		((i++));
+	done
 
 8 - MONITORING LOG FILES IN REAL TIME
 	# tail -f /var/log/apache2/access.log
@@ -18272,7 +18293,7 @@ Another important part of the while loop is i=$(($i+1)) or (($i++)) which increm
 Usually, the log files are rotated frequently on a Linux server by the logrotate utility. 
 TO WATCH LOG FILES THAT GET ROTATED ON A DAILY BASE you can use the -F flag to tail command.
 
-#tail -F /var/log/apache2/access.log
+# tail -F /var/log/apache2/access.log
 tail -F will read the newly created file as soon as it's truncated
 
 By default tail will display the last 10 lines of a given file,
@@ -18281,13 +18302,13 @@ you can increase/decrase that line count with : #tail -n2 -f /var/log/apache2/ac
 	8.1 MULTITAIL COMMAND – MONITOR MULTIPLE LOG FILES IN REAL TIME
 		MULTITAIL utility can monitor and keep track of multiple files in real time.
 	It'll also let you monitor different files back and forth.
-		ex.: #multitail /var/log/apache2/access.log /var/log/apache2/error.log
+		ex.: # multitail /var/log/apache2/access.log /var/log/apache2/error.log
 	
 	8.2 - MULTITAIL COMMAND - USING LNAV FOR THE SAME TASK ABOVE:
-		ex.: #lnav /var/log/apache2/access.log /var/log/apache2/error.log
+		ex.: # lnav /var/log/apache2/access.log /var/log/apache2/error.log
 	
 	8.2 - MULTITAIL COMMAND - USING LESS FOR THE SAME TASK ABOVE:
-		ex.: #less +F /var/log/apache2/access.log
+		ex.: # less +F /var/log/apache2/access.log
 		Alternatively the user can press Shift+F by running standard less command without +F.
 
 9 - MONITORING TOOLS
