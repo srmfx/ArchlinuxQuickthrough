@@ -18247,14 +18247,16 @@ In case a user types a wrong password, sudo will display insults on the terminal
 4.12 - DIFFERENCE BETWEEN SUDO, SU AND RUN0
 Although optional, 'sudo' can log every single user access/use, whereas 'su' doesn't.
 'sudo' also maintains a user list access of those allowed to use it; that means when a user isn't on the '/etc/sudoers' list, they can't use the 'sudo' command, 
-even if they know the password.
+even if they know the password. It's also possible to control which applications can be used by determined user(s) through 'sudo'.
 
-‘su‘ forces you to share your root password to other users who might need to use it for 'root'. Whereas ‘sudo‘ uses the user's own password for executing system commands. 
-in other words, ‘sudo‘ lets you use your own password to execute system commands i.e., delegates system responsibility without root password.
+‘su‘ forces the user to share the root password to other users who might need to use it for 'root'. Whereas ‘sudo‘ uses the user's own password for executing system commands. 
+in other words, ‘sudo‘ lets you use your own password to execute system commands, delegating system responsibility without the root password.
 
-‘sudo‘ is a root binary setuid, which executes root commands on behalf of authorized users and the USERS NEED TO ENTER THEIR OWN PASSWORD to execute system command followed by ‘sudo‘.
+‘sudo‘ is a root binary setuid, which executes root commands on behalf of authorized users and the USERS NEED TO ENTER THEIR OWN PASSWORD to execute system 
+command followed by ‘sudo‘.
 
-'run0' acts like 'sudo', but containerizes the executed command/user for safety. 'run0' however doesn't ever logs anything.
+'run0' acts like 'sudo', but containerizes the executed command/user for safety. 'run0' however doesn't ever logs anything other than adding a single entry to 
+/var/log/journal whenever executed. Run0 also doesn't use a file like '/etc/sudoers' for access control like 'sudo' does, Run0 instead does relies on Polkit for doing that.
 
 5 - TOOLS FOR SECURELY REMOVING LINUX FILES
 List of Programs: shred, wipe, secure-delete(or srm), sfill, sswap, sdmem
@@ -32611,6 +32613,8 @@ TEMPORARY 2:
 			or
 		$ openssl aes-256-cbc -d -a -p<password> -in <filename>.txt.enc -out <filename>.txt.new
 
+6 - Write something about POLKIT
+	https://wiki.archlinux.org/title/Polkit
 ---
 VERY IMPORTANT/TASK  LOGS:
 
