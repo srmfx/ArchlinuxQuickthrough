@@ -311,9 +311,16 @@ USE LICENSE:
 					XZ CHEAT SHEET
 					ZSTD CHEAT SHEET
 					BROTLI CHEAT SHEET
+					LZ4 CHEAT SHEET
 					OTHER COMPRESSION ALGORITHM TOOLS
 				7Z ZIP TAR CHEAT SHEET
-					PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
+					TAR CHEAT SHEET
+						TAR DATA COMPRESSION
+							MANUAL TAR COMPRESSION 
+							AUTOMATIC TAR COMPRESSION 
+					7Z CHEAT SHEET
+						PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
+					ZIP CHEAT SHEET
 				GNU TAR EXAMPLES
 					EXAMPLE 0 - EXTRACTING TAR DATA ON A GIVEN DIRECTORY
 					EXAMPLE 1 - CREATING, UPDATING AND APPENDING TO TAR ARCHIVE
@@ -323,7 +330,8 @@ USE LICENSE:
 						EXAMPLE 1.3 - EXTRACTING A CHOSEN FILE WITHIN TAR ARCHIVE
 						EXAMPLE 1.4 - SPLITTING A LARGE FILE INTO MANY DIFFERENT FILES | SPLITTING A FILE INTO DIFFERENT CHUNKS USING TAR
 						EXAMPLE 1.5 - EXTRACTING SPLIT FILES USING TAR
-				IMPORTANT TAR RESOURCE LINKS
+				IMPORTANT LINKS ABOUT COMPRESSION
+					IMPORTANT TAR RESOURCE LINKS
 				COMPRESSION ALGORITHMS/FORMATS FOR GNU TAR
 
 		HOW TO USE THE 'LESS' COMMANDLINE TOOL
@@ -22563,11 +22571,13 @@ EXAMPLE 1.5 - EXTRACTING SPLIT FILES USING TAR
 
 		Note 1: -z extracts 'gz' compressed files; -J extracts 'xz' compressed files; check tar manual(man tar) for more options.
 
+IMPORTANT LINKS ABOUT COMPRESSION:
+	https://wiki.archlinux.org/title/Archiving_and_compression
 
-IMPORTANT TAR RESOURCE LINKS: 
-	https://www.gnu.org/software/tar/manual/html_section/tar_toc.html#SEC_Contents
-	https://www.gnu.org/software/tar/manual/html_section/Styles.html#Styles
-	https://www.gnu.org/software/tar/manual/html_section/extract.html#extracting-untrusted-archives
+	IMPORTANT TAR RESOURCE LINKS: 
+		https://www.gnu.org/software/tar/manual/html_section/tar_toc.html#SEC_Contents
+		https://www.gnu.org/software/tar/manual/html_section/Styles.html#Styles
+		https://www.gnu.org/software/tar/manual/html_section/extract.html#extracting-untrusted-archives
 
 ---
 VERY IMPORTANT: TAR defaults to overwritting files on the disk, so becareful with TAR BOMBS who 
@@ -31154,6 +31164,17 @@ when needed.
 	NOTE: Reminder that any person who wants to uncompress any of the compressed files created in this section must have the related capable tools 
 	installed on their system.
 
+	VERY IMPORTANT NOTE: 
+		All of the compression tools listed here aren't capable of retrieving any kind of metadata directly from the files,
+	because of this, filename, filename extension and other meta-data about compressed files can't be retrieved/restored upon extraction.
+
+		The way most of these tools recover meta-data like filename and filename extension is simply by renaming the source file when
+	extracting/decompressing the file.
+
+	It's highly advisable that for storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR 
+	in conjunction with a Compression Algorithm like the ones described here for compression! READ TOPIC: 
+			MANUAL TAR COMPRESSION 
+
 		GZ CHEAT SHEAT
 			'GZ' has the best compatibility when it comes to running support on different operating system. On windows, it can be compressed/decompressed
 			by WINZIP and 7Z.
@@ -31168,6 +31189,11 @@ when needed.
 					$ gzip -c ./file\ 1 >> file.gz;
 					$ gzip -c ./file\ 2 >> file.gz;
 
+
+				VERY IMPORTANT: 
+					READ TOPIC: 
+						4 - Decompressing/Extracting file from compressed .gz file into the current folder
+
 			2 - Integrity Test for compressed .gz file:
 				$ gzip -tv ./file.gz
 
@@ -31176,11 +31202,33 @@ when needed.
 					$ gzip -rc ./TEST\ FOLDER >> ./file.gz;
 
 			4 - Decompressing/Extracting file from compressed .gz file into the current folder:
-				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
-				$ gzip -dk ./file.gz 
-					or
-				$ gunzip -k ./file.gz
-				NOTE: the word 'gunzip' comes from the conjunction of 'g' letter and 'unzip', therefore 'gunzip' works the same way as 'unzip' does.
+				Note: Unless --stdout or -o is specified, by default files are written to a new file whose name is derived from the source file name.
+				this means that if the compressed file wasn't named/renamed properly, it's filename extension will not be recovered upon extraction.
+
+				NOTE: the word 'gunzip' comes from the conjunction of 'g' letter and 'unzip', therefore 'gunzip' works the same way as 'unzip' does for 'zip'
+				files.
+
+				Reminder: Extraction/Decompression happens at current folder by default.
+
+					Example - Descompressing .mp3 file from compressed .gz file - good example:
+						This will rename file.mp3.gz to 'file.mp3' upon extraction:
+							$ gzip -dkf ./file.mp3.gz
+								or
+							$ gunzip -f ./file.mp3.gz
+								or
+							$ gunzip --stdout -f ./file.mp3.gz >> ./file.mp3
+
+					Example - Decompressing .mp3 file from file.gz - bad example:
+						As a result, the filename extension will be lost in all 2 examples.
+							$ zstd -dkf ./file.gz
+								or
+							$ gunzip -f ./file.gz
+
+						NOTE: It's still possible to recover the file if you know the filename extension by head:
+							$ gunzip --stdout -f ./file.gz >> ./file.mp3
+
+					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+					in conjunction with a Compression Algorithm like the one described here for compression!
 
 			5 - Listing contents from compressed .gz file:
 				$ gzip -lv ./file.gz
@@ -31239,6 +31287,10 @@ when needed.
 
 				NOTE: See 'xz -lv' below
 
+				VERY IMPORTANT: 
+					READ TOPIC: 
+						3 - Decompressing/Extracting file from .xz compressed file
+
 				1.1 - Compressing file using Compression level:
 					NOTE: -k option will prevent original files from being deleted after compression.
 					NOTE: -f option will overwrite any compressed .xz file if they already exist
@@ -31256,15 +31308,38 @@ when needed.
 			2 - Integrity Test of Compressed .xz file:
 				$ xz -t ./file.xz 
 
-			3 - Decompressing/Extract file from .xz compressed file:
+			3 - Decompressing/Extracting file from .xz compressed file:
 				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
 				NOTE: -k option will prevent original files from being deleted after decompression/extraction.
+				NOTE: -f forces file overwritting when it already exists.
+				NOTE: -d decompresses.
 
-					$ xz -dk ./file.xz
-						or
-					$ xz -d ./file.xz
-						or
-					$ xzdec ./file.xz >> ./file
+				Note: Unless --stdout or -o is specified, by default files are written to a new file whose name is derived from the source file name.
+				this means that if the compressed file wasn't named/renamed properly, it's filename extension will not be recovered upon extraction.
+
+				Reminder: Extraction/Decompression happens at current folder by default.
+
+					Example - Descompressing .mp3 file from compressed .xz file - good example:
+						This will rename file.mp3.xz to 'file.mp3' upon extraction:
+							$ xz -dkf ./file.mp3.xz
+								or
+							$ xz -dkf ./file.mp3.xz -o /tmp/file.mp3
+								or
+							$ xzdec -f ./file.mp3.xz >> /tmp/file.mp3
+
+					Example - Decompressing .mp3 file from file.xz - bad example:
+						As a result, the filename extension will be lost in all 3 examples.
+							$ xz -dkf ./file.xz
+								or
+							$ xz -dkf ./file.xz -o /tmp/extracted_content
+								or
+							$ xzdec -f ./file.xz >> /tmp/extracted_content
+
+						Note: if you know the filename extension, you can still recover by just renaming upon extraction:
+							$ xzdec -f ./file.xz  >> ./file.mp3
+				
+					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+					in conjunction with a Compression Algorithm like the one described here for compression!
 
 			4 - Listing contents from compressed .xz file:
 				NOTE: this will output the contents of a compressed file to the screen.
@@ -31299,16 +31374,15 @@ when needed.
 					$ zstd -zf ./file\ 1 ./file\ 2
 						or
 					$ zstd -z ./file\ 1 ./file\ 2
-					
-				1.1 - Compressing and  Spliting files into blocks of bytes size 
-					$ zstd -zf -B10 ./file\ 1
-						or
-					$ zstd -zfB10 ./file\ 1
 
-				1.2 - Compressing into a different directory:
+				VERY IMPORTANT: 
+					READ TOPIC: 
+						3 - Decompressing/Extracting file from .zst compressed file
+
+				1.1 - Compressing into a different directory:
 					$ mkdir ./newfolder;  zstd -zf ./file\ 1 -o ./newfolder/file1.zst
 
-				1.3 - Compressing file using Compression level:
+				1.2 - Compressing file using Compression level:
 					Just listing a few of the many options available in the 'zstd' man page.
 					Check 'ADVANCED COMPRESSION OPTIONS' on zstd's man page for more options.
 
@@ -31321,7 +31395,7 @@ when needed.
 					be observed with '-v' passed as argument. This works only with multi-threading and '--long'. (check 'man' page)
 
 
-					1.3.1 - Fastest Compression level:
+					1.2.1 - Fastest Compression level:
 						$ zstd -zf -1 ./file\ 1
 							or
 						$ zstd -1zf ./file\ 1
@@ -31331,27 +31405,27 @@ when needed.
 								or
 							$ zstd -1zfT0 ./file\ 1
 
-					1.3.2 - Slowest & Best Compression:
+					1.2.2 - Slowest & Best Compression:
 						$ zstd -zf -19 ./file\ 1
 							or
 						$ zstd -19zf ./file\ 1
 
-						1.3.2.1 - Using Multiple Physical Cores:
+						1.2.2.1 - Using Multiple Physical Cores:
 							$ zstd -zf -19 -T0 ./file\ 1
 								or
 							$ zstd -19zfT0 ./file\ 1
 
-					1.3.3 - Using Ultra Compression:
+					1.2.3 - Using Ultra Compression:
 						$ zstd -zf --ultra -22 ./file\ 1
 							or
 						$ zstd -22zf --ultra ./file\ 1 
 							
-						1.3.3.1 - Using Multiple Physical cores:
+						1.2.3.1 - Using Multiple Physical cores:
 							$ zstd -zf --ultra -22 -T0 ./file\ 1
 								or
 							$ zstd -22zfT0 --ultra ./file\ 1
 
-					1.3.4 - Using Available Logical Cores:
+					1.2.4 - Using Available Logical Cores:
 						$ zstd -zf -19 --auto-threads=logical -T0 ./file\ 1
 							or
 						$ zstd -19zfT0 --auto-threads=logical ./file\ 1
@@ -31359,12 +31433,33 @@ when needed.
 			2 - Integrity Test of Compressed .zst file:
 				$ zstd -t ./file.zst
 
-			3 - Decompressing/Extract file from .zst compressed file:
-				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
+			3 - Decompressing/Extracting file from .zst compressed file:
+				Note: Unless --stdout or -o is specified, by default files are written to a new file whose name is derived from the source file name.
+				this means that if the compressed file wasn't named/renamed properly, it's filename extension will not be recovered upon extraction.
 
-					$ zstd -fd ./file.zst
-						or
-					$ unzstd -f ./file.zst
+				Reminder: Extraction/Decompression happens at current folder by default.
+
+					Example - Descompressing .mp3 file from compressed .zst file - good example:
+						This will rename file.mp3.zst to 'file.mp3' upon extraction:
+							$ zstd -df ./file.mp3.zst
+								or
+							$ zstd -df ./file.mp3.zst -o /tmp/file.mp3
+								or
+							$ unzstd -f ./file.mp3.zst -o /tmp/file.mp3
+
+					Example - Decompressing .mp3 file from file.zst - bad example:
+						As a result, the filename extension will be lost in all 3 examples.
+							$ zstd -df ./file.zst 
+								or
+							$ zstd -df ./file.zst -o /tmp/extracted_content
+								or
+							$ unzstd -f ./file.zst -o /tmp/extracted_content
+
+						Note: if you know the filename extension, you can still recover by just renaming upon extraction:
+							$ unzstd -f ./file.zst -o /tmp/file.mp3
+				
+					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+					in conjunction with a Compression Algorithm like the one described here for compression!
 
 			4 - Listing contents from compressed .zst file:
 				NOTE: this will output the contents of a compressed file to the screen.
@@ -31400,6 +31495,10 @@ when needed.
 				NOTE: -f option will overwrite any compressed .br file if they already exist
 					$ brotli -f ./file\ 1 ./file\ 2
 
+				VERY IMPORTANT: 
+					READ TOPIC: 
+						3 - Decompressing/Extracting file from .br compressed file into the current folder
+
 				1.1 - Compressing file using Compression level:
 					NOTE: -f option will overwrite any compressed .xz file if they already exist.
 					NOTE: -q defines compression level.
@@ -31415,10 +31514,29 @@ when needed.
 				$ brotli --test -v ./file\ 1.br
 
 			3 - Decompressing/Extracting file from .br compressed file into the current folder:
-				NOTE: use 'cd' to change directory if you want to extract in a specific directory of your choice.
-				$ brotli -df ./file\ 1.br
-					or
-				$ brotli -d ./file\ 1.br
+				Note: Unless --stdout or -o is specified, by default files are written to a new file whose name is derived from the source file name.
+				this means that if the compressed file wasn't named/renamed properly, it's filename extension will not be recovered upon extraction.
+
+				Reminder: Extraction/Decompression happens at current folder by default.
+
+					Example - Decompressing .mp3 file from compressed .br file - good example:
+						This will rename 'file.mp3.br' to 'file.mp3' upon extraction:
+							$ brtoli -df ./file.mp3.br
+								or
+							$ brotli -df ./file.mp3.br -o /tmp/file.mp3
+
+					Example - Decompressing .mp3 file from file .br - bad example:
+						As a result, the filename extension will be lost in all 2 examples.
+							$ brotli -df ./file.br
+								or
+							$ brotli -df ./file.zst -o /tmp/extracted_content
+
+						Note: if you know the filename extension, you can still recover by just renaming upon extraction:
+							$ brotli -df ./file.br -o /tmp/file.mp3
+				
+
+				VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+				in conjunction with a Compression Algorithm like the one described here for compression!
 
 			4 - Listing contents from compressed .br file:
 				$ brotli --test -v ./file1.br     
@@ -31433,7 +31551,12 @@ when needed.
 
 		--------
 		--------
+		LZ4 CHEAT SHEET
+			- TODO - 
+		--------
+		--------
 		OTHER COMPRESSION ALGORITHM TOOLS:
+			LZ4
 			BZIP2
 			LZIP
 			PBZIP ( Multi-threaded version of BZIP2 )
@@ -31445,8 +31568,8 @@ when needed.
 			COMPRESS
 
 	7Z ZIP TAR CHEAT SHEET
-		TAR
-			Compressing:
+		TAR CHEAT SHEET
+			TAR DATA COMPRESSION
 				Tar has the ability to use filename extension to determine the compression algorithm to be used by passing the 'a' argument.
 				Tar also has the ability to store file/data permission and ownership.
 
@@ -31460,23 +31583,30 @@ when needed.
 					Using one of the compression algorithms/formats will require you to have it's tools installed on your system,
 					GNU TAR will usually complain when the tools fail to exist.
 
-				Practical example - using long name extensions:
-					$ tar caf ~/my\ filename.tar.xz ~/{file1,file2,file3}
-						or
-					$ tar caf ~/my\ filename.tar.lz ~/{file1,file2,file3}
-						or
-					$ tar caf ~/my\ filename.tar.zst ~/{file1,file2,file3}
-						or
-					$ tar caf ~/my\ filename.tar.gz ~/{file1,file2,file3}
-				
-				Practical example - using short name extensions:
-					$ tar caf ~/my\ filename.txz ~/{file1,file2,file3}
-						or
-					$ tar caf ~/my\ filename.tlz ~/{file1,file2,file3}
-						or
-					$ tar caf ~/my\ filename.tzst ~/{file1,file2,file3}
-						or
-					$ tar caf ~/my\ filename.tgz ~/{file1,file2,file3}
+				MANUAL TAR COMPRESSION
+					USING ZSTD 
+						The command below will archive the directory 'my folder' as 'my folder.tar',
+						zstd will in turn compress the archive 'my folder.tar' and then name it 'my folder.tar.zst':
+							$ tar cf ~/my\ folder.tar ~/my\ folder && zstd --ultra -22zfT0 ~/my\ folder.tar
+
+				AUTOMATIC TAR COMPRESSION
+					Practical example - using long name extensions:
+						$ tar caf ~/my\ filename.tar.xz ~/{file1,file2,file3}
+							or
+						$ tar caf ~/my\ filename.tar.lz ~/{file1,file2,file3}
+							or
+						$ tar caf ~/my\ filename.tar.zst ~/{file1,file2,file3}
+							or
+						$ tar caf ~/my\ filename.tar.gz ~/{file1,file2,file3}
+					
+					Practical example - using short name extensions:
+						$ tar caf ~/my\ filename.txz ~/{file1,file2,file3}
+							or
+						$ tar caf ~/my\ filename.tlz ~/{file1,file2,file3}
+							or
+						$ tar caf ~/my\ filename.tzst ~/{file1,file2,file3}
+							or
+						$ tar caf ~/my\ filename.tgz ~/{file1,file2,file3}
 
 			Extracting:
 				If you intend to preserve file permission and ownership when extracting files, you need to run 'tar' as root:
@@ -31495,7 +31625,7 @@ when needed.
 				$ tar tvf <file_to_extract>.tar
 				
 		------------------------
-		7Z
+		7Z CHEAT SHEET
 			NOTE: While '7z' does support the creation and extraction of .tar archives, it's not possible to extract - under a single command - .tar files that 
 		have been compressed under compression algorithms (ex.: tar.gz, tar.zst, tar.lz, ... ); this task has to be done programmatically using multiple commands.
 
@@ -31561,7 +31691,7 @@ when needed.
 				$ 7z l <file_to_extract>
 		
 		------------------------
-		ZIP
+		ZIP CHEAT SHEET
 			Extracting:
 				$ unzip <file_to_extract>.zip -d <destination_directory>
 
