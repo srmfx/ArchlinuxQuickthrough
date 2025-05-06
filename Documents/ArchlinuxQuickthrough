@@ -313,11 +313,14 @@ USE LICENSE:
 					BROTLI CHEAT SHEET
 					LZ4 CHEAT SHEET
 					OTHER COMPRESSION ALGORITHM TOOLS
-				7Z ZIP TAR CHEAT SHEET
+				ARCHIVING TOOLS / ARCHIVE TOOLS
 					TAR CHEAT SHEET
 						TAR DATA COMPRESSION
 							MANUAL TAR COMPRESSION 
 							AUTOMATIC TAR COMPRESSION 
+					DAR CHEAT SHEET
+						LIST OF DAR FEATURES
+						BASIC DAR EXAMPLES
 					7Z CHEAT SHEET
 						PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
 					ZIP CHEAT SHEET
@@ -31429,6 +31432,8 @@ when needed.
 						$ zstd -zf -19 --auto-threads=logical -T0 ./file\ 1
 							or
 						$ zstd -19zfT0 --auto-threads=logical ./file\ 1
+							or
+						$ zstd --ultra -22zfT0 --auto-threads=logical ./file\ 1
 
 			2 - Integrity Test of Compressed .zst file:
 				$ zstd -t ./file.zst
@@ -31567,7 +31572,7 @@ when needed.
 			DEFLATE (libdeflate) / rarely used
 			COMPRESS
 
-	7Z ZIP TAR CHEAT SHEET
+	ARCHIVING TOOLS / ARCHIVE TOOLS
 		TAR CHEAT SHEET
 			TAR DATA COMPRESSION
 				Tar has the ability to use filename extension to determine the compression algorithm to be used by passing the 'a' argument.
@@ -31624,6 +31629,281 @@ when needed.
 					or
 				$ tar tvf <file_to_extract>.tar
 				
+		------------------------
+		DAR CHEAT SHEET
+			DAR is a more powerful version of TAR, it is meant as a disk/data backup utility, but can be used as an Archival Tool
+		in the same fashion as TAR.
+		
+			LIST OF DAR FEATURES
+				SOURCE: http://dar.linux.free.fr/doc/Features.html
+
+				A) Unlike TAR, DAR HAS SUPPORT FOR HARD LINKS. 
+
+				B) DAR HAS DEFAULT SUPPORT FOR SPARSE FILES and will remember and re-create it when extracting data to a Disk with Sparse File support. 
+				When the data being stored in a DAR Archive is met with a long sequence of zero bytes, DAR stores the data as Sparse and remembers how big 
+				that file was for re-creation when extracting and copying back to disk. 
+				[ --sparse-file-min-size, -ah ]
+
+				C) EXTENDED ATTRIBUTES [ -u -U -am -ae --alter=list-ea  ]
+				D) FILESYSTEM SPECIFIC ATTRIBUTES ( FSA ) [ --fsa-family ]
+				E) DIRTY FILES:  At backup time, dar checks whether each saved file had not changed at the time it was read. If a file has changed in that 
+				situation, dar retries saving it up to three times (by default) and if it is still changing, is flagged as "dirty" in the backup, and handled 
+				differently from other files at restoration time. The dirty file handling is either to warn the user before restoring, to ignore and avoid 
+				restoring them, or to ignore the dirty flag and restore them normally.
+				[ --dirty-behavior , --retry-on-change ]  
+
+				F) FILTERS:  dar is able to backup from a total file system to a single file, thanks to its filter mechanism. 
+				This one is dual headed: The first head let one decide which part of a directory tree to consider for the operation (backup, restoration, etc.) 
+				while the second head defines which type of file to consider (filter only based on filename, like for example the extension of the file).
+
+				For backup operation, files and directories can also be filtered out if they have been set with a given user defined EA. 
+				[ -I -X -P -g -[ -] -am --exclude-by-ea ]
+
+				G) NODUMP Flag: Many filesystems, like ext2/3/4 filesystems provide for each inodes a set of flags, among which is the "nodump" flag. 
+				You can instruct dar to avoid saving files that have this flag set, as does the so-called dump backup program.  
+				[ --nodump ]
+
+				H) ONE-FILESYSTEM: DAR can stay in one single filesystem, without stepping into the boundary of other mounted filesystems 
+				[ -M ]
+
+				I) CACHE DIRECTORY TAGGING STANDARD: Many software use cache directories (mozilla web browser for example), directories where is stored 
+				temporaneous data that is not interesting to backup. The Cache Directory Tagging Standard provides a standard way for software applications 
+				to identify this type of data, which let dar (like some other backup softwares) ignore cache data designated as such by other applications.
+				[ --cache-directory-tagging ]
+
+				J) DIFFERENTIAL BACKUP: a differential backup, saves only files that have changed since a given reference backup. Additionally, files that 
+				existed in the reference backup and which do no more exist at the time of the differential backup are recorded in the backup as "been removed". 
+				At recovery time, (unless you deactivate it), restoring a differential backup will update changed files and new files, but also remove files 
+				that have been recorded as "been removed".
+
+				Note that the reference backup can be a full backup or another differential backup (this second method is usually designed as 
+				incremental backup). This way you can make a first full backup, then many incremental backups, each taking as reference the last backup made, 
+				for example. 
+				[ -A ]
+
+				K) DECREMENTAL BACKUP:  As opposed to incremental backups, where the older one is a full backup and each subsequent backup contains only the 
+				changes from the previous backup, a decremental backup let the full backup be the more recent while the older ones only contain changes compared 
+				to the just more recent one.
+
+				This has the advantage of providing a single backup to use to restore a whole system in its latest known state, while reducing the overall 
+				amount of data to retain older versions of files (same amount required as with differential backup). It has also the advantage to not have 
+				to keep several set of backup as you just need to delete the oldest backup when you need storage space. However it has the default to require 
+				at each new cycle the creation of a full backup, then the transformation of the previous full backup into a so-called decremental backup. 
+				Yes, everything has a cost!
+				[ -+ -ad ]
+
+
+				L) DELTA BINARY / DELTA TRANSFER [ --delta sig, --include-delta-sig, --exclude-delta-sig, --delta-sig-min-size, --delta no-patch ]
+
+				M) PREVENTING ROOTKITS AND OTHER MALWARE: At backup time when a differential, incremental or decremental backup is done, dar compares 
+				the status of inode on the filesystem to the status they had at the time of the last backup. If the ctime of a file has changed while 
+				no other inode field changed, dar issues a warning considering that file as suspicious. This does not mean that your system has been 
+				compromised but you are strongly advised to check whether the concerned file has recently been updated (Some package manager may lead 
+				to that situation) or has its Extended Attributes changed since last backup was made. In normal situation this type of warning does not 
+				show often (false positive are rare but possible). However in case your system has been infected by a virus, compromised by a rootkit or 
+				by a trojan, dar will signal the problem if the intruder tried to hide its forfait.  
+				[ -asecu ]
+
+				N) DIRECTORY TREE SNAPSHOT:  Dar can make a snapshot of a directory tree and files or even of a whole system, recording the inode status of 
+				each files. This may be used to detect changes in filesystem, by "diffing" the resulting snapshot with the filesystem at a later time. 
+				The resulting snapshot can also be used as reference to save files that have changed since the snapshot has been done.
+
+				A snapshot is just a special dar backup, that is very small compared to the corresponding full backup but of course, it cannot be 
+				used to restore any data. As a dar backup, it can be created using compressed, slices, encryption... 
+				[ -A + ]
+
+				P) SLICES : Given the size, dar will split the archive/backup in several files (called SLICES), eventually pausing before creating the next one, 
+				and/or allowing the user to automate any action (like un/mount a medium, burn the file on CD-R, send it to the cloud, and so on)
+
+				Additionally, the size of the first slice can be specified separately, if for example you want first to fulfill a partially filled disk before 
+				starting using empty ones. Last, at restoration time, dar will just pause and prompt the user asking a slice only if it is missing, 
+				and allowing here too user to automate any particular action (dowloading the slice from the cloud, mount/unmounting a removable media and so on).
+
+				You can choose to have either more than one slice per medium without penalty from dar (no extra user interaction than asking the user to change 
+				the removable media when it has been read), or just one slice per medium or even a backup without slice, which is a single file, 
+				depending on your need. 
+				[ -s -S -p -aSI -abinary ]
+
+				Q) COMPRESSION: dar can use compression. Actually gzip, bzip2, lzo, xz/lzma, zstd, lz4 algorithms are available, and there is still room 
+				available for any other compression algorithm. Note that, compression is made before slicing, which means that using compression together 
+				with slices, will not make slices smaller, but will probably make less slices in the backup. 
+				[ -z ]
+
+				O) SELECTIVE COMPRESSION: dar can be given a special filter that determines which files will be compressed or not. This way you can speed up 
+				the backup operation by not trying to compress *.mp3, *.mpg, *.zip, *.gz and other already compressed files, for example. Moreover another 
+				mechanism allows you to say that files below a given size (whatever their name is) will not be compressed. 
+				[ -Y -Z -m -am ]
+
+				R) STRONG ENCRYPTION: Dar can use blowfish, twofish, aes256, serpent256 and camellia256 algorithms to encrypt the whole backup. 
+				Two "elastic buffers" are inserted and encrypted with the rest of the data, one at the beginning and one at the end of the archive 
+				to prevent a clear text attack or codebook attack.
+
+				For symmetric key encryption several Key Derivation Functions are available, from the legacy PBKDF2 (PKCS#5 v2) to the modern Argon2 algorithm. 
+				The user has the possibility to set the hash algorithm for the first and the interation count for both algorithms. 
+				[  -K -J -# -* blowfish, twofish, aes256, serpent256, camellia256, --kdf-param ]
+
+				S) PUBLIC KEY ENCRYPTION: Encryption based on GPG public key is available. A given backup can be encrypted for a recipient 
+				(or several recipients without visible overhead) using its public key. Only the recipient(s) will be able to read such encrypted backup.
+
+				The advantage over ciphering the backup as a whole is that you don't have to uncipher it all to extract a particular file or set of file, 
+				which brings a huge gain of CPU usage and execution time.
+				[ -K, --key-length ]
+
+				T) PRIVATE KEY SIGNATURE: When using encryption with public key it is possible in addition to sign an archive with your own private key(s). 
+				Your recipients can then be sure the archive has been generated by you, dar will check the signature validity against the corresponding public 
+				key(s) each time the archive is used (restoration, testing, etc.) and a warning is issued if signature does not match or key is missing to 
+				verify the signature. You can also have the list of signatories of the archive while listing the archive content. 
+				[ --sign ]
+
+				U) SLICE HASHING:  When creating a backup, dar can compute an md5, sha1 or sha512 hash before the backup is even written to disk and produce 
+				a small file compatible with md5sum, sha1sum or sha512sum that let verify that the medium has not corrupted the slices of the backup.
+				[ --hash, md5, sha1, sha512 ]
+
+
+				V) DATA PROTECTION:  Dar is able to detect corruption in any part of a dar backup, but it cannot fix it on it's own.
+
+				Instead Dar relies on the Parchive program for data protection against media errors. Thanks to dar's ability to run user command or script 
+				and thanks to the ad hoc provided scripts, dar can use Parchive as simply as adding a word (par2) on command-line. Depending on the context 
+				(backup, restoration, testing, ...), dar will by this mean create parity data for each slice, verify and if necessary repair the archive slices.
+
+				Without Parchive, dar can workaround a corruption, skipping the concerned file and restoring all others. Dar also offers a 'lax' mode, in which
+				the user will be asked several questions to help dar recover very corrupted archives.
+				[ -al ]
+
+				W) TRUNCATED ARCHIVE/BACKUP REPARATION: Since version 2.6.0 an truncated archive (due to lack of disk space, power outage, or any other reason) 
+				can be repaired. A truncated archive lacks a table of content which is located at the end of the archive, without it you cannot know what file 
+				is saved and where to fetch its data from, unless you use the sequential reading mode which is slow as it implies reading the whole archive even 
+				for restoring just one file. To allow sequential reading of an archive, which is suitable for tape media, some metadata is by default inserted 
+				all along the archive. This metadata is globally the same information that should contain the missing table fo content, but spread by pieces all 
+				along the archive. Reparing an archive consists of gathering this inlined metadata and adding it at the end of the repaired archive to allow 
+				direct access mode (default mode) which is fast and efficient. 
+				[ -y ]
+
+				X) DIRECT DATA ACCESS:  Even using compression and/or encryption dar has not to read the whole backup to extract one file. 
+				This way if you just want to restore one file from a huge backup, the process will be very quick. Dar first reads the catalogue 
+				(i.e. the contents of the backup), then it goes directly to the location of the saved file(s) you want to restore and then proceeds to 
+				restoration. In particular using slices, dar will ask only for the slice(s) containing the file(s) to restore.
+
+				Since version 2.6.0 dar can also read a backup from a remote host by mean of FTP or SFTP. Here too dar can leverage its direct access 
+				ability to only download the necessary stuff in order to restore some files from a large backup, or list the backup content and even compare 
+				a set of file with the live filesystem.
+				[ -g ]
+
+				Y) SEQUENTIAL ACCESS FOR TAPES: By default, DAR uses 'Random Access' meant for disks, however it's still possible to use Sequential Access 
+				meant for tapes.
+				[ -sequential-read, -at ]
+
+				Z) MULTI-VOLUME TAPES: The independant dar_split program provides a mean to output dar but also tar archives to several tapes. 
+				If takes care of splitting the archive when writing to tapes and gather pieces of archive from several tapes for dar/tar to work as 
+				if it was a single pieced archive. 
+				[ --sequential-read ]
+
+				AA) ARCHIVE/BACKUP TESTING:  thanks to CRC (cyclic redundancy checks), dar is able to detect data corruption in a backup. 
+				Only the file where data corruption occurred will not be possible to restore, but dar will restore the others even when compression 
+				or encryption (or both) is used.
+				[ -t ]
+	
+
+				AB) ISOLATION:  The catalogue (i.e.: the contents of a backup), can be extracted as a copy (this operation is called isolation) to a small file,
+				that can in turn be used as reference for differential backup and as rescue of the internal catalogue (in case of backup corruption).
+
+				There is then no need to provide a backup to be able to create a differential backup based on it, just its isolated catalogue can be used 
+				instead. Such an isolated catalogue 
+				[  -C -A -@ ]
+
+				AC) FLAT RESTORATION: It is possible to restore any file without restoring the directories and subdirectories it was in at the time of the 
+				backup. If this option is activated, all files will be restored in the (-R) root directory whatever their real position is recorded inside 
+				the backup. 
+				[ -f ]
+
+				AD) USER COMMAND BETWEEN SLICES: several hooks are provided for dar to call a given command once a slice has been written or before reading 
+				a slice. Several macros allow the user command or script to know the requested slice number, path and backup basename. 
+				[ -E -F -~ ]
+				
+				AE) USER COMMAND BEFORE AND AFTER SAVING A DIRECTORY OR A FILE:
+				It is possible to define a set of file that will have a command executed before dar starts saving them and once dar has completed saved them. 
+				Before entering a directory dar will call the specified user command, then it will proceed to the backup of that directory. 
+
+				Once the whole directory has been saved, dar will call again the same user command again (with slightly different arguments) and then continue 
+				the backup process. Such user command may for example run a particular command which output will be redirected to a file of that directory, 
+				suitable for backup. Another purpose is to force auto-mounting filesystems that else would not be visible and thus not saved. 
+				[  -< -> -= ]
+				
+				AF) CONFIGURATION FILE: 
+				dar can read parameters from file. This is a way to extends the command-line limited length input. A configuration file can ask dar to read 
+				(or to include) other configuration files. A simple but efficient mechanism forbids a file to include itself directly or not, and there is 
+				no limitation in the degree of recursion for the inclusion of configuration files.
+
+				Two special configuration files $HOME/.darrc and /etc/darrc are read if they exist. They share the same syntax as any configuration file 
+				which is the syntax used on the command-line, eventually completed by newlines and comments.
+
+				Any configuration file can also receive conditional statements, which describe which options are to be used in different conditions. 
+				Conditions are: "extract", "listing", "test", "diff", "create", "isolate", "merge", "reference", "auxiliary", "all", "default" (which may 
+				be useful in case or recursive inclusion of files) ... more about their meaning and use cases in dar man page. 
+				[ -B ]
+
+				AG) REMOTE OPERATIONS: dar is able to read and write a backup to a remote server.
+				[ -i -o - -afile-auth ]
+
+				AH) DRY-RUN EXECUTION:  You can run any feature without effectively performing the action. Dar will report any problem but will not create, 
+				remove or modify any file. 
+				[ -e ]
+				
+				AI) ARCHIVE/BACKUP MERGING:
+				From version 2.3.0, dar supports the merging of two existing archives into a single one. This merging operation is assorted by the 
+				same filtering mechanism used for archive creation. This let the user define which file will be part of the resulting archive.
+
+				By extension, archive merging can also take as single source archive as input. This may sound a bit strange at first, but this let you 
+				make a subset of a given archive without having to extract any file to disk. In particular, if your filesystem does not support Extended 
+				Attributes (EA), thanks to this feature you can still cleanup an archive from files you do not want to keep anymore without loosing any EA or 
+				performing any change to standard file attributes (like modification dates for example) of files that will stay in the resulting archive.
+
+				Last, this merging feature give you also the opportunity to change the compression level or algorithm used as well as the encryption 
+				algorithm and passphrase. Of course, from a pair of source archive you can do all these sub features at the same time: filtering out files you 
+				do not want in the resulting archive, use a different compression level and algorithm or encryption password and algorithm than the source 
+				archive(s), you may also have a different archive slicing or no slicing at all (well dar_xform is more efficient for this feature only, 
+				see above "RE-SHAPE SLICES OF AN EXISTING ARCHIVE/BACKUP" for details). 
+				[ -+ -ak -A -@ ]
+
+				AJ) ARCHIVE SUBSETTING: As seen above under the "archive merging" feature description, it is possible to define a subset of files from 
+				an archive and put them into a new archive without having to really extract these files to disk. To speed up the process, it is also possible 
+				to avoid uncompressing/recompressing files that are kept in the resulting archive or change their compression, as well change the encryption 
+				scheme used. Last, you may manipulate this way files and their EA while you don't have EA support available on your system. 
+				[ -+ -ak ] 
+
+				AK) ARCHIVE/BACKUP USER COMMENTS: The backup header can hold a message from the user. This message is never ciphered nor compressed and always 
+				available to any one listing the archive summary (-l and -q options). Several macro are available to add more confort using this option, 
+				like the current date, uid and gid, hostname, and command-line used at backup creation.
+				[ --user-comment, -l -v, -l -q ] 
+
+				AL) MINIMUM DIGITS / PADDED ZEROS TO SLICE NUMBER: For example, with 3 as minimum digit, the slice name would become: 
+				archive.001.dar, archive.002.dar, ... archive.010.dar. 
+				[ --min-digits ]
+
+				AM) MULTI-THREADING: Since release 2.7.0, compression can use several threads when the new compression per block is used (by opposition to the 
+				streaming compression used so far, which is still available). Encryption can also be processed with multiple threads even for old backups 
+				(no change at encryption level). The user defines the number of threads he wants for each process, compression/decompression as well as 
+				ciphering/deciphering. 
+				[ --multi-thread ]
+
+			BASIC DAR EXAMPLES:
+				1) Adding files to DAR Archive:
+					$ dar -c <backup_file_without_extension> -g <file_to_backup> -g <file_to_backup_2>
+
+				2) Listing DAR files:
+					$ dar -l ./<filename>.dar
+
+				3) Integrity test for DAR archive:
+					$ dar -t ./<filename>.dar
+
+				4) Extracting ALL contents from DAR archive into current folder:
+					$ dar -x ./<filename>.dar
+
+				5) Extracting SINGLE content from DAR archive into current folder:
+					NOTE: The existing_dar_content must existing within the DAR Archive passed as <filename>.dar,
+					you can list existing contents using the command on Step #2( $ dar -l ):
+						$ dar -x ./<filename>.dar -g <existing_dar_content>
+			
 		------------------------
 		7Z CHEAT SHEET
 			NOTE: While '7z' does support the creation and extraction of .tar archives, it's not possible to extract - under a single command - .tar files that 
@@ -32745,6 +33025,8 @@ TEMPORARY 2:
 
 6 - Write something about POLKIT
 	https://wiki.archlinux.org/title/Polkit
+
+7 - Write something about DAR vs TAR
 ---
 VERY IMPORTANT/TASK  LOGS:
 
