@@ -321,6 +321,20 @@ USE LICENSE:
 					DAR CHEAT SHEET
 						LIST OF DAR FEATURES
 						BASIC DAR EXAMPLES
+							ADDING DATA TO DAR ARCHIVE
+								USING DAR ARCHIVING WITHOUT COMPRESSION
+								USING DAR COMPRESSION
+									USING DAR WITH LZ4 COMPRESSION
+									USING DAR WITH ZSTD COMPRESSION
+								USING MULTITHREADING DAR COMPRESSION 
+								CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
+							INTEGRITY TEST FOR DAR ARCHIVE
+							EXTRACTING DATA FROM DAR ARCHIVE
+								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
+								EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
+								EXTRACTING DAR ARCHIVE USING PASSWORD
+							LISTING DAR FILES
+						SOME DAR LINKS
 					7Z CHEAT SHEET
 						PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
 					ZIP CHEAT SHEET
@@ -31158,8 +31172,8 @@ when needed.
 
 
 	COMPRESSION ALGORITHM TOOLS
-		VERY IMPORTANT: If you want to archive multiple files and be able to extract them separately, use TAR in conjunction with one of the compression algorithms!
-	GNU TAR is capable of using these compression algorithm tools on it's own, so you likely don't have to use this step.
+		VERY IMPORTANT: If you want to archive multiple files and be able to extract them separately, use DAR or TAR in conjunction with one of the 
+		compression algorithms! GNU TAR is capable of using these compression algorithm tools on it's own, so you likely don't have to use this step.
 	
 	However, it's possible to use different arguments than the default ones that GNU Tar uses, so using these is still an option,
 	for example, 'xz' tool allows using many different options for compression on .tar files: $ man tar
@@ -31174,7 +31188,7 @@ when needed.
 		The way most of these tools recover meta-data like filename and filename extension is simply by renaming the source file when
 	extracting/decompressing the file.
 
-	It's highly advisable that for storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR 
+	It's highly advisable that for storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR  or DAR
 	in conjunction with a Compression Algorithm like the ones described here for compression! READ TOPIC: 
 			MANUAL TAR COMPRESSION 
 
@@ -31230,7 +31244,7 @@ when needed.
 						NOTE: It's still possible to recover the file if you know the filename extension by head:
 							$ gunzip --stdout -f ./file.gz >> ./file.mp3
 
-					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR or DAR
 					in conjunction with a Compression Algorithm like the one described here for compression!
 
 			5 - Listing contents from compressed .gz file:
@@ -31341,7 +31355,7 @@ when needed.
 						Note: if you know the filename extension, you can still recover by just renaming upon extraction:
 							$ xzdec -f ./file.xz  >> ./file.mp3
 				
-					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR or DAR
 					in conjunction with a Compression Algorithm like the one described here for compression!
 
 			4 - Listing contents from compressed .xz file:
@@ -31463,7 +31477,7 @@ when needed.
 						Note: if you know the filename extension, you can still recover by just renaming upon extraction:
 							$ unzstd -f ./file.zst -o /tmp/file.mp3
 				
-					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+					VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR or DAR
 					in conjunction with a Compression Algorithm like the one described here for compression!
 
 			4 - Listing contents from compressed .zst file:
@@ -31540,7 +31554,7 @@ when needed.
 							$ brotli -df ./file.br -o /tmp/file.mp3
 				
 
-				VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR
+				VERY IMPORTANT: For storing filename, filename extension and other meta-data, it's important to use an archiving tool like TAR or DAR
 				in conjunction with a Compression Algorithm like the one described here for compression!
 
 			4 - Listing contents from compressed .br file:
@@ -31715,14 +31729,14 @@ when needed.
 				P) SLICES : Given the size, dar will split the archive/backup in several files (called SLICES), eventually pausing before creating the next one, 
 				and/or allowing the user to automate any action (like un/mount a medium, burn the file on CD-R, send it to the cloud, and so on)
 
-				Additionally, the size of the first slice can be specified separately, if for example you want first to fulfill a partially filled disk before 
-				starting using empty ones. Last, at restoration time, dar will just pause and prompt the user asking a slice only if it is missing, 
+					Additionally, the size of the first slice can be specified separately, if for example you want first to fulfill a partially filled 
+				disk before starting using empty ones. Last, at restoration time, dar will just pause and prompt the user asking a slice only if it is missing, 
 				and allowing here too user to automate any particular action (dowloading the slice from the cloud, mount/unmounting a removable media and so on).
 
 				You can choose to have either more than one slice per medium without penalty from dar (no extra user interaction than asking the user to change 
 				the removable media when it has been read), or just one slice per medium or even a backup without slice, which is a single file, 
 				depending on your need. 
-				[ -s -S -p -aSI -abinary ]
+				[ -s -S -p -aSI -abinary -b ]
 
 				Q) COMPRESSION: dar can use compression. Actually gzip, bzip2, lzo, xz/lzma, zstd, lz4 algorithms are available, and there is still room 
 				available for any other compression algorithm. Note that, compression is made before slicing, which means that using compression together 
@@ -31887,23 +31901,141 @@ when needed.
 				[ --multi-thread ]
 
 			BASIC DAR EXAMPLES:
-				1) Adding files to DAR Archive:
-					$ dar -c <backup_file_without_extension> -g <file_to_backup> -g <file_to_backup_2>
+				1) ADDING DATA TO DAR ARCHIVE:
+					IMPORTANT: DAR automatically creates filename extension in the following format <archive_filename>.<slice>.dar, 
+				all DAR Archives must end in <slice>.dar for it to work.
 
-				2) Listing DAR files:
-					$ dar -l ./<filename>.dar
+					1.1 - USING DAR ARCHIVING WITHOUT COMPRESSION:
+						$ dar -c <backup_file_without_extension> -g <data_to_backup> -g <data_to_backup>
+					
+					1.2 - USING DAR COMPRESSION
+						NOTE: DAR uses level 9 gzip compression by default.
+							$ dar -c <backup_file_without_extension> -z -g <data_to_backup> 
 
-				3) Integrity test for DAR archive:
-					$ dar -t ./<filename>.dar
+						1.2.1 - USING DAR WITH ZSTD COMPRESSION
+							$ dar -c <backup_file_without_extension> -zzstd:22 -g <data_to_backup> 
 
-				4) Extracting ALL contents from DAR archive into current folder:
-					$ dar -x ./<filename>.dar
+						1.2.2 - USING DAR WITH LZ4 COMPRESSION
+							$ dar -c <backup_file_without_extension> -zlz4 -g <data_to_backup> 
 
-				5) Extracting SINGLE content from DAR archive into current folder:
-					NOTE: The existing_dar_content must existing within the DAR Archive passed as <filename>.dar,
-					you can list existing contents using the command on Step #2( $ dar -l ):
-						$ dar -x ./<filename>.dar -g <existing_dar_content>
-			
+					1.3 - USING MULTITHREADING DAR COMPRESSION 
+						NOTE: -G and <block_size> must be passed when using multi-thread.
+						<block_size> defines how much data each thread will take care when compressing.
+						NOTE 2: -G, --multi-thread { <num_of_threads> | <crypto_threads>,<compression_threads> }
+						with this, it's possible to pass how many threads and/or also specify how many crypto and compression threads
+						you want.
+
+						Syntax:
+							$ dar -c <backup_file_without_extension> -G -zzstd:22:<block-size> -g <data_to_backup> 
+
+						Practical Example:
+							$ dar -c <backup_file_without_extension> -G -zzstd:22:2M -g <data_to_backup> 
+
+						Practical Example 2:
+							$ dar -c <backup_file_without_extension> -G3 -zzstd:22:2M -g <data_to_backup> 
+						
+					1.4 - CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
+						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
+						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
+
+						Syntax:
+							$ dar -c <backup_file_without_extension> -K <algorithm>:<password/cipher> -g <data_to_backup>
+								or
+							$ dar -c<backup_file_without_extension> -K<algorithm>:<password/cipher> -g<data_to_backup>
+								or
+							$ dar -c <backup_file_without_extension> --key <algorithm>:<password/cipher> -g <data_to_backup>
+
+						Practical Example - Using SCRAMBLE Algorithm - :
+							$ dar -c ./data\ archive -K scram:asdf -g ./data\ folder/
+								or
+							$ dar -c./data\ archive -Kscram:asdf -g./data\ folder/
+
+						READ TOPIC:
+							EXTRACTING DAR ARCHIVE USING PASSWORD
+
+					1.5 - SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
+						From 'man page': If the number is appended by k (or K), M, G, T, P, E, Z, Y, R or Q 
+						the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes, yottabytes, ronnabytes 
+						or quettabytes respectively. 
+
+						Syntax:
+							$ dar -c <backup_file_without_extension> -s <slice_size> -g <data_to_backup>
+								or
+							$ dar -c<backup_file_without_extension> -s<slice_size> -g<data_to_backup>
+
+						Practical Example:
+							$ dar -c ./data\ archive -s 2M -g ./data\ folder/
+								or
+							$ dar -c./data\ archive -s2M -g./data\ folder/
+							
+				2) LISTING DAR FILES
+					NOTE: DAR works different from other Archiving/Compressing tools, filename extension DOESN'T has to be passed for dar.
+					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
+
+						$ dar -l ./<archive_filename>
+
+				3) INTEGRITY TEST FOR DAR ARCHIVE
+					NOTE: DAR works different from other Archiving/Compressing tools, filename extension DOESN'T has to be passed for dar.
+					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
+
+						$ dar -t ./<archive_filename>
+
+				4) EXTRACTING DATA FROM DAR ARCHIVE
+					There is 2 ways of extracting DATA from a DAR Archive:
+						A) As regular user
+						B) As root
+
+					Extracting data as root will allow you to extract metadata with permissions, ACLs and other filesystem settings
+					that has been stored in the archive.
+
+					NOTE: DAR works different from other Archiving/Compressing tools, filename extension DOESN'T has to be passed for dar.
+					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
+					you can list existing contents using the command on Step #2( $ dar -l )
+
+					4.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
+
+							Syntax:
+								$ dar -x ./<archive_filename>
+									or
+								$ dar -x./<archive_filename>
+
+							Practical Example:
+								$ dar -x ./archive
+
+
+					4.2 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
+						NOTE: The <existing_dar_content> must exist within the DAR Archive passed as <filename>.dar .
+
+							Syntax:
+								$ dar -x ./<archive_filename> -g <existing_content>
+
+							Practical Example:
+								$ dar -x ./archive -g ./existing_content
+
+					4.3 - EXTRACTING DAR ARCHIVE USING PASSWORD
+						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
+						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
+
+						Syntax:
+							$ dar -x ./<archive_filename> -K <algo>:<password> 
+								or
+							$ dar -x./<archive_filename> -K<algo>:<password> 
+								or
+							$ dar -x./<archive_filename> --key <algo>:<password> 
+
+						Practical Example:
+							$ dar -x./archive -K scram:asdf
+								or
+							$ dar -x./archive -Kscram:asdf
+								or
+							$ dar -x./archive --key scram:asdf
+
+
+			SOME DAR LINKS:
+				http://dar.linux.free.fr/doc/Features.html
+				http://dar.linux.free.fr/doc/Tutorial.html
+				http://dar.linux.free.fr/doc/mini-howto/dar-differential-backup-mini-howto.en.html#simple-dar-usage
+
 		------------------------
 		7Z CHEAT SHEET
 			NOTE: While '7z' does support the creation and extraction of .tar archives, it's not possible to extract - under a single command - .tar files that 
