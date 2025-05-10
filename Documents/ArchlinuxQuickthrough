@@ -319,6 +319,7 @@ USE LICENSE:
 							MANUAL TAR COMPRESSION 
 							AUTOMATIC TAR COMPRESSION 
 					DAR CHEAT SHEET
+						READ THIS BEFORE USING DAR
 						LIST OF DAR FEATURES
 						BASIC DAR EXAMPLES
 							ADDING DATA TO DAR ARCHIVE
@@ -328,12 +329,24 @@ USE LICENSE:
 									USING DAR WITH ZSTD COMPRESSION
 								USING MULTITHREADING DAR COMPRESSION 
 								CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
+								SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
+									PAUSING ARCHIVE PROCESS FOR EACH SLICE CREATED
+								ADDING/EXCLUDING DATA TO DAR ARCHIVE USING A LISTING FILE
+							LISTING DAR FILES
+							MERGING DIFFERENT DAR ARCHIVES
+								MERGING TWO DIFFERENT DAR ARCHIVES
+								MERGING A THIRD DAR ARCHIVE
+							MAKING CHANGES TO AN EXISTING DAR ARCHIVE
+								CHANGING COMPRESSION ALGORITHM FROM EXISTING DAR ARCHIVE
+								CHANGING ENCRYPTION ALGORITHM AND PASSWORD FROM EXISTING DAR ARCHIVE
+								CREATING BACKUP SLICES FROM AN EXISTING DAR ARCHIVE
+								ADDING NEW FILES AND CONTENTS TO AN EXISTING DAR ARCHIVE
+								MAKING OTHER TYPES OF CHANGES TO EXISTING DAR ARCHIVE
 							INTEGRITY TEST FOR DAR ARCHIVE
 							EXTRACTING DATA FROM DAR ARCHIVE
 								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
 								EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 								EXTRACTING DAR ARCHIVE USING PASSWORD
-							LISTING DAR FILES
 						SOME DAR LINKS
 					7Z CHEAT SHEET
 						PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
@@ -31647,6 +31660,28 @@ when needed.
 		DAR CHEAT SHEET
 			DAR is a more powerful version of TAR, it is meant as a disk/data backup utility, but can be used as an Archival Tool
 		in the same fashion as TAR.
+
+			READ THIS BEFORE USING DAR
+				1 - When in doubt, remember to check on these things:
+					1.1 - $ man dar
+					1.2 - $ dar --help
+
+				2 - When compressing the chosen data, unlike other archiving tools, dar requires '-g' to be used;
+				WHEN NOT passing '-g', dar defaults to executing a system backup.
+					example:
+							$ dar -c <backup_file_without_extension> -g <data_to_archive> 
+
+				3 - Unlike TAR and Other archiving tools, when using compression, DAR compresses each file in the archive instead of compressing 
+				the entire archive. DAR does the same when encrypting data, instead of encrypting the entire archive, it encrypts each of the file/data 
+				inside the archive. therefore, files like 'my archive.dar.zst' will not exist like it does in TAR and other archiving tools, unless
+				this is manually done by the user using compression tools on his own.
+
+				4 - When working with archiving, there's always the chance the system might hang, freeze, crash for unexpected reasons like
+				a power blackout; This may cause archive data structure to be corrupt, leading data unrecoverable even if they've kept integrity 
+				inside the archive. Because of this, it's important to isolate the archive catalogue using -C option so that you can repair it with -y.
+				check 'man page' and '--help' for more info on this.
+
+				By isolating the catalogue, you won't need a backup/copy of the archive, just the catalogue is enough.
 		
 			LIST OF DAR FEATURES
 				SOURCE: http://dar.linux.free.fr/doc/Features.html
@@ -31906,19 +31941,25 @@ when needed.
 				all DAR Archives must end in <slice>.dar for it to work.
 
 					1.1 - USING DAR ARCHIVING WITHOUT COMPRESSION:
-						$ dar -c <backup_file_without_extension> -g <data_to_backup> -g <data_to_backup>
+						$ dar -c <backup_file_without_extension> -g <data_to_archive> -g <data_to_archive>
 					
 					1.2 - USING DAR COMPRESSION
 						NOTE: DAR uses level 9 gzip compression by default.
-							$ dar -c <backup_file_without_extension> -z -g <data_to_backup> 
+							$ dar -c <backup_file_without_extension> -z -g <data_to_archive> 
 
 						1.2.1 - USING DAR WITH ZSTD COMPRESSION
-							$ dar -c <backup_file_without_extension> -zzstd:22 -g <data_to_backup> 
+							$ dar -c <backup_file_without_extension> -zzstd:22 -g <data_to_archive> 
 
 						1.2.2 - USING DAR WITH LZ4 COMPRESSION
-							$ dar -c <backup_file_without_extension> -zlz4 -g <data_to_backup> 
+							$ dar -c <backup_file_without_extension> -zlz4 -g <data_to_archive> 
 
 					1.3 - USING MULTITHREADING DAR COMPRESSION 
+						Common Option(s) when Adding Data to Archive:
+							-m <size>	#Sets up a Minimum size for compression, files under this size will not be compressed.
+									Default value is '100' bytes.
+									example: - argument for not compressing files under 1MB - 
+										-m 1M
+
 						NOTE: -G and <block_size> must be passed when using multi-thread.
 						<block_size> defines how much data each thread will take care when compressing.
 						NOTE 2: -G, --multi-thread { <num_of_threads> | <crypto_threads>,<compression_threads> }
@@ -31926,24 +31967,24 @@ when needed.
 						you want.
 
 						Syntax:
-							$ dar -c <backup_file_without_extension> -G -zzstd:22:<block-size> -g <data_to_backup> 
+							$ dar -c <backup_file_without_extension> -G -zzstd:22:<block-size> -g <data_to_archive> 
 
 						Practical Example:
-							$ dar -c <backup_file_without_extension> -G -zzstd:22:2M -g <data_to_backup> 
+							$ dar -c <backup_file_without_extension> -G -zzstd:22:2M -g <data_to_archive> 
 
 						Practical Example 2:
-							$ dar -c <backup_file_without_extension> -G3 -zzstd:22:2M -g <data_to_backup> 
+							$ dar -c <backup_file_without_extension> -G3 -zzstd:22:2M -g <data_to_archive> 
 						
 					1.4 - CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
 						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
 
 						Syntax:
-							$ dar -c <backup_file_without_extension> -K <algorithm>:<password/cipher> -g <data_to_backup>
+							$ dar -c <backup_file_without_extension> -K <algorithm>:<password/cipher> -g <data_to_archive>
 								or
-							$ dar -c<backup_file_without_extension> -K<algorithm>:<password/cipher> -g<data_to_backup>
+							$ dar -c<backup_file_without_extension> -K<algorithm>:<password/cipher> -g<data_to_archive>
 								or
-							$ dar -c <backup_file_without_extension> --key <algorithm>:<password/cipher> -g <data_to_backup>
+							$ dar -c <backup_file_without_extension> --key <algorithm>:<password/cipher> -g <data_to_archive>
 
 						Practical Example - Using SCRAMBLE Algorithm - :
 							$ dar -c ./data\ archive -K scram:asdf -g ./data\ folder/
@@ -31959,28 +32000,181 @@ when needed.
 						or quettabytes respectively. 
 
 						Syntax:
-							$ dar -c <backup_file_without_extension> -s <slice_size> -g <data_to_backup>
+							$ dar -c <backup_file_without_extension> -s <slice_size> -g <data_to_archive>
 								or
-							$ dar -c<backup_file_without_extension> -s<slice_size> -g<data_to_backup>
+							$ dar -c<backup_file_without_extension> -s<slice_size> -g<data_to_archive>
 
 						Practical Example:
 							$ dar -c ./data\ archive -s 2M -g ./data\ folder/
 								or
 							$ dar -c./data\ archive -s2M -g./data\ folder/
+
+						1.5.1 - PAUSING ARCHIVE PROCESS FOR EACH SLICE CREATED
+							In dar, it's possible to pause archiving for each slice created using the '-p' argument.
+						This allows each slice to be copied into a different disk, before creating a new slice.
+
+						This is very important when creating full system backups and there isn't enough disk space available 
+						for all of the slices to be created. It can also be used when the Backup Media isn't big enough and needs
+						to be switched between each slice creation.
+
+						Practical Example:
+							$ dar -c ./data\ archive -p -s 2M -g ./data\ folder/
 							
+					1.6 - ADDING/EXCLUDING DATA TO DAR ARCHIVE USING A LISTING FILE
+						During archive creation, it's possible to add or exclude data using a text file for listing which data is included
+						or excluded from the archive during creation.
+
+						The '-[' and '-]' arguments are similar to '-g' with minor differences:
+							1.6.1 - No WildCard is supported
+							1.6.2 - '-[' adds only the given data the given data to archive, not it's files and sub-directories
+							1.6.3 - '-]' does the same, but excludes given files and directories from being added to archive
+							1.6.4 - Unlike '-g' you need to create a listing file for it
+
+						NOTE: since '[' is a reserved special character used by the terminal, you need to use '-\['
+						for passing the '-[' argument. same for ']'
+
+						Practical Example:
+							Just for this example, you need to follow 3 different steps:
+
+							-- Creating Dummy Folders and Files:
+								$ mkdir -p ./test\ folder/folder\ B;
+								$ folder=(./test\ folder ./test\ folder/folder\ B);
+								$ touch {$folder[1],$folder[2]}/{file\ a,file\ b};
+
+							-- Creating a Listing File:
+								$ find ./test\ folder > ./listing\ file
+									or
+								$ find ./test\ folder > ./listing\ file.txt
+
+								Note: At this point, you can open the listing file and edit it on your favorite text editor,
+								applying any final changes by hand if desired.
+
+							-- Creating Archive from Listing File:
+								$ dar -c ./data\ archive -\[ ./listing\ file
+							
+							With everything done, you can now check the archive that has just been created:
+								$ dar -l ./data\ archive
+							
+							Finally, you can remove everything after you're done with it.
+								$ rm -r ./{test\ folder,data\ archive}
+
+						RECOMMENDED TOPIC READING:
+							SOME FIND COMMANDS
+							FIND, AWK GREP AND UGREP
+
+
 				2) LISTING DAR FILES
+					Common Options to use when listing data (-l):
+						-T              tree output format
+						-as             only list files saved in the archive
+
 					NOTE: DAR works different from other Archiving/Compressing tools, filename extension DOESN'T has to be passed for dar.
 					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
 
 						$ dar -l ./<archive_filename>
 
-				3) INTEGRITY TEST FOR DAR ARCHIVE
+				3) MERGING DIFFERENT DAR ARCHIVES
+					Syntax:
+						$ dar -+ ./<New Merged Archive> -A ./<Archive 1> -@ ./<Archive\ 2>
+						Note: Check the 'Examples' section below
+
+					Read this before merging - VERY IMPORTANT:
+						'DAR' by default replaces files when they're under the same filename, from the archive passed in '-@'
+						with the one passed in '-A' (see example 3.1). 'Dar' always consider the archive passed in '-A' to have
+						the most recent data when data under same filename exists in the archive passed in '-@'. 
+
+						In this case, only the data/file on the archive passed in argument '-A' is copied/created on the merged archive,
+						instead of the data in the archive passed in the '-@' argument.
+
+						Everything else is merged.
+
+					Common Options - VERY IMPORTANT -:
+						A) '-ad' treats the whole merging as a DECREMENTAL BACKUP, the rules are the same as when doing a regular merge. 
+
+						to put it simple: existing files and directories in the archive passed by '-@' are deleted in the final merge if they
+						do not exist in the archive passed by '-A' argument.
+
+						be warned delta binary feature (-8, --delta sig ) is not supported with '-ad'.
+							(Read more on DECREMENTAL BACKUP)
+
+						B) '-ak' for merging and repairing operations this means keeping files compressed. Both archives must either use 
+						the same compression method or one of them mustn't use compression at all for this to work.
+						Options -z, -Z, -Y, -m are ignored when using this.
+
+						C) '-ah' for merging and repairing operations, the sparse file detection mechanism is disabled by default.
+						this option enables it.
+
+					Mandatory Arguments:
+						A) '-+' initiates a merging operation, allowing to pass the name of the new merged archive.
+
+						B) '-A' specifies the archive to use as reference, which is mandatory for ARCHIVE ISOLATION (-C option) 
+						and MERGING OPERATION ( -+ ).  Else  it  specifies  the rescue catalogue to use when restoring/extracting (-x ), 
+						testing (-t ) or comparing (-d ) an archive.
+						
+						C) '-@' specifies  an  auxiliary  archive  of reference (merging context) or the name of the on-fly isolated catalogue 
+						(creation context). This option is thus only available with -+ option (merging) and -c option (archive creation). 
+						Note that --aux and --on-fly-isolate are really aliases to the same  option, this is the context of use 
+						(archive creation or merging) which lead it to behave a way or another.
+
+
+					Examples:
+						3.1 - MERGING TWO DIFFERENT DAR ARCHIVES
+							$ dar -+ ./merged\ archive -A ./archive\ 1 -@ ./archive\ 2 
+
+						3.2 - MERGING A THIRD DAR ARCHIVE
+							For merging a 3rd dar archive, you need to do step 3.1 above, then follow this step:
+
+								$ dar -+ ./merged\ archive -A ./merged\ archive -@ ./archive\ 3
+
+				4) MAKING CHANGES TO AN EXISTING DAR ARCHIVE
+					Common Options - VERY IMPORTANT -:
+						'-ak' can be used to keep files compressed using the same algorithm as the previous archive.
+
+					4.1 - CHANGING COMPRESSION ALGORITHM FROM EXISTING DAR ARCHIVE
+						Syntax:
+							$ dar -+ ./<new_archive> -A <old_archive> -z<algorithm>
+
+						Practical Example:
+							$ dar -+ ./new\ archive -A ./old\ archive -zzstd
+
+					4.2 - CHANGING ENCRYPTION ALGORITHM AND PASSWORD FROM EXISTING DAR ARCHIVE
+						Syntax:
+							$ dar -+ ./<new_archive> -A <old_archive> -K<algorithm>:<password> -ak
+
+						Practical Example:
+							$ dar -+ ./new\ archive -A ./old\ archive -Kscram:asdf -ak
+
+					4.3 - CREATING BACKUP SLICES FROM AN EXISTING DAR ARCHIVE
+						'DAR' can create slices from an existing dar file:
+
+							Syntax: 
+								$ dar -+ ./<new_archive> -A <old_archive> -s <slice_size> -ak
+
+							Practical Example:
+								$ dar -+ ./<new_archive> -A <old_archive> -s 1M -ak
+
+					4.4 - ADDING NEW FILES AND CONTENTS TO AN EXISTING DAR ARCHIVE
+						For adding new files, you'll have to go through topic and sub-topics:
+							MERGING DIFFERENT DAR ARCHIVES
+								MERGING TWO DIFFERENT DAR ARCHIVES
+								MERGING A THIRD DAR ARCHIVE
+					
+					4.5 - MAKING OTHER TYPES OF CHANGES TO EXISTING DAR ARCHIVE
+						Most of the sub-topics covered in the topic below can be applied to any already existing 'dar' archive:
+							ADDING DATA TO DAR ARCHIVE
+
+				5) INTEGRITY TEST FOR DAR ARCHIVE
 					NOTE: DAR works different from other Archiving/Compressing tools, filename extension DOESN'T has to be passed for dar.
 					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
 
 						$ dar -t ./<archive_filename>
 
-				4) EXTRACTING DATA FROM DAR ARCHIVE
+				6) EXTRACTING DATA FROM DAR ARCHIVE
+					Common Options to use when extracting (-x):
+						-k              #Do not remove files destroyed since the reference backup
+						-r              #Do not restore file older than those on filesystem
+						-f              #Do not restore directory structure
+
 					There is 2 ways of extracting DATA from a DAR Archive:
 						A) As regular user
 						B) As root
@@ -31992,7 +32186,7 @@ when needed.
 					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
 					you can list existing contents using the command on Step #2( $ dar -l )
 
-					4.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
+					5.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
 
 							Syntax:
 								$ dar -x ./<archive_filename>
@@ -32003,7 +32197,7 @@ when needed.
 								$ dar -x ./archive
 
 
-					4.2 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
+					5.2 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 						NOTE: The <existing_dar_content> must exist within the DAR Archive passed as <filename>.dar .
 
 							Syntax:
@@ -32012,7 +32206,7 @@ when needed.
 							Practical Example:
 								$ dar -x ./archive -g ./existing_content
 
-					4.3 - EXTRACTING DAR ARCHIVE USING PASSWORD
+					5.3 - EXTRACTING DAR ARCHIVE USING PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
 						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
 
