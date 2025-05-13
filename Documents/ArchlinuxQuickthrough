@@ -1,6 +1,6 @@
 {USE LICENSE}
 {S-INDEX, [INDEX], INDEX SYNTAX}
-{STACK OF  THINGS DONE}
+{STACK OF THINGS DONE}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
 {OPTIMIZATION, TWEAK, PERFORMANCE, [PERFORMANCE]}
 {PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
@@ -195,7 +195,7 @@ USE LICENSE:
 				ALTERNATE OPTION
 			CREATING VIRTUAL INPUT/OUTPUT AUDIO DEVICE
 			CONNECTING OUTPUT SOUND DEVICE TO VIRTUAL INPUT DEVICE
-			PLAYING MUSIC AND SPEAKING AT THE SAME TIME
+			PLAYING DESKTOP MUSIC TO INPUT DEVICE AND USING MICROPHONE AT THE SAME TIME | REDIRECTING DESKTOP AUDIO AS INPUT DEVICE
 			VOICE MODULATION THROUGH CARLA
 			TROUBLESHOOTING
 			INSTALLATION STEPS
@@ -324,7 +324,7 @@ USE LICENSE:
 						BASIC DAR EXAMPLES
 							ADDING DATA TO DAR ARCHIVE
 								USING DAR ARCHIVING WITHOUT COMPRESSION
-								USING DAR COMPRESSION
+								USING STANDARD DAR COMPRESSION
 									USING DAR WITH LZ4 COMPRESSION
 									USING DAR WITH ZSTD COMPRESSION
 								USING MULTITHREADING DAR COMPRESSION 
@@ -343,6 +343,13 @@ USE LICENSE:
 								ADDING NEW FILES AND CONTENTS TO AN EXISTING DAR ARCHIVE
 								MAKING OTHER TYPES OF CHANGES TO EXISTING DAR ARCHIVE
 							INTEGRITY TEST FOR DAR ARCHIVE
+							REPAIRING A DAMAGED/CORRUPTED DAR ARCHIVE
+								ISOLATING THE CATALOGUE
+								REPAIRING DAR ARCHIVE
+									LISTING REPAIRED FILES FROM DAR ARCHIVE
+							COMPARING DAR ARCHIVES
+								COMPARING TWO DIFFERENT DAR ARCHIVES
+								COMPARING ARCHIVE WITH DATA ON THE FILESYSTEM
 							EXTRACTING DATA FROM DAR ARCHIVE
 								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
 								EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
@@ -1153,6 +1160,7 @@ New Syntax(2023):
 		USING AND MANAGING DIFFERENT PROFILES ON MOZILLA
 		SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER | LIST OF UNSAFE DIRECTORIES
 		BATCH CONVERSION OF MULTIPLE VIDEOS INTO COMPRESSED FORMAT
+		[INDEX: COMPRESSING AND UNCOMPRESSING FILES & DATA]
 
 2025 - March:
 	--Day 30:
@@ -1164,6 +1172,8 @@ New Syntax(2023):
 2024 - December:
 	-- Day 22:
 		TROUBLESHOOTING AUDIO CRACKLING / AUDIO STUTTERS ON PIPEWIRE/WIREPLUMBER
+		TCP OFFLOAD AND WHAT IT IS || NETWORK OFFLOADING
+
 
 2024 - November:
 	-- Day 20:
@@ -24112,8 +24122,8 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 		Unload Module When Done:
 			$ pactl unload-module module-combine-sink
 
-		PLAYING MUSIC AND SPEAKING AT THE SAME TIME
-			1) Open 'helvum' or 'coppwr'
+		PLAYING DESKTOP MUSIC TO INPUT DEVICE AND USING MICROPHONE AT THE SAME TIME | REDIRECTING DESKTOP AUDIO AS INPUT DEVICE
+			1) Open 'helvum', 'coppwr', 'qpwgraph'
 
 			2) Find your audio input(microphone) device in 'helvum' or 'coppwr' by name
 				You can check the name by looking at your audio control system(pavucontrol)
@@ -29974,15 +29984,121 @@ Custom Option / Weechat Custom / WEECHAT MAC ADDRESS:
 	$ firejail --hostname=officepc3 --net=enp3s0 --mac=3a:01:76:36:1a:b4 --whitelist=~/.config/weechat --whitelist=~/Documents/Private/Apps/MORE/.cache/weechat weechat
 
 Valid Mac Address:
-	Mac Addresses can be either multicast or unicast addresses, weechat only supports unicast:
+		----START----
+	Mac Addresses can be either multicast or unicast addresses, this is a list of unicast addresses:
+
 		3a:01:76:36:1a:b4
 		68:72:F8:18:5E:0E
 		F2:91:FF:58:FB:9D
 		00:11:22:33:44:55
-LINKS:
-	https://macaddress.io/mac-address-generator				#Generates more addresses
-	https://www.hellion.org.uk/cgi-bin/randmac.pl?scope=local&type=unicast	#MAC ADDRESS GENERATOR, you can choose to opt out for multicast or unicast.
-	https://miniwebtool.com/mac-address-generator/	#MAC ADDRESS GENERATOR, can generate multicast/unicast without warnign the user
+
+		ca:67:46:fa:76:60
+		b6:b8:0d:4c:a3:1f
+		52:0f:6b:35:04:46
+		ae:97:bd:c2:a1:65
+		ce:2a:96:a0:94:3a
+		ee:1b:be:f4:f9:28
+		2e:9c:a6:2c:df:72
+		1a:53:be:36:5c:ec
+		ca:e4:3e:d8:07:5c
+		7e:04:ca:7c:30:fe
+		86:17:d7:d2:e7:7a
+		8a:69:2a:a0:9e:19
+		12:e3:1e:e6:46:96
+		9a:94:0c:fd:51:99
+		9e:91:8a:2f:13:5e
+		72:5e:23:06:15:f2
+		4a:71:48:25:06:7f
+		62:d4:eb:29:c8:3d
+		ca:6d:01:3a:13:e3
+		36:a3:9e:e6:0f:63
+		0e:cb:0c:b6:47:7b
+		d2:64:a7:35:d5:57
+		f6:85:eb:79:5d:6a
+		ae:4d:95:5a:0f:ff
+		4a:a8:13:18:3c:34
+		56:f5:c8:8d:e4:c4
+		3e:b9:fe:7d:6f:c8
+		2e:0d:1b:b2:14:ae
+		56:3e:a7:57:fc:cd
+		3a:0b:a9:16:14:82
+		ae:64:53:04:ed:35
+		02:3d:3b:b8:cf:34
+		d6:e3:af:3e:64:f7
+		92:9b:33:b4:1f:72
+		ba:14:85:24:34:8f
+		ca:9e:48:b0:12:49
+		5a:17:88:6a:61:95
+		4a:ac:c8:65:e7:00
+		36:da:e8:03:ed:97
+		06:66:77:73:68:c0
+		76:ba:f7:fe:87:17
+		52:b2:e6:f0:fe:66
+		3a:46:f2:3c:a2:97
+		76:ca:f8:e7:ed:b4
+		f6:ef:17:38:08:18
+		fe:ba:22:6a:bc:7d
+		9e:38:8b:7c:ad:af
+		ee:33:97:c5:90:35
+		1a:a0:80:fc:d1:21
+		56:1c:e9:a1:8d:04
+		e6:c2:18:4d:d7:b8
+		c6:73:0b:8c:a8:25
+		ee:32:40:06:e3:5c
+		ea:de:fc:36:a2:11
+		b2:bd:e1:7c:50:1f
+		ee:5c:4e:70:30:b4
+		02:f6:46:5d:4c:bc
+		4e:c0:ab:9b:a3:d8
+		c6:e6:1e:82:c7:6b
+		ca:be:5b:c5:c4:c7
+		3a:29:68:3b:4d:a3
+		0e:8c:09:52:cf:09
+		ea:1a:d0:f9:0d:cb
+		4a:88:29:f0:cc:1e
+		36:36:e1:7c:b7:98
+		9a:14:e5:8b:15:d3
+		6e:69:33:f9:3a:35
+		02:b5:3e:3b:be:b6
+		aa:c7:dc:aa:2c:fc
+		0a:2f:bb:d6:b5:9c
+		ea:9f:f7:b9:fc:25
+		fe:68:44:e8:d1:21
+		da:f9:26:2c:56:57
+		1a:2c:49:f5:87:4c
+		d6:50:7c:e5:12:1e
+		3a:98:5e:fd:1e:27
+		52:3c:2b:8e:3c:74
+		86:4e:50:64:18:96
+		5e:1c:3b:4b:28:66
+		6a:f1:e8:f3:36:23
+		8e:f2:92:8d:37:72
+		ee:61:d4:90:e6:e0
+		6e:69:56:c6:30:cb
+		fe:d8:9c:61:7b:11
+		de:84:58:07:29:70
+		ca:bc:53:d2:82:90
+		b6:df:fa:29:d6:53
+		76:c4:59:a1:e6:92
+		5a:e6:19:49:9f:57
+		96:59:c4:86:5c:90
+		d6:4c:09:e8:84:33
+		d2:99:32:4a:42:98
+		7e:c1:f6:3b:af:f5
+		96:6c:29:ae:28:cb
+		ba:ec:f5:e4:68:41
+		1e:97:fe:f6:ba:d4
+		b6:45:ca:37:77:e9
+		5a:19:c9:b5:6b:01
+		4a:44:41:08:c2:55
+		aa:6e:28:df:cc:d7
+
+		----END----
+
+MAC ADDRESS GENERATOR LINKS:
+	https://macaddress.io/mac-address-generator					#Generates more addresses
+	https://www.hellion.org.uk/cgi-bin/randmac.pl?scope=local&type=unicast		#MAC ADDRESS GENERATOR, you can choose to opt in for multicast or unicast.
+	https://miniwebtool.com/mac-address-generator/					#MAC ADDRESS GENERATOR, can generate multicast/unicast without warnign the user
 
 ----
 2) Initializes steam on a firejail sandbox, by using a  different Network IP Address, allowing PIPEWIRE'S PULSE SERVER to work:
@@ -31676,10 +31792,10 @@ when needed.
 				inside the archive. therefore, files like 'my archive.dar.zst' will not exist like it does in TAR and other archiving tools, unless
 				this is manually done by the user using compression tools on his own.
 
-				4 - When working with archiving, there's always the chance the system might hang, freeze, crash for unexpected reasons like
-				a power blackout; This may cause archive data structure to be corrupt, leading data unrecoverable even if they've kept integrity 
-				inside the archive. Because of this, it's important to isolate the archive catalogue using -C option so that you can repair it with -y.
-				check 'man page' and '--help' for more info on this.
+				4 - When working with archiving of any kind, there's always the chance the system might hang, freeze, crash for unexpected reasons like
+				a power blackout during compression, decompression, encrypting, listing, etc; This may cause archive data structure to corrupt, leading 
+				data unrecoverable even if they've kept integrity inside the archive. Because of this, it's important to isolate the archive catalogue 
+				using -C option so that you can repair it with -y at some later point. check 'man page' and '--help' for more info on this.
 
 				By isolating the catalogue, you won't need a backup/copy of the archive, just the catalogue is enough.
 		
@@ -31937,21 +32053,30 @@ when needed.
 
 			BASIC DAR EXAMPLES:
 				1) ADDING DATA TO DAR ARCHIVE:
+					Common Options:
+					'-va' outputs verbose mode.
+					'-b' turns on 'beep' on the terminal for noticing the end of a given task. Only works on beep capable/enabled terminals.
+					'-m <size>' data below the specified size will not be compressed - only works with '-z' - default value is 100.(size = 1K, 1M, 1G)
+					'-m 0' compresses all files.
+
 					IMPORTANT: DAR automatically creates filename extension in the following format <archive_filename>.<slice>.dar, 
-				all DAR Archives must end in <slice>.dar for it to work.
+					all DAR Archives must end in <slice>.dar for it to be detected by dar. So don't modify it!
 
 					1.1 - USING DAR ARCHIVING WITHOUT COMPRESSION:
+
 						$ dar -c <backup_file_without_extension> -g <data_to_archive> -g <data_to_archive>
 					
-					1.2 - USING DAR COMPRESSION
+					1.2 - USING STANDARD DAR COMPRESSION
+						'-m0' is used to compress files of all sizes.
+
 						NOTE: DAR uses level 9 gzip compression by default.
-							$ dar -c <backup_file_without_extension> -z -g <data_to_archive> 
+							$ dar -c <backup_file_without_extension> -m0 -z -g <data_to_archive> 
 
 						1.2.1 - USING DAR WITH ZSTD COMPRESSION
-							$ dar -c <backup_file_without_extension> -zzstd:22 -g <data_to_archive> 
+							$ dar -c <backup_file_without_extension> -m0 -zzstd:22 -g <data_to_archive> 
 
 						1.2.2 - USING DAR WITH LZ4 COMPRESSION
-							$ dar -c <backup_file_without_extension> -zlz4 -g <data_to_archive> 
+							$ dar -c <backup_file_without_extension> -m0 -zlz4 -g <data_to_archive> 
 
 					1.3 - USING MULTITHREADING DAR COMPRESSION 
 						Common Option(s) when Adding Data to Archive:
@@ -31967,13 +32092,13 @@ when needed.
 						you want.
 
 						Syntax:
-							$ dar -c <backup_file_without_extension> -G -zzstd:22:<block-size> -g <data_to_archive> 
+							$ dar -c <backup_file_without_extension> -m0 -G -zzstd:22:<block-size> -g <data_to_archive> 
 
 						Practical Example:
-							$ dar -c <backup_file_without_extension> -G -zzstd:22:2M -g <data_to_archive> 
+							$ dar -c <backup_file_without_extension> -m0 -G -zzstd:22:2M -g <data_to_archive> 
 
 						Practical Example 2:
-							$ dar -c <backup_file_without_extension> -G3 -zzstd:22:2M -g <data_to_archive> 
+							$ dar -c <backup_file_without_extension> -m0 -G3 -zzstd:22:2M -g <data_to_archive> 
 						
 					1.4 - CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
@@ -32160,8 +32285,8 @@ when needed.
 								MERGING A THIRD DAR ARCHIVE
 					
 					4.5 - MAKING OTHER TYPES OF CHANGES TO EXISTING DAR ARCHIVE
-						Most of the sub-topics covered in the topic below can be applied to any already existing 'dar' archive:
-							ADDING DATA TO DAR ARCHIVE
+						Most of the sub-topics covered in the topic right below can be applied to any already existing 'dar' archive:
+											ADDING DATA TO DAR ARCHIVE
 
 				5) INTEGRITY TEST FOR DAR ARCHIVE
 					NOTE: DAR works different from other Archiving/Compressing tools, filename extension DOESN'T has to be passed for dar.
@@ -32169,7 +32294,58 @@ when needed.
 
 						$ dar -t ./<archive_filename>
 
-				6) EXTRACTING DATA FROM DAR ARCHIVE
+				6) REPAIRING A DAMAGED/CORRUPTED DAR ARCHIVE
+					DAR makes it possible to isolate the index catalogue from an archive, this allows for quick repairing the catalogue
+					in case the archive gets damaged by a power blackout or system crash while you're accessing the archive for listing,
+					comparing, extracting or even copying/cloning the archive.
+
+						6.1) ISOLATING THE CATALOGUE
+							When the catalogue is damaged, you'll be unable to extract the archive or do any other available operations in it,
+							for this reason it's important to isolate the catalogue.
+
+							This merely makes a copy of the catalogue called 'Archive Catalogue', allowing to isolate it:
+								$ dar -C ./Archive\ Catalogue -A ./Dar\ Archive
+
+						6.2) REPAIRING DAR ARCHIVE
+							Repairing the archive creates a complete new copy of it by completely overwritting the catalogue as 
+							the new repaired archive, it doesn't removes the damaged archive nor replaces it: 
+								$ dar -y ./Archive\ Catalogue -A ./Dar\ Archive
+							
+							After fixing the archive, the "Archive Catalogue" will be the repaired archive.
+							
+							6.3) LISTING REPAIRED FILES FROM DAR ARCHIVE
+								With the repaired archive in hands, you can now list to see which files have been saved by the repair:
+									$ dar -l ./Archive\ Catalogue
+
+								Files that have been "recovered" will have been tagged as 'Saved'.
+
+				7) COMPARING DAR ARCHIVES
+
+					7.1 - COMPARING TWO DIFFERENT DAR ARCHIVES
+						This will compare 2 different archives, both must share the same catalogue.
+
+							$ dar -d ./Archive\ 1 -A ./Archive\ 2
+						
+					7.2 - COMPARING ARCHIVE DATA WITH DATA ON THE FILESYSTEM
+						DAR also makes it possible to compare the archived data with the data located on the filesystem.
+						This will quickly test all files under the filesystem belonging to the dar archive.
+						
+						Note 1: Just for this case, it'd be wise to archive data as root - during archive creation (using sudo or run0) -
+						to ensure the filesystem properties for each archived file are copied as is from the disk to the archive.
+						In this case, The same must be done when comparing archived, to ensure all properties are tested.
+						archiving as regular user might not copy all filesystem properties, and comparing as regular user will
+						not check for filesystem property differences.
+
+						Note 2: This can be useful to see whether data has been properly extracted inheriting all of it's archived 
+						filesystem properties (User, group, permissions, FSA, EA, etc) or not as well as checking which files have been removed
+						or added/created in the filesystem.
+
+							# dar -d ./Archive\ Name
+								or
+							# dar -va -d ./Archive\ Name
+
+
+				8) EXTRACTING DATA FROM DAR ARCHIVE
 					Common Options to use when extracting (-x):
 						-k              #Do not remove files destroyed since the reference backup
 						-r              #Do not restore file older than those on filesystem
@@ -32186,7 +32362,7 @@ when needed.
 					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
 					you can list existing contents using the command on Step #2( $ dar -l )
 
-					5.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
+					8.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
 
 							Syntax:
 								$ dar -x ./<archive_filename>
@@ -32197,7 +32373,7 @@ when needed.
 								$ dar -x ./archive
 
 
-					5.2 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
+					8.2 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 						NOTE: The <existing_dar_content> must exist within the DAR Archive passed as <filename>.dar .
 
 							Syntax:
@@ -32206,7 +32382,7 @@ when needed.
 							Practical Example:
 								$ dar -x ./archive -g ./existing_content
 
-					5.3 - EXTRACTING DAR ARCHIVE USING PASSWORD
+					8.3 - EXTRACTING DAR ARCHIVE USING PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
 						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
 
