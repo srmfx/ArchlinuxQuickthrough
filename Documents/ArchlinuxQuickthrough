@@ -324,14 +324,16 @@ USE LICENSE:
 						BASIC DAR EXAMPLES
 							ADDING DATA TO DAR ARCHIVE
 								USING DAR ARCHIVING WITHOUT COMPRESSION
+								GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
 								USING STANDARD DAR COMPRESSION
 									USING DAR WITH LZ4 COMPRESSION
 									USING DAR WITH ZSTD COMPRESSION
 								USING MULTITHREADING DAR COMPRESSION 
 								CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
 								SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
-									PAUSING ARCHIVE PROCESS FOR EACH SLICE CREATED
-								ADDING/EXCLUDING DATA TO DAR ARCHIVE USING A LISTING FILE
+									PAUSING ARCHIVING PROCESS FOR EACH SLICE CREATED
+										PAUSING ARCHIVING PROCESS AFTER A GIVEN NUMBER OF SLICES HAVE BEEN CREATED
+								ADDING/EXCLUDING DATA FROM DAR ARCHIVING USING A LISTING FILE
 							LISTING DAR FILES
 							MERGING DIFFERENT DAR ARCHIVES
 								MERGING TWO DIFFERENT DAR ARCHIVES
@@ -31777,15 +31779,25 @@ when needed.
 			DAR is a more powerful version of TAR, it is meant as a disk/data backup utility, but can be used as an Archival Tool
 		in the same fashion as TAR.
 
+			LIST OF DAR TOOLS
+				dar, dar_slave, dar_split, dar_cp, dar_manager, dar_xform, parchive(install par2cmdline - par2, par2create, par2verify and par2repair) and avfs.
+
+				NOTE: While archiving can be used to keep multiple backup copies of the original data,
+				it's not possible to guarantee that the backup copies might not get damaged. One way of achieving this is to use Parchive
+				to ensure aditional integrity of the backed up data.
+
+				NOTE2: AVFS is virtual file system layer for transparently accessing the content of archives and remote directories just like local files.
+				Currently it can access natively tar, rar, zip, ar, gzip, bzip2, ftp, http, dav and some other. Although, this only works for read-only.
+
 			READ THIS BEFORE USING DAR
 				1 - When in doubt, remember to check on these things:
 					1.1 - $ man dar
 					1.2 - $ dar --help
 
 				2 - When compressing the chosen data, unlike other archiving tools, dar requires '-g' to be used;
-				WHEN NOT passing '-g', dar defaults to executing a system backup.
+				WHEN NOT passing '-g', dar defaults to executing a full system backup.
 					example:
-							$ dar -c <backup_file_without_extension> -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -g <data_to_archive> 
 
 				3 - Unlike TAR and Other archiving tools, when using compression, DAR compresses each file in the archive instead of compressing 
 				the entire archive. DAR does the same when encrypting data, instead of encrypting the entire archive, it encrypts each of the file/data 
@@ -31810,7 +31822,9 @@ when needed.
 				[ --sparse-file-min-size, -ah ]
 
 				C) EXTENDED ATTRIBUTES [ -u -U -am -ae --alter=list-ea  ]
+
 				D) FILESYSTEM SPECIFIC ATTRIBUTES ( FSA ) [ --fsa-family ]
+
 				E) DIRTY FILES:  At backup time, dar checks whether each saved file had not changed at the time it was read. If a file has changed in that 
 				situation, dar retries saving it up to three times (by default) and if it is still changing, is flagged as "dirty" in the backup, and handled 
 				differently from other files at restoration time. The dirty file handling is either to warn the user before restoring, to ignore and avoid 
@@ -32049,7 +32063,7 @@ when needed.
 				streaming compression used so far, which is still available). Encryption can also be processed with multiple threads even for old backups 
 				(no change at encryption level). The user defines the number of threads he wants for each process, compression/decompression as well as 
 				ciphering/deciphering. 
-				[ --multi-thread ]
+				[ -m, --multi-thread ]
 
 			BASIC DAR EXAMPLES:
 				1) ADDING DATA TO DAR ARCHIVE:
@@ -32058,27 +32072,90 @@ when needed.
 					'-b' turns on 'beep' on the terminal for noticing the end of a given task. Only works on beep capable/enabled terminals.
 					'-m <size>' data below the specified size will not be compressed - only works with '-z' - default value is 100.(size = 1K, 1M, 1G)
 					'-m 0' compresses all files.
+					'-' argument tells dar to either produce the archive or output results on the standard output(stdout).
+					this allows the resulting output to be piped into another program/utility or to be sent directly to a writable media.
 
-					IMPORTANT: DAR automatically creates filename extension in the following format <archive_filename>.<slice>.dar, 
+					IMPORTANT: When not using '-' DAR automatically creates filename extension in the following format <archive_filename>.<slice>.dar, 
 					all DAR Archives must end in <slice>.dar for it to be detected by dar. So don't modify it!
+					When using '-' you'll need to name the file manually by adding '.1.dar' at the end of the filename, see 1.1 example below.
 
 					1.1 - USING DAR ARCHIVING WITHOUT COMPRESSION:
+						$ dar -c <archive_filename_without_extension> -g <data_to_archive> -g <data_to_archive>
+								or
+						$ dar -c - -g <data_to_archive> > ./<archive_filename>.1.dar
 
-						$ dar -c <backup_file_without_extension> -g <data_to_archive> -g <data_to_archive>
-					
-					1.2 - USING STANDARD DAR COMPRESSION
+					1.2 - GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
+						It's possible to choose between "md5", "sha1" and "sha512" algorithms. By default, no hash file is generated.
+					this option is available when creating, isolating catalogue, merging or repairing an archive.
+
+					NOTE: This is different than generating a hash file after the archive has been created,
+					in the case where the storage media is faulty - ex.: old hard disk - there's a chance that the archive may get corrupt
+					as soon as it is created; generating a hash file in this case will not allow you to test for data corruption.
+						
+
+						$ dar --hash md5 -c <archive_filename_without_extension> -g <data_to_archive>
+								or
+						$ dar -c - -g <data_to_archive> > ./<archive_filename>.1.dar
+						
+						NOTE: If multiple slices of a given size are created (-s <size> ) then a new hash will 
+						automatically be created per slice.
+
+						1.2.1 -- Practical example - Testing with a hash file --
+
+							1.2.1.1 - Generate hash during archive creation
+								$ dar --hash md5 -c ./archive -g ./data\ to\ archive
+									or
+								$ dar -3 sha512 -c ./archive -g ./data\ to\ archive
+
+							1.2.1.2 - Testing the archive with the generated hash
+								$ md5sum -c archive.1.dar.md5
+									or
+								$ sha512sum -c archive.1.dar.sha512
+						
+						1.2.2 -- Practical example - Testing hash for multiple slices  -
+							First, this will create an archive and slice it in sizes of 700 bytes,	
+							note that this will create as many files as needed. 
+
+							NOTE: In this example, The Data to be archived needs to be bigger than 700 bytes due to slices being created (-s ).
+
+							1.2.2.1 - Generate hash during archive creation
+								$ dar --hash md5 -c ./<archive_name_with_no_extension> -g ./<data_to_archive> -s 700
+									or
+								$ dar -3 sha512 -c ./<archive_name_with_no_extension> -g ./<data_to_archive> -s 700
+
+							1.2.2.2 - Testing all hashed slices
+								$ md5sum -c ./<archive_name>*.md5 | grep -P -v 'OK' 
+									or
+								$ sha512sum -c ./<archive_name>*.sha512 | grep -P -v 'OK'
+
+						NOTE: If you just need the return value of these tests for a script, you have the choice of not using 'grep' at all.
+						you can get the return value straight from system call or from the environmental '$?' you can test with:
+							$ echo $?
+								
+
+						RECOMMENDED READINGS:
+							INTEGRITY TEST FOR DAR ARCHIVE
+							COMPARING DAR ARCHIVES
+
+					1.3 - USING STANDARD DAR COMPRESSION
 						'-m0' is used to compress files of all sizes.
 
 						NOTE: DAR uses level 9 gzip compression by default.
-							$ dar -c <backup_file_without_extension> -m0 -z -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -m0 -z -g <data_to_archive> 
+									or
+							$ dar -c - -g <data_to_archive> -m0 -z -g > ./<archive_filename>.1.dar
 
-						1.2.1 - USING DAR WITH ZSTD COMPRESSION
-							$ dar -c <backup_file_without_extension> -m0 -zzstd:22 -g <data_to_archive> 
+						1.3.1 - USING DAR WITH ZSTD COMPRESSION
+							$ dar -c <archive_filename_without_extension> -m0 -zzstd:22 -g <data_to_archive> 
+									or
+							$ dar -c - -g <data_to_archive> -m0 -zzstd:22 -g > ./<archive_filename>.1.dar
 
-						1.2.2 - USING DAR WITH LZ4 COMPRESSION
-							$ dar -c <backup_file_without_extension> -m0 -zlz4 -g <data_to_archive> 
+						1.3.2 - USING DAR WITH LZ4 COMPRESSION
+							$ dar -c <archive_filename_without_extension> -m0 -zlz4 -g <data_to_archive> 
+									or
+							$ dar -c - -g <data_to_archive> -m0 -zlz4 -g > ./<archive_filename>.1.dar
 
-					1.3 - USING MULTITHREADING DAR COMPRESSION 
+					1.4 - USING MULTITHREADING DAR COMPRESSION 
 						Common Option(s) when Adding Data to Archive:
 							-m <size>	#Sets up a Minimum size for compression, files under this size will not be compressed.
 									Default value is '100' bytes.
@@ -32092,24 +32169,24 @@ when needed.
 						you want.
 
 						Syntax:
-							$ dar -c <backup_file_without_extension> -m0 -G -zzstd:22:<block-size> -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -m0 -G -zzstd:22:<block-size> -g <data_to_archive> 
 
 						Practical Example:
-							$ dar -c <backup_file_without_extension> -m0 -G -zzstd:22:2M -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -m0 -G -zzstd:22:2M -g <data_to_archive> 
 
 						Practical Example 2:
-							$ dar -c <backup_file_without_extension> -m0 -G3 -zzstd:22:2M -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -m0 -G3 -zzstd:22:2M -g <data_to_archive> 
 						
-					1.4 - CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
+					1.5 - CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
 						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
 
 						Syntax:
-							$ dar -c <backup_file_without_extension> -K <algorithm>:<password/cipher> -g <data_to_archive>
+							$ dar -c <archive_filename_without_extension> -K <algorithm>:<password/cipher> -g <data_to_archive>
 								or
-							$ dar -c<backup_file_without_extension> -K<algorithm>:<password/cipher> -g<data_to_archive>
+							$ dar -c<archive_filename_without_extension> -K<algorithm>:<password/cipher> -g<data_to_archive>
 								or
-							$ dar -c <backup_file_without_extension> --key <algorithm>:<password/cipher> -g <data_to_archive>
+							$ dar -c <archive_filename_without_extension> --key <algorithm>:<password/cipher> -g <data_to_archive>
 
 						Practical Example - Using SCRAMBLE Algorithm - :
 							$ dar -c ./data\ archive -K scram:asdf -g ./data\ folder/
@@ -32119,22 +32196,22 @@ when needed.
 						READ TOPIC:
 							EXTRACTING DAR ARCHIVE USING PASSWORD
 
-					1.5 - SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
+					1.6 - SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
 						From 'man page': If the number is appended by k (or K), M, G, T, P, E, Z, Y, R or Q 
 						the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes, yottabytes, ronnabytes 
 						or quettabytes respectively. 
 
 						Syntax:
-							$ dar -c <backup_file_without_extension> -s <slice_size> -g <data_to_archive>
+							$ dar -c <archive_filename_without_extension> -s <slice_size> -g <data_to_archive>
 								or
-							$ dar -c<backup_file_without_extension> -s<slice_size> -g<data_to_archive>
+							$ dar -c<archive_filename_without_extension> -s<slice_size> -g<data_to_archive>
 
 						Practical Example:
 							$ dar -c ./data\ archive -s 2M -g ./data\ folder/
 								or
 							$ dar -c./data\ archive -s2M -g./data\ folder/
 
-						1.5.1 - PAUSING ARCHIVE PROCESS FOR EACH SLICE CREATED
+						1.6.1 - PAUSING ARCHIVING PROCESS FOR EACH SLICE CREATED
 							In dar, it's possible to pause archiving for each slice created using the '-p' argument.
 						This allows each slice to be copied into a different disk, before creating a new slice.
 
@@ -32144,16 +32221,24 @@ when needed.
 
 						Practical Example:
 							$ dar -c ./data\ archive -p -s 2M -g ./data\ folder/
-							
-					1.6 - ADDING/EXCLUDING DATA TO DAR ARCHIVE USING A LISTING FILE
+
+							1.6.1.2 - PAUSING ARCHIVING PROCESS AFTER A GIVEN NUMBER OF SLICES HAVE BEEN CREATED
+								This can be used for the same purpose; in this example, the archiving
+							will pause after 3 slices of 2MB have been created.
+
+								$ dar -c ./data\ archive -p 3 -s 2M -g ./data\ folder/
+									or
+								$ dar -c ./data\ archive -p3 -s 2M -g ./data\ folder/
+
+					1.7 - ADDING/EXCLUDING DATA FROM DAR ARCHIVING USING A LISTING FILE
 						During archive creation, it's possible to add or exclude data using a text file for listing which data is included
 						or excluded from the archive during creation.
 
 						The '-[' and '-]' arguments are similar to '-g' with minor differences:
-							1.6.1 - No WildCard is supported
-							1.6.2 - '-[' adds only the given data the given data to archive, not it's files and sub-directories
-							1.6.3 - '-]' does the same, but excludes given files and directories from being added to archive
-							1.6.4 - Unlike '-g' you need to create a listing file for it
+							1.7.1 - No WildCard is supported
+							1.7.2 - '-[' adds only the given data the given data to archive, not it's files and sub-directories
+							1.7.3 - '-]' does the same, but excludes given files and directories from being added to archive
+							1.7.4 - Unlike '-g' you need to create a listing file for it
 
 						NOTE: since '[' is a reserved special character used by the terminal, you need to use '-\['
 						for passing the '-[' argument. same for ']'
@@ -32289,10 +32374,12 @@ when needed.
 											ADDING DATA TO DAR ARCHIVE
 
 				5) INTEGRITY TEST FOR DAR ARCHIVE
-					NOTE: DAR works different from other Archiving/Compressing tools, filename extension DOESN'T has to be passed for dar.
-					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
-
+					This integrity test only tests the archive structure and not the contents of the archive:
 						$ dar -t ./<archive_filename>
+
+						RECOMMENDED READINGS:
+							GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
+							COMPARING DAR ARCHIVES
 
 				6) REPAIRING A DAMAGED/CORRUPTED DAR ARCHIVE
 					DAR makes it possible to isolate the index catalogue from an archive, this allows for quick repairing the catalogue
@@ -32305,6 +32392,8 @@ when needed.
 
 							This merely makes a copy of the catalogue called 'Archive Catalogue', allowing to isolate it:
 								$ dar -C ./Archive\ Catalogue -A ./Dar\ Archive
+									or
+								$ dar - -A ./Dar\ Archive > ./Archive\ Catalogue.1.dar
 
 						6.2) REPAIRING DAR ARCHIVE
 							Repairing the archive creates a complete new copy of it by completely overwritting the catalogue as 
@@ -32344,6 +32433,9 @@ when needed.
 								or
 							# dar -va -d ./Archive\ Name
 
+					RECOMMENDED READINGS:
+						GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
+						INTEGRITY TEST FOR DAR ARCHIVE
 
 				8) EXTRACTING DATA FROM DAR ARCHIVE
 					Common Options to use when extracting (-x):
@@ -32402,9 +32494,12 @@ when needed.
 
 
 			SOME DAR LINKS:
+				http://www.boomerangsworld.de/cms/avfs/extfs.html
+				hhttp://dar.linux.free.fr/doc/benchmark.html
 				http://dar.linux.free.fr/doc/Features.html
 				http://dar.linux.free.fr/doc/Tutorial.html
 				http://dar.linux.free.fr/doc/mini-howto/dar-differential-backup-mini-howto.en.html#simple-dar-usage
+				https://wiki.archlinux.org/title/Parchive
 
 		------------------------
 		7Z CHEAT SHEET
@@ -33528,7 +33623,8 @@ TEMPORARY 2:
 6 - Write something about POLKIT
 	https://wiki.archlinux.org/title/Polkit
 
-7 - Write something about DAR vs TAR
+7 - TODO: Write PARCHIVE topic about DAR
+
 ---
 VERY IMPORTANT/TASK  LOGS:
 
