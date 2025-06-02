@@ -3,7 +3,7 @@
 {STACK OF THINGS DONE}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
 {OPTIMIZATION, TWEAK, PERFORMANCE, [PERFORMANCE]}
-{PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
+{RECOMMENDED, PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
 
 NOTES:
 	MAN PAGE SAVES LIVES
@@ -246,6 +246,16 @@ USE LICENSE:
 				FIREWALLD VS IPTABLES
 			ENABLING FIREFOX ENCRYPTED CLIENT HELLO (ECH)
 			CLAMAV ANTI-VIRUS
+				ENABLING CLAMAV SERVICES
+				TESTING CLAMAV TOOLS
+				CLAMAV CONFIGURATION FILES
+					ALLOW FILE DESCRIPTOR PASS | ALLOWING CLAMAV TO SCAN DIFFERENT FILE SYSTEM TREES
+					ENABLE LOGGING FOR DETECTED INFECTED DATA
+					CHANGING QUARANTINE DIRECTORY FOR REAL-TIME ACCESS SCAN
+					SETTING UP DIRECTORIES FOR REAL TIME SCANNING
+					EXCLUDING DIRECTORIES FROM REAL TIME SCANNING
+					TURNING ON REAL-TIME SCANNING ON NEW, MOVED OR RENAMED FILES
+				CLAMAV UTILITIES
 			NETWORK MONITORING
 			FIREWALLING
 			HOW TO CREATE SECURITY KEYS / KEYFILES ON LINUX
@@ -519,13 +529,24 @@ USE LICENSE:
 			BATCH RENAMING FILES AND DIRECTORY
 			RENAMING ALL ZIP FILES
 		CUSTOMIZING YOUR ZSH EXPERIENCE
+			INSTALLING ZSH
+				INSTALLING CUSTOM THEMES
 			SETTING UP ZSH AS YOUR DEFAULT SHELL
 			CLONING ZSH CONFIGURATION FOR OTHER USERS
-			CHANGING ZSH THEME
-				RECOMMENDED THEMES
+			CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
+				CLONING POWERLEVEL10K FOR OTHER USERS
+			CHANGING ZSH THEME | INSTALLING OH-MY-ZSH
+				RECOMMENDED OH-MY-ZSH TOPIC READINGS
+				TROUBLESHOOTING ZSH AND OH-MY-ZSH INSTALLATION
+				RECOMMENDED OH-MY-ZSH THEMES
+			USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
+				CLONING POWERLEVEL10K + OH-MY-ZSH CONFIGURATION FOR OTHER USERS
+				MY CUSTOM POWERLEVEL10K + OH-MY-ZSH CONFIGURATION FILE
 			MY CUSTOM ZSHRC CONFIGURATION FILE
+			MY CUSTOM POWERLEVEL10K ZSHRC CONFIGURATION FILE
 			MY CUSTOM OH-MY-ZSH ZSHRC CONFIGURATION FILE
 			LOADING ZSH MODULE
+			USING ZSH WITH VI/VIM KEYS
 		MKINITCPIO NVIDIA CONFIGURATION 2024
 		CREATING KEY BINDINGS
 			CREATING MODULAR KEYBINDINGS
@@ -618,6 +639,11 @@ USE LICENSE:
 		INSTALLING UNICODE CHARACTERS
 		DISK SCHEDULERS / I/O SCHEDULERS
 		SUDO BASICS
+			SUDO - SUDOERS TUTORIAL
+				ADDING USER TO SUDOERS LIST
+					TROUBLESHOOTING ADDING USER TO SUDO
+				RUNNING PROGRAMS AS ROOT WITH SUDO
+				SUDO / GKSUDO OR GKSU COMMAND OPTIONS
 			EXECUTING PROGRAMS AS A DIFFERENT GROUP IN THE SYSTEM
 			IPTABLES
 				REVOKING INTERNET PERMISSION FROM AN EXISTING GROUP
@@ -935,6 +961,34 @@ USE LICENSE:
 		DECREASING/CAPPING/LIMITING FPS IN GAMES
 		HOW TO CHECK GNOME SETTING
 
+--SOME WINDOWS STUFF:
+	SOME WINDOWS UTILITIES
+	RUNNINNG COMMAND AS ADMINISTRATOR
+	SOME WINDOWS 11 HOTKEYS
+	RECOMMENDED ARCHLINUX PACKAGES FOR WSL
+		BASICS ON HOW TO USE PACMAN
+	RUNNING CLAMAV ANTI-VIRUS IN WSL
+	LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
+	ENABLING DBUS-BROKER IN WSL
+	MOUNTING DEVICES IN WSL
+		FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
+		MOUNTING DEVICES ON WSL
+		COPYING AND MOVING FILES FROM WITHIN WSL
+	INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
+	MANAGING ALIASES IN WINDOWS POWER SHELL
+		LISTING ALL AVAILABLE ALIASES
+		CREATING AN ALIAS IN WINDOWS POWER SHELL
+		CREATING ALIAS FOR A COMMAND
+		UPDATING ALIASES
+		HOW TO PERMANENTLY SET ALIASES
+			LISTING ALL PROFILES AVAILABLE
+			CREATE THE FILE USING NVIM OR NOTEPAD
+			ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
+	SETTING UP A NEW DEFAULT USER FOR WSL DISTRO
+	ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
+	COMPILING WSL KERNEL
+		HOW TO SELECT THE RIGHT KERNEL VERSION FOR YOU
+
 --MISCALENEOUS:
 	MONITORING LOG FILES IN REAL TIME
 		MULTITAIL COMMAND – MONITOR MULTIPLE LOG FILES IN REAL TIME
@@ -970,6 +1024,7 @@ USE LICENSE:
 			ENABLING CLIPBOARD PERMANENTLY ON NVIM:
 			TROUBLESHOOTING ISSUES NVIM:
 			CLIPBOARD TOOLS
+			SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
 			MANUALLY SETTING UP NVIM CLIPBOARD
 			AUTOMATICALLY SETTING UP NVIM CLIPBOARD 
 				***: XORG CLIPBOARD TOOL
@@ -1155,6 +1210,12 @@ New Syntax(2023):
 ====================================================================================================
 ===================================STACK OF THINGS DONE==========================================
 ====================================================================================================
+
+2025 - May:
+	--Day 30:
+		SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
+		SOME WINDOWS STUFF
+		CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
 
 2025 - April:
 	--Day 21:
@@ -6087,7 +6148,7 @@ note.: not in order, use search function to find it:
 	*aplay, *arecord, *stat, *file, fscrypt, ghex,
 	debugfs, tree, dircolors, broot, pmap,  
 	diff, cmp, comm, join, uniq, *xdelta3, *parallel, args, xargs, awk,
-	*rclone.
+	*rclone, split, dar, tar, par2 (parchive).
 
 	look later:
 		dircolors for setting colors to 'ls'
@@ -13098,12 +13159,6 @@ This is because the variable created in this way is a shell variable.
 3. Another way to confirm this is to type bash and start a child shell session. Using the echo command to search for the EXAMPLE variable now returns no output:
 ------------------------------
 ================================================================================
-WEECHAT HOTKEYS:
-	ctrl+a		#returns to first character in the line(Carriage Return?) - CHECK
-	ctrl+d		#deletes character ahead of the cursor
-	ctrl+p		#Goes to next channel
-	ctrl+n		#Goes to previous channel
-
 ------------------------------
 ================================================================================
 ------------------------------
@@ -17678,6 +17733,7 @@ $echo 'xmodmap -e "remove lock = Caps_Lock"' >> ~/.bash_profile
 
 ----------------------------------------
 ================================================================================
+SUDO BASIC
 SUDO - SUDOERS TUTORIAL
 Next, add the line below:
 	john ALL=(root) /bin/systemctl restart NetworkManager
@@ -17700,12 +17756,37 @@ To run all sudo commands without password prompt as any user,group on all hosts,
 
 (all:all defines user:group, the reason is sudo allows users to execute allowed programs AS another user/group.)
 
+ADDING USER TO SUDOERS LIST
+	First, you'll need to add yourself as SUDOERS:
+	
+	1) Add yourself as sudo by using 'visudo' and editing /etc/sudoers,
+		It is recommended to use visudo!
+			$ visudo
 
-RUNNING PROGRAMS AS SUDO
-	Use sudo to run commandline applications as root or another user(default is root)
+	2) Add yourself to wheel and sudo groups
+		$ usermod -aG wheel,sudo <username>
+	
+	3) You can now finally use 'sudo' test it with:
+		$ sudo ls -la ~/
+	
+		TROUBLESHOOTING ADDING USER TO SUDO
+			A) You can not add yourself to /etc/sudoers without administrative privileges on the system
+			B) You can check which groups your user already belongs to:
+				$ groups
+			C) You can check which user you are:
+				$ whoami
+				   or
+				$ users
+
+
+RUNNING PROGRAMS AS ROOT WITH SUDO
+	A) Use sudo to run commandline applications as root or another user(default is root):
 		$sudo cp <file2> /tmp/
 	
-	Use gksudo to run GUI applications as root or another user(default is root)
+	B) You can also run applications as a different user:
+		$ sudo -iu <username> <program_name>
+
+	C) Use gksudo to run GUI applications as root or another user(default is root):
 		$gksudo teams
 
 SUDO / GKSUDO OR GKSU COMMAND OPTIONS
@@ -18196,12 +18277,12 @@ usually the next sudo command will do it, but if it doesn't happen try restartin
 
 3 - REPLAYING SUDO-IO EVENTS
 
-sudoreplay -l					#Lists all sudo events
-sudoreplay -l user <username>			#Lists all sudo events for a given username
-sudoreplay -l user <username> command ls	#Lists all sudo events for a given username's command
-sudoreplay <replayid>				#Replays a given sudo session by it's ID
-							ex.: sudoreplay 000001
-sudoreplay -d <sudo_log_dir> -l|head		#Replays sudo sessions from a given sudo log directory.
+	sudoreplay -l					#Lists all sudo events
+	sudoreplay -l user <username>			#Lists all sudo events for a given username
+	sudoreplay -l user <username> command ls	#Lists all sudo events for a given username's command
+	sudoreplay <replayid>				#Replays a given sudo session by it's ID
+								ex.: sudoreplay 000001
+	sudoreplay -d <sudo_log_dir> -l|head		#Replays sudo sessions from a given sudo log directory.
 							ex.: sudoreplay -d /var/log/sudo-io/ -l|head
 4 - LOGGING OPTIONS
 
@@ -20517,20 +20598,42 @@ TROUBLESHOOTING ISSUES NVIM:
 it's respective tool installed. For ex.: NVIM Clipboard usually requires a system Clipboard tool installed
 
 CLIPBOARD TOOLS
-	The presence of a working clipboard tool implicitly enables the '+' and '*' registers. 
-Nvim looks for these clipboard tools, in order of priority:
+	The presence of a working clipboard tool implicitly enables the "+" and "*"
+registers. Nvim supports these clipboard tools, in order of priority:
 
-	g:clipboard
-	pbcopy, pbpaste (macOS)
-	wl-copy, wl-paste (if $WAYLAND_DISPLAY is set)
-	waycopy, waypaste (if $WAYLAND_DISPLAY is set)
-	xclip (if $DISPLAY is set)
-	xsel (if $DISPLAY is set)
-	lemonade (for SSH) https://github.com/pocke/lemonade
-	doitclient (for SSH) https://www.chiark.greenend.org.uk/~sgtatham/doit/
-	win32yank (Windows)
-	termux (via termux-clipboard-set, termux-clipboard-set)
-	tmux (if $TMUX is set)
+- |g:clipboard| : User override (if set to a dict or any string "name" below;
+  e.g. `g:clipboard="tmux"` forces tmux clipboard and skips auto-detection).
+- "pbcopy"    : pbcopy, pbpaste (macOS)
+- "wl-copy"   : wl-copy, wl-paste (if $WAYLAND_DISPLAY is set)
+- "wayclip"   : waycopy, waypaste (if $WAYLAND_DISPLAY is set)
+- "xsel"      : xsel (if $DISPLAY is set)
+- "xclip"     : xclip (if $DISPLAY is set)
+- "lemonade"  : lemonade (for SSH) https://github.com/pocke/lemonade
+- "doitclient": doitclient (for SSH) https://www.chiark.greenend.org.uk/~sgtatham/doit/
+- "win32yank" : *win32yank* (Windows)
+- "putclip"   : putclip, getclip (Windows) https://cygwin.com/packages/summary/cygutils.html
+- "clip"      : clip, powershell (Windows) https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/clip
+- "termux"    : termux (via termux-clipboard-set, termux-clipboard-set)
+- "tmux"      : tmux (if $TMUX is set)
+- "osc52"     : |clipboard-osc52| (if supported by your terminal)
+
+SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
+
+	1) Install your clipboard of choice, example:
+		# pacman -S xsel xclip
+
+		Note: If you're using WSL (Windows Linux Subsystem) use 'xsel'.
+
+	2) Open nvim
+		$ nvim
+
+	3) Go into command mode by typing ':' and type:
+		let g:clipboard = 'xsel'
+			or
+		let g:clipboard = 'xclip'
+		
+		
+	Note: if needed type ':h clipboard' in nvim's command-mode for more instructions
 
 MANUALLY SETTING UP NVIM CLIPBOARD
 	create a file on "~/.config/nvim/init.vim", make directory if needed.
@@ -22725,31 +22828,201 @@ be a spyware/trojan on the system.
 --------------------------------------------------
 --------------------------------------------------
 CLAMAV ANTI-VIRUS
+	source: https://wiki.archlinux.org/title/ClamAV
 
-1 - Running clamav daemon for the first time
-	# clamd
+ENABLING CLAMAV SERVICES
 
-2 - Updating clamav
-	# freshclam
+	1) After installing clamav, you need to update it first:
+		# freshclam
 
-3 - Scanning & Showing only infected files, with clamav daemon
-	# clamdscan -v -i <dir>
+	2) Now you can enable the following services
 
-4(Optional) - Scanning with multi-threading enabled, with clamav daemon
-	# clamdscan -v -m <dir>
+		2.1 - Enable and then start clamav-daemon
+			# systemctl enable clamav-daemon.service && systemctl start clamav-daemon.service
 
-5(Optional/Preferred) - Recursive Scanning(scan all directories) without clamav daemon
-	# clamscan -v -r <dir>
+		2.2 - Additionally enable real time on-access protection
+			Type on command line:
+				# systemctl enable clamav-clamonacc.service && systemctl start clamav-clamonacc.service
 
-6(Optional/Preferred) - Recursive Scanning(scan all directories) without clamav daemon
-	# clamscan -v -r --multiscan <dir>
+			Just for real-time protection you'll need to set this option up in the following config file:
+				[file: /etc/clamav/clamd.conf ]
+					# Exclude the UID of the scanner itself from checking, to prevent loops
+					OnAccessExcludeUname clamav
+				[/file]
 
-7(Optional) - Clamav Monitoring Tool for monitoring multiple instances of clamd
-	# clamdtop
+			Read more on:
+				CLAMAV CONFIGURATION FILES
+	
+	3) Add clamav to sudoers list
+		Use visudo to add clamav to sudoers list:
+			# visudo
 
-8(Optional) - Enabling On-Access Scanning for the entire system, this causes performance loss on the system,
-	      it requires clamd to be running: 
-		# clamonacc
+	4) Create default quarantine directory
+		Create default quarantine directory:
+			# mkdir /root/quarantine
+
+	5) Setting up CLAMAV for Auto-update 
+		The clamav-freshclam-once.timer will update clamav every 24 hours:
+			# systemctl enable clamav-freshclam-once.timer && systemctl start clamav-freshclam-once.timer
+
+TESTING CLAMAV TOOLS
+
+	1) Testing CLAMAV Scan tool
+
+		$ curl https://secure.eicar.org/eicar.com.txt | clamscan -
+		
+		If it's working, this will output the following text:
+			stdin: Win.Test.EICAR_HDB-1 FOUND
+
+	2) Testing CLAMAV Real time protection
+		You can download and save a the eicar file in one of the directories you configured clamonacc to monitor. 
+		For example:
+
+			$ cd /home/${USER}/Downloads/ &&
+			  wget https://secure.eicar.org/eicar.com.txt &&
+			  cat eicar.com.txt;
+	
+		VERY IMPORTANT: If Real Time Protection IS WORKING, 'cat' WILL FAIL to output the contents of the 
+		eicar.com.txt file. If cat doesn't fails, then real time protection isn't working!!!
+			If this is the case, consider doing the following steps:
+				MANDATORY READINGS:
+					ALLOW FILE DESCRIPTOR PASS | ALLOWING CLAMAV TO SCAN DIFFERENT FILE SYSTEM TREES
+					TURNING ON REAL-TIME SCANNING ON NEW, MOVED OR RENAMED FILES
+					SETTING UP DIRECTORIES FOR REAL TIME SCANNING
+
+	3) If Boths tests succeed, congratulations your CLAMAV Anti-virus is now working!
+
+CLAMAV CONFIGURATION FILES
+	The following files contain the relevant configuration options:
+
+		A) freshclam: /etc/clamav/freshclam.conf
+		B) clamd: /etc/clamav/clamd.conf
+		C) clamd mail filtering: /etc/clamav/clamav-milter.conf
+
+	You can also use 'clamconf' on commandline to list/display all attributes for all configuration files.
+		$ clamconf
+	
+	ALLOWING CLAMAV TO WORK ON APPARMOR ENABLED ENVIRONMENTS
+		Clamav requires these steps to have access to files and data in this case.
+
+			1) Check that you have not APPARMOR enabled kernel
+				$ zcat /proc/config.gz | grep -i "apparmor"
+				
+				Expected output if you have apparmor enabled kernel:
+					CONFIG_SECURITY_APPARMOR=y
+
+			2) If you do have APPARMOR enabled kernel, do this:
+				# aa-complain clamd
+
+				Note: after typing aa-complain clamd, if it shows that you have any configuration file containning 
+				syntax errors, try isolating it in a different directory.
+
+	ALLOW FILE DESCRIPTOR PASS | ALLOWING CLAMAV TO SCAN DIFFERENT FILE SYSTEM TREES
+		Useful if clamd is running as a different  user  or  if clamd  sees  a different file system tree. 
+		This is faster than streaming the file to clamd.  Only available if connected to clamd via local(unix) socket.
+		
+		1) You can edit the path on the service file located in:
+			# nvim /etc/systemd/system/multi-user.target.wants/clamav-clamonacc.service
+				or
+			# systemctl edit clamav-clamonacc.service
+
+		2) Edit and add --fdpass as described below:
+             		/usr/sbin/clamonacc -F --log=/var/log/clamav/clamonacc.log --move=/root/quarantine --fdpass
+
+	CHANGING QUARANTINE DIRECTORY FOR REAL-TIME ACCESS SCAN
+		1) You can edit the path on the service file located in:
+			# nvim /etc/systemd/system/multi-user.target.wants/clamav-clamonacc.service
+				or
+			# systemctl edit clamav-clamonacc.service
+
+
+		2) You can edit and change '--move' argument as you wish:
+			/usr/sbin/clamonacc -F --log=/var/log/clamav/clamonacc.log --move=/root/quarantine
+		
+
+		VERY IMPORTANT: You can replace '--move' with '--delete', but this isn't recommended,
+		false positives can happen and will lead important data to be permanently removed.
+
+	ENABLE LOGGING FOR DETECTED INFECTED DATA
+		Will store data for each detected infected file on the system:
+
+		example:
+			[file: /etc/clamav/clamd.conf ]
+				# Log additional information about the infected file, such as its
+				# size and hash, together with the virus name.
+				ExtendedDetectionInfo yes
+
+				# Log time with each message.
+				# Default: no
+				LogTime yes
+			[/file]
+		
+		NOTE: 
+			/var/log/clamav/			#Default storage for CLAMAV Logs
+
+	SETTING UP DIRECTORIES FOR REAL TIME SCANNING
+		On /etc/clamav/clamd.conf you can add directories to be scanned by the real-time protection.
+
+		example:
+			[file: /etc/clamav/clamd.conf ]
+				OnAccessIncludePath /home
+				OnAccessIncludePath /root
+				OnAccessIncludePath /etc
+				OnAccessIncludePath /boot
+				OnAccessIncludePath /usr
+				OnAccessIncludePath /mnt
+				OnAccessIncludePath /var
+				OnAccessIncludePath /tmp
+				OnAccessIncludePath /.fscrypt
+			[/file]
+
+	EXCLUDING DIRECTORIES FROM REAL TIME SCANNING
+		Same thing, but excludes directories from being scanned:
+
+		example:
+			[file: /etc/clamav/clamd.conf ]
+				OnAccessExcludePath /home/special_user/
+			[/file]
+
+	TURNING ON REAL-TIME SCANNING ON NEW, MOVED OR RENAMED FILES
+		Perform scans on newly created, moved, or renamed files:
+
+		example:
+			[file: /etc/clamav/clamd.conf ]
+				OnAccessExtraScanning yes
+			[/file]
+
+CLAMAV UTILITIES
+	ClamAV offers 2 main tools for scanning 'clamscan' and 'clamdscan'.
+	The difference is that 'clamdscan' uses the settings stored in /etc/clamav/clamd.conf for scanning
+
+	for example:
+		 # clamscan --recursive --infected --exclude-dir='^/sys|^/dev' /
+
+		 note: even if /sys and /dev/ are excluded in clamd.conf, clamscan will completely ignore it
+		 unless --exclude-dirs is explicitely used.
+
+	Important:
+		Remember that when scanning, some systems like WSL might require --fdpass to be used
+		when executing either 'clamdscan' or 'clamscan'
+
+	1 - Updating clamav
+		# freshclam
+
+	2 - Scanning & Showing only infected files, with clamav daemon
+		# clamdscan -v -i <dir>
+
+	3(Optional) - Scanning with multi-threading enabled, with clamav daemon
+		# clamdscan -v -m <dir>
+
+	4(Optional) - Recursive Scanning(scan all directories) without clamav daemon
+		# clamscan -v -r <dir>
+
+	5(Optional) - Recursive Scanning(scan all directories) without clamav daemon
+		# clamscan -v -r --multiscan <dir>
+
+	6(Optional) - Clamav Monitoring Tool for monitoring multiple instances of clamd
+		# clamdtop
 
 	CLAMAV GRAPHICAL USER INTERFACE / CLAMAV GUI
 		#clamtk
@@ -22757,14 +23030,16 @@ CLAMAV ANTI-VIRUS
 
 	CLAMAV DIRECTORY ON ARCHLINUX
 		/etc/clamav/				#Configuration Files
-		/var/log/clamav/clamav-milter.log	#Log File
-		/var/log/clamav/freshclam.log		#Update Log File
+		/var/log/clamav/			#Default Storage Directory for Logs
+		/root/quarantine			#Default Quarantine Directory
 
 
 	FINDING OTHER CLAMAV DATA/FILES
 		$ pacman -Ql clamav
 
+
 source:
+	https://wiki.archlinux.org/title/ClamAV
 	https://docs.clamav.net/Introduction.html
 
 --------------------------------------------------
@@ -22821,6 +23096,7 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 	however, pavucontrol and alsamixer are still usable tools! VERY IMPORTANT: Some alsa and pulseaudio files are still
 	used by pipewire. So some of the instructions are still valid.
 
+	NOTE: Pipewire/Wireplumber might only work with 'dbus-broker' at this point, so install it.
 
 	INTRODUCTION
 		ALSA AND OSS DRIVERS
@@ -22986,7 +23262,7 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 				VERY IMPORTANT: DO NOT USE 'clock.force-rate' as specified below, since this will also force audio-input rate:
 					pw-metadata -n settings 0 clock.force-rate 48000 && pw-metadata -n settings 0 clock.force-quantum 600 
 
-			RECOMMENDED TOPIC READINGS:
+			RECOMMENDED PIPEWIRE TOPIC READINGS:
 				MICROPHONE UNMUTED BUT STILL GIVES NO AUDIO OR GIVES GARBLED MICROPHONE INPUT
 				MICROPHONE INPUT/SOURCE AUDIO MUTE OR CRACKLING ON FEW APPLICATIONS
 
@@ -24046,11 +24322,12 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 		connecting clients can change settings like default-sink-source or volume.
 
 		runs program with the following environment variable:
-			PULSE_SERVER="tcp:127.0.0.1:4713"
-				or
 			PULSE_SERVER=tcp:127.0.0.1:4713
+				or
+			PULSE_SERVER="tcp:127.0.0.1:4713"
 
 		^ The above environment variable should be added to /etc/environment 
+		NOTE: Pipewire/Wireplumber might only work with 'dbus-broker' at this point, so install it.
 
 		VERY IMPORTANT: Updates can change the pipewire-pulse.conf file mentioned above,
 		it's recommended to copy it to /etc/pipewire/ after making changes.
@@ -26093,11 +26370,24 @@ HOW TO DOSBOX-X
 --------------------------------------------------
 CUSTOMIZING YOUR ZSH EXPERIENCE
 
-	Install zsh.
+	INSTALLING ZSH
 		source: https://wiki.archlinux.org/title/zsh
 
-	Install the oh-my-zsh-git package, it'll install themes & plugins that you can use with ZSH:
-		source: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+		1) As of current date, zsh package belongs to the 'extra' repository:
+			# pacman -S zsh
+
+		INSTALLING CUSTOM THEMES
+			Here are a few options for customizing your ZSH Experience:
+
+				1) It's also possible to use 'powerlevel10k' instead of 'oh-my-zsh'
+				read more on:
+					CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
+
+				2) Install the oh-my-zsh-git package, it'll install themes & plugins that you can use with ZSH:
+					source: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+				read more on:
+					CHANGING ZSH THEME | INSTALLING OH-MY-ZSH
+
 
 	SETTING UP ZSH AS YOUR DEFAULT SHELL
 		After installing zsh, you'll have to change your default shell:
@@ -26108,204 +26398,669 @@ CUSTOMIZING YOUR ZSH EXPERIENCE
 			#usermod --shell /usr/bin/zsh <username>
 
 	CLONING ZSH CONFIGURATION FOR OTHER USERS
-		Copy the file located in your home user directory: ~/.zshrc
-	and change the following line: 
-		[file: ~/.zshrc]
-			zstyle :compinstall filename '/home/<user>.zshrc'
-		[/file]
+		Follow 1st and 2nd steps! The same can be done to ~/.zshrc file after installing oh-my-zsh-git
 
-		NOTE: It's also possible to copy .zshrc file to /etc/skel/ to allow all newly created users
-		to copy and user the same settings.
+		---- 1st STEP:
+			Copy the file located in your home user directory: ~/.zshrc
+			and change the following line: 
+				[file: ~/.zshrc]
+					zstyle :compinstall filename '/home/<user>/.zshrc'
+				[/file]
 
-		VERY IMPORTANT:
-			Note that the <user> must be your username; root home directory is located under /root/
-			not in /home/
+			NOTE: It's also possible to copy .zshrc file to /etc/skel/ to allow all newly created users
+			to copy and user the same settings.
 
-	CHANGING ZSH THEME
-		After installing oh-my-zsh-git package, copy the contents of "/usr/share/oh-my-zsh/zshrc"
+			VERY IMPORTANT:
+				Note that the <user> must be your username; as for the root home directory, 
+				it is located under /root/ not in /home/ .
+
+			(RECOMMENDED) ALTERNATE OPTION - It's also possible to use the Enviornment Variable $USER :
+
+				[file: ~/.zshrc]
+					zstyle :compinstall filename '/home/${USER}/.zshrc'
+				[/file]
+
+		---- 2nd STEP:
+			Linux has a directory that is used for automatically copying files for newly created users
+			it is called /etc/skel :
+				
+				# cp ~/.zshrc /etc/skel
+					or
+				$ sudo cp ~/.zshrc /etc/skel
+					or
+				$ run0 cp ~/.zshrc /etc/skel
+
+	CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
+		Before you procede, know that it's possible to use both 'powerlevel10k' and 'oh-my-zsh', recommended readings:
+			USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
+
+		-----
+		Unlike the some other themes, this doesn't require oh-my-zsh to be installed.
+		this theme also removes the native 'zsh' lag that happens when you login into a user that also has zsh.
+		the user must also be using powerlevel10k.
+
+		Also, it's also very fast when running/instantiating new terminals.
+
+		VERY GOOD ZSH Theme, can be easily installed with:
+
+		1.1 - Install zsh-theme-powerlevel10k
+			$ yay -S zsh-theme-powerlevel10k
+		
+			1.1.1) (OPTIONAL) If you don't have zsh-theme-powerlevel10k available in any of your linux distro 
+			package manager repositories, it's still possible to fetch it straight from github:
+				$ git clone --depth=1 'https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+				
+				Note: if you've done 1.1.1 step, you can skip the 1st line in 1.2.2 step.
+
+		1.2 - Copy the zsh theme:
+			1.2.1) It's advisable to make a backup copy of your current ~/.zshrc
+				$ cp ~/.zshrc ~/.zshrc-old
+			
+			1.2.2) Copy and then install and setup by running 'zsh' again:
+				$ cp /usr/share/zsh-theme-powerlevel10k ~/powerlevel10k;
+				$ echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc;
+				$ zsh;
+
+			1.2.3) Check differences to make sure everything is 'OK':
+				$ nvim -d ~/.zshrc ~/.zshrc-old
+
+		If you have to, you can check my ~/.zshrc file for reference:
+			MY CUSTOM POWERLEVEL10K ZSHRC CONFIGURATION FILE
+
+		source: 
+			/usr/share/zsh-theme-powerlevel10k/README.md
+			https://github.com/romkatv/powerlevel10k?tab=readme-ov-file#arch-linux
+
+
+		CLONING POWERLEVEL10K FOR OTHER USERS
+			This will allow every single new user to have the same settings as yours on 'powerlevel10k',
+		only use this AFTER setting up and installing powerlevel10k for your own user:
+
+			# cp -R ~/{.pk10.zsh,.zshrc,powerlevel10k} /etc/skel/
+
+		you'll need to make the necessary changes to .zshrc to allow other users to use the same file.
+		example: HISTFILE var might need to be changed on the /etc/skel/ copy of the .zshrc.
+
+	CHANGING ZSH THEME | INSTALLING OH-MY-ZSH
+		IMPORTANT: AS OF 2025, i'd recommended to install powerlevel10k, read more on:
+			INSTALLING POWERLEVEL10K
+
+		however, it's also possible to install and use both for extra features, read more on:
+			USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
+
+		----
+		On archlinux, you'll need YAY Package Manager installed and running, then simply do this:
+			$ yay -S oh-my-zsh-git
+
+		OLD NOTE: After installing oh-my-zsh-git package, copy the contents of "/usr/share/oh-my-zsh/zshrc"
 		into your home directory: ~/.zshrc
 
-			ex.: $nvim -d /usr/share/oh-my-zsh/zshrc ~/.zshrc
+		UPDATE: As of 2025, Manually Copying the contents is no longer necessary, however oh-my-zsh-git installation 
+		will replace your current ~/.zshrc file, make a backup copy before installing!
 
-		Make sure to keep the same previous configuration, only copy & paste the new contents from oh-my-zsh
-		configuration file.
+			1) Make a backup copy:
+				$ cp ~/.zshrc ~/.zshrc-old
+
+			2) Installing oh-my-zsh-git:
+				$ yay -S oh-my-zsh-git
+
+			2) See the differences between them and apply them:
+				$ nvim -d ~/.zshrc ~/.zshrc-old
+					or
+				$ nvim -d /usr/share/oh-my-zsh/zshrc ~/.zshrc
+
+			Copy & paste the new contents from the ~/.zshrc-old into the new ~/.zshrc configuration file.
+
+				RECOMMENDED OH-MY-ZSH TOPIC READINGS:
+					MY CUSTOM OH-MY-ZSH ZSHRC CONFIGURATION FILE
+
+			TROUBLESHOOTING ZSH AND OH-MY-ZSH INSTALLATION
+				If you mess setting up oh-my-zsh, you can try generating a new .zshrc file
+			by simply deleting it and running "zsh" again.
+
+			You'll then be guided into making a complete new setup.
+			
+			Again, make sure you backup your current ~/.zshrc file installed by oh-my-zsh first
+			if it's still working:
+
+				1A) (Optional - Only do this if the current ~/.zshrc is working) Move the old file: 
+					$ mv ~/.zshrc ~/.zshrc-old
+
+				2) Run ZSH again and complete the setup:
+					$ zsh
+
+				3A) See the differences between them and apply them to the ~/.zshrc file
+					$ nvim -d ~/.zshrc ~/.zshrc-old
+						or
+				3B) - (Optional/Alternate - Only if the current ~/.zshrc is completely broken) 
+					Fetch a complete New Copy, check differences then apply it:
+						$ nvim -d ~/.zshrc /usr/share/oh-my-zsh/zshrc
 
 		In order to enable a theme, set ZSH_THEME to the name of the theme in your ~/.zshrc, 
-	before sourcing Oh My Zsh; for example: ZSH_THEME=robbyrussell If you do not want any theme enabled, 
-	just set ZSH_THEME to blank: ZSH_THEME=""
+		before sourcing Oh My Zsh; for example: ZSH_THEME=robbyrussell If you do not want any theme enabled, 
+		just set ZSH_THEME to blank: ZSH_THEME=""
 
-		RECOMMENDED THEMES
-			0) powerlevel10k
-				Unlike the other themes, this doesn't require oh-my-zsh.
-				as of 2024, this theme also removes the native zsh lag
-				that happens when you login into a user that also has zsh.
-				the user must also be using powerlevel10k.
-
-				Also, when running/instantiate new terminals, makes it much faster.
-
-				VERY GOOD ZSH Theme, can be easily installed with:
-					yay -S --noconfirm zsh-theme-powerlevel10k-git
-					echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
-				source: https://github.com/romkatv/powerlevel10k?tab=readme-ov-file#arch-linux
-
-			1) jonathan
-				Very good theme, becareful when using the root user,
-				the # symbol isn't shown on the far left of the screen at cursor position.
-			2) af-magic 
-			3) blinks
-			4) fino-time
-			5) linux-only
+	
+		RECOMMENDED OH-MY-ZSH THEMES
+			1) af-magic 
+			2) blinks
+			3) fino-time
+			4) linux-only
 				Vanilla theme
 
-	MY CUSTOM ZSHRC CONFIGURATION FILE
+			5) jonathan
+				this theme has been broken for a very long time, it contains a graphical glitch that has never
+				been fixed to this day. Also, becareful when using the root user, the '#' symbol that shows up for root 
+				user isn't shown on the far left side of the screen, the name 'root' instead shows up on the far-right 
+				side, if you're not paying attention on the commandline it can lead you to cause permanent harm.
 
-	[file: ~/.zshrc]
-		# MY ZSHRC CUSTOM CONFIGURATION
-		# Lines configured by zsh-newuser-install
-		HISTFILE=~/.histfile
-		HISTSIZE=1000
-		SAVEHIST=1000
-		setopt extendedglob
-		unsetopt beep nomatch
-		bindkey -v
-		# End of lines configured by zsh-newuser-install
-		# The following lines were added by compinstall
-		# VERY IMPORTANT CHANGE THE USER NAME HERE:
-		zstyle :compinstall filename '/home/<username>/.zshrc'
 
-		autoload -Uz compinit
-		compinit
-		# End of lines added by compinstall
-	[/file]
-	NOTE: Replace <username> with your username
+	USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
+		It's also possible to use both POWERLEVEL10K theme and OH-MY-ZSH features(without the theme!)
+		First, you'll need to install and setup 'oh-my-zsh', then install 'powerlevel10k'
+
+		MANDATORY STEPS:
+			CHANGING ZSH THEME | INSTALLING OH-MY-ZSH
+			CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
+	
+		One of the best things from 'oh-my-zsh' is the auto-complete feature after partially typing something by 
+		pressing the 'up' key.
+
+		
+		CLONING POWERLEVEL10K + OH-MY-ZSH CONFIGURATION FOR OTHER USERS
+			This will allow every single new user to have the same settings as yours,
+			only use this AFTER setting up and installing powerlevel10k + 'oh-my-zsh' for your own user:
+
+				# cp -R ~/{.pk10.zsh,.zshrc,powerlevel10k} /etc/skel/
+
+			you'll need to make the necessary changes to .zshrc to allow other users to use the same file.
+			example: HISTFILE var might need to be changed on the /etc/skel/ copy of the .zshrc.
+
+		MY CUSTOM POWERLEVEL10K + OH-MY-ZSH CONFIGURATION FILE
+			Only after following the 'MANDATORY STEPS', you can check this configuration 
+			file for reference and make changes if you need.
+			
+			Note: you should disable the broot line if you DON'T plan on using broot.
+			Note: Always alter the HISTFILE variable in this file, read the comments.
+
+			[file: ~/.zshrc ]
+				# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+				# Initialization code that may require console input (password prompts, [y/n]
+				# confirmations, etc.) must go above this block; everything else may go below.
+				if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+				  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+				fi
+
+
+				# If you come from bash you might have to change your $PATH.
+				# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+
+				# Path to your Oh My Zsh installation.
+				ZSH=/usr/share/oh-my-zsh/
+
+				# Set name of the theme to load --- if set to "random", it will
+				# load a random theme each time Oh My Zsh is loaded, in which case,
+				# to know which specific one was loaded, run: echo $RANDOM_THEME
+				# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+				#ZSH_THEME="robbyrussell"
+
+				# Set list of themes to pick from when loading at random
+				# Setting this variable when ZSH_THEME=random will cause zsh to load
+				# a theme from this variable instead of looking in $ZSH/themes/
+				# If set to an empty array, this variable will have no effect.
+				# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+
+				# Uncomment the following line to use case-sensitive completion.
+				# CASE_SENSITIVE="true"
+
+				# Uncomment the following line to use hyphen-insensitive completion.
+				# Case-sensitive completion must be off. _ and - will be interchangeable.
+				# HYPHEN_INSENSITIVE="true"
+
+				# Uncomment one of the following lines to change the auto-update behavior
+				# zstyle ':omz:update' mode disabled  # disable automatic updates
+				# zstyle ':omz:update' mode auto      # update automatically without asking
+				# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+
+				# Uncomment the following line to change how often to auto-update (in days).
+				# zstyle ':omz:update' frequency 13
+
+				# Uncomment the following line if pasting URLs and other text is messed up.
+				# DISABLE_MAGIC_FUNCTIONS="true"
+
+				# Uncomment the following line to disable colors in ls.
+				# DISABLE_LS_COLORS="true"
+
+				# Uncomment the following line to disable auto-setting terminal title.
+				# DISABLE_AUTO_TITLE="true"
+
+				# Uncomment the following line to enable command auto-correction.
+				# ENABLE_CORRECTION="true"
+
+				# Uncomment the following line to display red dots whilst waiting for completion.
+				# You can also set it to another string to have that shown instead of the default red dots.
+				# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+				# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+				# COMPLETION_WAITING_DOTS="true"
+
+				# Uncomment the following line if you want to disable marking untracked files
+				# under VCS as dirty. This makes repository status check for large repositories
+				# much, much faster.
+				# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+				# Uncomment the following line if you want to change the command execution time
+				# stamp shown in the history command output.
+				# You can set one of the optional three formats:
+				# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+				# or set a custom format using the strftime function format specifications,
+				# see 'man strftime' for details.
+				# HIST_STAMPS="mm/dd/yyyy"
+
+				# Would you like to use another custom folder than $ZSH/custom?
+				# ZSH_CUSTOM=/path/to/new-custom-folder
+
+				# Which plugins would you like to load?
+				# Standard plugins can be found in $ZSH/plugins/
+				# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+				# Example format: plugins=(rails git textmate ruby lighthouse)
+				# Add wisely, as too many plugins slow down shell startup.
+				plugins=(git)
+
+				# User configuration
+
+				# export MANPATH="/usr/local/man:$MANPATH"
+
+				# You may need to manually set your language environment
+				# export LANG=en_US.UTF-8
+
+				# Preferred editor for local and remote sessions
+				# if [[ -n $SSH_CONNECTION ]]; then
+				#   export EDITOR='vim'
+				# else
+				#   export EDITOR='nvim'
+				# fi
+
+				# Compilation flags
+				# export ARCHFLAGS="-arch $(uname -m)"
+
+				# Set personal aliases, overriding those provided by Oh My Zsh libs,
+				# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+				# users are encouraged to define aliases within a top-level file in
+				# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+				# - $ZSH_CUSTOM/aliases.zsh
+				# - $ZSH_CUSTOM/macos.zsh
+				# For a full list of active aliases, run `alias`.
+				#
+				# Example aliases
+				# alias zshconfig="mate ~/.zshrc"
+				# alias ohmyzsh="mate ~/.oh-my-zsh"
+				# Lines configured by zsh-newuser-install
+
+				#----VERY IMPORTANT: This line from oh-my-zsh, it actually 
+				#belong to the end of the script, but were moved here because 
+				#they were overriding desired user options for zsh like 'bindkey -v':
+				source $ZSH/oh-my-zsh.sh
+
+				#----This will read your system-wide Environment Variables:
+				source /etc/environment
+
+				#----This is the default value for HISTFILE, 
+				#----disabling since i'm using a custom one on my /etc/environmment file:
+				#HISTFILE=~/.histfile
+				HISTFILE=${USER_HISTFILE}
+				HISTSIZE=4000
+				SAVEHIST=4000
+				setopt autocd extendedglob nomatch notify
+				unsetopt beep
+				bindkey -v
+				# End of lines configured by zsh-newuser-install
+				# The following lines were added by compinstall
+				zstyle :compinstall filename '~/.zshrc'
+
+				autoload -Uz compinit
+				compinit
+				# End of lines added by compinstall
+
+				#-------These lines are from oh-my-zsh:
+				ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
+				if [[ ! -d $ZSH_CACHE_DIR ]]; then
+				  mkdir $ZSH_CACHE_DIR
+				fi
+
+				#----You need broot installed on your system and run broot at least once per user
+				#----you can also disable the broot line by adding '#' to the beginning for commenting it out:
+				source ~/.config/broot/launcher/bash/br
+
+				#----powerlevel10k, leave it be:
+				source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+				# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+				[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+			[/file]
+
+	----
+	MY CUSTOM ZSHRC CONFIGURATION FILE BEFORE INSTALLING POWERLEVEL10K / OH-MY-ZSH
+
+		--Old file - not updated, just here for reference:
+		[file: ~/.zshrc ]
+			# MY ZSHRC CUSTOM CONFIGURATION
+			# Lines configured by zsh-newuser-install
+			HISTFILE=~/.histfile
+			HISTSIZE=1000
+			SAVEHIST=1000
+			setopt extendedglob
+			unsetopt beep nomatch
+			bindkey -v
+			# End of lines configured by zsh-newuser-install
+			# The following lines were added by compinstall
+			# VERY IMPORTANT CHANGE THE USER NAME HERE:
+			zstyle :compinstall filename '~/.zshrc'
+
+			autoload -Uz compinit
+			compinit
+			# End of lines added by compinstall
+		[/file]
+
+	MY CUSTOM POWERLEVEL10K ZSHRC CONFIGURATION FILE
+
+		[file:  ~/.zshrc ]
+			# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+			# Initialization code that may require console input (password prompts, [y/n]
+			# confirmations, etc.) must go above this block; everything else may go below.
+			if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+			  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+			fi
+
+
+			# If you come from bash you might have to change your $PATH.
+			# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+
+			# Path to your Oh My Zsh installation.
+			#ZSH=/usr/share/oh-my-zsh/
+
+			# Set name of the theme to load --- if set to "random", it will
+			# load a random theme each time Oh My Zsh is loaded, in which case,
+			# to know which specific one was loaded, run: echo $RANDOM_THEME
+			# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+			#ZSH_THEME="robbyrussell"
+
+			# Set list of themes to pick from when loading at random
+			# Setting this variable when ZSH_THEME=random will cause zsh to load
+			# a theme from this variable instead of looking in $ZSH/themes/
+			# If set to an empty array, this variable will have no effect.
+			# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+
+			# Uncomment the following line to use case-sensitive completion.
+			# CASE_SENSITIVE="true"
+
+			# Uncomment the following line to use hyphen-insensitive completion.
+			# Case-sensitive completion must be off. _ and - will be interchangeable.
+			# HYPHEN_INSENSITIVE="true"
+
+			# Uncomment one of the following lines to change the auto-update behavior
+			# zstyle ':omz:update' mode disabled  # disable automatic updates
+			# zstyle ':omz:update' mode auto      # update automatically without asking
+			# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+
+			# Uncomment the following line to change how often to auto-update (in days).
+			# zstyle ':omz:update' frequency 13
+
+			# Uncomment the following line if pasting URLs and other text is messed up.
+			# DISABLE_MAGIC_FUNCTIONS="true"
+
+			# Uncomment the following line to disable colors in ls.
+			# DISABLE_LS_COLORS="true"
+
+			# Uncomment the following line to disable auto-setting terminal title.
+			# DISABLE_AUTO_TITLE="true"
+
+			# Uncomment the following line to enable command auto-correction.
+			# ENABLE_CORRECTION="true"
+
+			# Uncomment the following line to display red dots whilst waiting for completion.
+			# You can also set it to another string to have that shown instead of the default red dots.
+			# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+			# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+			# COMPLETION_WAITING_DOTS="true"
+
+			# Uncomment the following line if you want to disable marking untracked files
+			# under VCS as dirty. This makes repository status check for large repositories
+			# much, much faster.
+			# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+			# Uncomment the following line if you want to change the command execution time
+			# stamp shown in the history command output.
+			# You can set one of the optional three formats:
+			# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+			# or set a custom format using the strftime function format specifications,
+			# see 'man strftime' for details.
+			# HIST_STAMPS="mm/dd/yyyy"
+
+			# Would you like to use another custom folder than $ZSH/custom?
+			# ZSH_CUSTOM=/path/to/new-custom-folder
+
+			# Which plugins would you like to load?
+			# Standard plugins can be found in $ZSH/plugins/
+			# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+			# Example format: plugins=(rails git textmate ruby lighthouse)
+			# Add wisely, as too many plugins slow down shell startup.
+			plugins=(git)
+
+			# User configuration
+
+			# export MANPATH="/usr/local/man:$MANPATH"
+
+			# You may need to manually set your language environment
+			# export LANG=en_US.UTF-8
+
+			# Preferred editor for local and remote sessions
+			# if [[ -n $SSH_CONNECTION ]]; then
+			#   export EDITOR='vim'
+			# else
+			#   export EDITOR='nvim'
+			# fi
+
+			# Compilation flags
+			# export ARCHFLAGS="-arch $(uname -m)"
+
+			# Set personal aliases, overriding those provided by Oh My Zsh libs,
+			# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+			# users are encouraged to define aliases within a top-level file in
+			# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+			# - $ZSH_CUSTOM/aliases.zsh
+			# - $ZSH_CUSTOM/macos.zsh
+			# For a full list of active aliases, run `alias`.
+			#
+			# Example aliases
+			# alias zshconfig="mate ~/.zshrc"
+			# alias ohmyzsh="mate ~/.oh-my-zsh"
+			# Lines configured by zsh-newuser-install
+
+			#VERY IMPORTANT: These 2 lines are from oh-my-zsh, they actually 
+			#belong to the end of the script, but were moved here because 
+			#they were overriding user options for zsh:
+			#source $ZSH/oh-my-zsh.sh
+			#This line is only meant for /usr/bin/broot
+			source /etc/environment
+
+			#----This is the default value for HISTFILE, 
+			#----disabling since i'm using a custom one on my /etc/environmment file:
+			#HISTFILE=~/.histfile
+			HISTFILE=${USER_HISTFILE}
+			HISTSIZE=4000
+			SAVEHIST=4000
+			setopt autocd extendedglob nomatch notify
+			unsetopt beep
+			bindkey -v
+			# End of lines configured by zsh-newuser-install
+			# The following lines were added by compinstall
+			zstyle :compinstall filename '~/.zshrc'
+
+			autoload -Uz compinit
+			compinit
+			# End of lines added by compinstall
+
+			#-------These lines are from oh-my-zsh:
+			#ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
+			#if [[ ! -d $ZSH_CACHE_DIR ]]; then
+			#  mkdir $ZSH_CACHE_DIR
+			#fi
+
+			#Disabling ZSH Here:
+			#source $ZSH/oh-my-zsh.sh
+			source ~/.config/broot/launcher/bash/br
+			source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+			# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+			[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+		[/file]
 
 	MY CUSTOM OH-MY-ZSH ZSHRC CONFIGURATION FILE
 		Only use this if you have oh-my-zsh-git packages installed on your system.
 
-	[file: ~/.zshrc]
-		# If you come from bash you might have to change your $PATH.
-		# export PATH=$HOME/bin:/usr/local/bin:$PATH
+		--Updated file:
+		[file: ~/.zshrc]
+			# If you come from bash you might have to change your $PATH.
+			# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-		# Path to your oh-my-zsh installation.
-		ZSH=/usr/share/oh-my-zsh/
+			# Path to your Oh My Zsh installation.
+			ZSH=/usr/share/oh-my-zsh/
 
-		# Set name of the theme to load --- if set to "random", it will
-		# load a random theme each time oh-my-zsh is loaded, in which case,
-		# to know which specific one was loaded, run: echo $RANDOM_THEME
-		# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-		ZSH_THEME="jonathan"
+			# Set name of the theme to load --- if set to "random", it will
+			# load a random theme each time Oh My Zsh is loaded, in which case,
+			# to know which specific one was loaded, run: echo $RANDOM_THEME
+			# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+			ZSH_THEME="robbyrussell"
 
-		# Set list of themes to pick from when loading at random
-		# Setting this variable when ZSH_THEME=random will cause zsh to load
-		# a theme from this variable instead of looking in $ZSH/themes/
-		# If set to an empty array, this variable will have no effect.
-		# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+			# Set list of themes to pick from when loading at random
+			# Setting this variable when ZSH_THEME=random will cause zsh to load
+			# a theme from this variable instead of looking in $ZSH/themes/
+			# If set to an empty array, this variable will have no effect.
+			# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
-		# Uncomment the following line to use case-sensitive completion.
-		# CASE_SENSITIVE="true"
+			# Uncomment the following line to use case-sensitive completion.
+			# CASE_SENSITIVE="true"
 
-		# Uncomment the following line to use hyphen-insensitive completion.
-		# Case-sensitive completion must be off. _ and - will be interchangeable.
-		# HYPHEN_INSENSITIVE="true"
+			# Uncomment the following line to use hyphen-insensitive completion.
+			# Case-sensitive completion must be off. _ and - will be interchangeable.
+			# HYPHEN_INSENSITIVE="true"
 
-		# Uncomment one of the following lines to change the auto-update behavior
-		# zstyle ':omz:update' mode disabled  # disable automatic updates
-		# zstyle ':omz:update' mode auto      # update automatically without asking
-		# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+			# Uncomment one of the following lines to change the auto-update behavior
+			# zstyle ':omz:update' mode disabled  # disable automatic updates
+			# zstyle ':omz:update' mode auto      # update automatically without asking
+			# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
-		# Uncomment the following line to change how often to auto-update (in days).
-		# zstyle ':omz:update' frequency 13
+			# Uncomment the following line to change how often to auto-update (in days).
+			# zstyle ':omz:update' frequency 13
 
-		# Uncomment the following line if pasting URLs and other text is messed up.
-		# DISABLE_MAGIC_FUNCTIONS="true"
+			# Uncomment the following line if pasting URLs and other text is messed up.
+			# DISABLE_MAGIC_FUNCTIONS="true"
 
-		# Uncomment the following line to disable colors in ls.
-		# DISABLE_LS_COLORS="true"
+			# Uncomment the following line to disable colors in ls.
+			# DISABLE_LS_COLORS="true"
 
-		# Uncomment the following line to disable auto-setting terminal title.
-		# DISABLE_AUTO_TITLE="true"
+			# Uncomment the following line to disable auto-setting terminal title.
+			# DISABLE_AUTO_TITLE="true"
 
-		# Uncomment the following line to enable command auto-correction.
-		# ENABLE_CORRECTION="true"
+			# Uncomment the following line to enable command auto-correction.
+			# ENABLE_CORRECTION="true"
 
-		# Uncomment the following line to display red dots whilst waiting for completion.
-		# You can also set it to another string to have that shown instead of the default red dots.
-		# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-		# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-		# COMPLETION_WAITING_DOTS="true"
+			# Uncomment the following line to display red dots whilst waiting for completion.
+			# You can also set it to another string to have that shown instead of the default red dots.
+			# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+			# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+			# COMPLETION_WAITING_DOTS="true"
 
-		# Uncomment the following line if you want to disable marking untracked files
-		# under VCS as dirty. This makes repository status check for large repositories
-		# much, much faster.
-		# DISABLE_UNTRACKED_FILES_DIRTY="true"
+			# Uncomment the following line if you want to disable marking untracked files
+			# under VCS as dirty. This makes repository status check for large repositories
+			# much, much faster.
+			# DISABLE_UNTRACKED_FILES_DIRTY="true"
 
-		# Uncomment the following line if you want to change the command execution time
-		# stamp shown in the history command output.
-		# You can set one of the optional three formats:
-		# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-		# or set a custom format using the strftime function format specifications,
-		# see 'man strftime' for details.
-		# HIST_STAMPS="mm/dd/yyyy"
+			# Uncomment the following line if you want to change the command execution time
+			# stamp shown in the history command output.
+			# You can set one of the optional three formats:
+			# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+			# or set a custom format using the strftime function format specifications,
+			# see 'man strftime' for details.
+			# HIST_STAMPS="mm/dd/yyyy"
 
-		# Would you like to use another custom folder than $ZSH/custom?
-		# ZSH_CUSTOM=/path/to/new-custom-folder
+			# Would you like to use another custom folder than $ZSH/custom?
+			# ZSH_CUSTOM=/path/to/new-custom-folder
 
-		# Which plugins would you like to load?
-		# Standard plugins can be found in $ZSH/plugins/
-		# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-		# Example format: plugins=(rails git textmate ruby lighthouse)
-		# Add wisely, as too many plugins slow down shell startup.
-		plugins=(git)
+			# Which plugins would you like to load?
+			# Standard plugins can be found in $ZSH/plugins/
+			# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+			# Example format: plugins=(rails git textmate ruby lighthouse)
+			# Add wisely, as too many plugins slow down shell startup.
+			plugins=(git)
 
+			# User configuration
 
-		# User configuration
+			# export MANPATH="/usr/local/man:$MANPATH"
 
-		# export MANPATH="/usr/local/man:$MANPATH"
+			# You may need to manually set your language environment
+			# export LANG=en_US.UTF-8
 
-		# You may need to manually set your language environment
-		# export LANG=en_US.UTF-8
+			# Preferred editor for local and remote sessions
+			# if [[ -n $SSH_CONNECTION ]]; then
+			#   export EDITOR='vim'
+			# else
+			#   export EDITOR='nvim'
+			# fi
 
-		# Preferred editor for local and remote sessions
-		# if [[ -n $SSH_CONNECTION ]]; then
-		#   export EDITOR='vim'
-		# else
-		#   export EDITOR='mvim'
-		# fi
+			# Compilation flags
+			# export ARCHFLAGS="-arch $(uname -m)"
 
-		# Compilation flags
-		# export ARCHFLAGS="-arch x86_64"
+			# Set personal aliases, overriding those provided by Oh My Zsh libs,
+			# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+			# users are encouraged to define aliases within a top-level file in
+			# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+			# - $ZSH_CUSTOM/aliases.zsh
+			# - $ZSH_CUSTOM/macos.zsh
+			# For a full list of active aliases, run `alias`.
+			#
+			# Example aliases
+			# alias zshconfig="mate ~/.zshrc"
+			# alias ohmyzsh="mate ~/.oh-my-zsh"
+			# Lines configured by zsh-newuser-install
 
-		# Set personal aliases, overriding those provided by oh-my-zsh libs,
-		# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-		# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-		# For a full list of active aliases, run `alias`.
-		#
-		# Example aliases
-		# alias zshconfig="mate ~/.zshrc"
-		# alias ohmyzsh="mate ~/.oh-my-zsh"
+			#VERY IMPORTANT: These 2 lines are from oh-my-zsh, they actually 
+			#belong to the end of the script, but were moved here because 
+			#they were overriding user options for zsh:
+			source $ZSH/oh-my-zsh.sh
+			#This line is only meant for /usr/bin/broot
+			#source /home/${USER}/.config/broot/launcher/bash/br
+			source /etc/environment
 
-		ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
-		if [[ ! -d $ZSH_CACHE_DIR ]]; then
-		  mkdir $ZSH_CACHE_DIR
-		fi
+			#----This is the default value for HISTFILE, 
+			#----disabling since i'm using a custom one on my /etc/environmment file:
+			#HISTFILE=~/.histfile
+			HISTFILE=${USER_HISTFILE}
+			HISTSIZE=4000
+			SAVEHIST=4000
+			setopt autocd extendedglob nomatch notify
+			unsetopt beep
+			bindkey -v
+			# End of lines configured by zsh-newuser-install
+			# The following lines were added by compinstall
+			zstyle :compinstall filename '/home/${USER}/.zshrc'
 
-		source $ZSH/oh-my-zsh.sh
-		# MY ZSHRC CUSTOM CONFIGURATION
-		# Lines configured by zsh-newuser-install
-		HISTFILE=~/.histfile
-		HISTSIZE=1000
-		SAVEHIST=1000
-		setopt extendedglob
-		unsetopt beep nomatch
-		bindkey -v
-		# End of lines configured by zsh-newuser-install
-		# The following lines were added by compinstall
-		zstyle :compinstall filename '/home/<username>/.zshrc'
+			autoload -Uz compinit
+			compinit
+			# End of lines added by compinstall
 
-		autoload -Uz compinit
-		compinit
-		# End of lines added by compinstall
-	[/file]
+			#-------These lines are from oh-my-zsh:
+			ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
+			if [[ ! -d $ZSH_CACHE_DIR ]]; then
+			  mkdir $ZSH_CACHE_DIR
+			fi
+
+			#VERY IMPORTANT: These lines were moved upwards,
+			#because they were overriding VI/NVIM keys set on bindkey -v as 
+			#well as the other options above it:
+			#source $ZSH/oh-my-zsh.sh
+			#source /home/${USER}/.config/broot/launcher/bash/br
+		[/file]
 	Note: Replace <username> with your username
 --------------------------------------------------
 --------------------------------------------------
@@ -26316,6 +27071,24 @@ LOADING ZSH MODULE
 type 'zmodload' to see a list of loaded modules.
 
 type 'zmodload zsh/pcre' to load zsh's pcre module.
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+USING ZSH WITH VI/VIM KEYS
+	'ZSH' uses the some of the same features found in VI, VIM and NVIM.
+It also has insertion, selection and command mode.
+
+This option can be chosen during installation.
+Simply re-install by removing ~/.zshrc and executing 'zsh' on the commandline.
+
+Alternatively, the option can also be added by inserting the following option 'bindkey -v' in the ~/.zshrc file.
+
+'ZSH' defaults to using Emac keys instead, so manual setup will be required as described above.
+
+You'll have to learn VIM/NVIM on your own tho ;)
+I do suggest looking at the INDEX
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
@@ -26952,6 +27725,9 @@ and the user may set it to zero if he wants. Do this for all users if you don't 
 								with nvim, emacs or other text editor may
 								REMOVE the symlink to a text file type,
 								allowing bash/zsh to use it without obfuscation.
+		~/.bash_history
+		~/.zsh_history
+
 			VERY IMPORTANT: 
 		If you're going to symlink ~/.histfile to an fscrypt dir, it's required to create a new directory
 		and changing the filepath in ~/.zshrc if you're using zsh. 
@@ -27423,6 +28199,23 @@ ALA Repository Website: https://archive.archlinux.org/
 --------------------------------------------------
 --------------------------------------------------
 LINUX FIREWALLING WITH IPTABLES
+
+	UPDATE INFO - VERY IMPORTANT - :
+		source: 
+			https://wiki.archlinux.org/title/Iptables
+			https://en.wikipedia.org/wiki/Netfilter
+
+		As of current date, 'iptables' is a legacy framework, 'nftables' aims to provide a modern replacement including 
+		a compatibility layer for iptables.
+
+		Note:  
+			'nftables' allows the use of 'iptables-nft' package that works by providing implementations of the iptables 
+			commands that actually create and act on the nftables rules. However, rules created using the old 
+			iptables-legacy tools are separate objects, and iptables-nft will warn you if they are present.
+
+			If you intend to use some of the things described here for iptables, it's advisable to install 'iptables-nft'.
+
+
 BASIC CONCEPTS
 	Is a port bound to a socket?
 		A socket is one endpoint of a two-way communication link between two programs running on the network. A socket is bound to a port number so that the TCP layer can identify the application that data is destined to be sent to. An endpoint is a combination of an IP address and a port number.
@@ -29540,6 +30333,11 @@ WEECHAT HOTKEYS
 		alt+c			- Switch beetween exact case
 		tab			- Alternates between pre|msg or both?
 
+
+	ctrl+a		#returns to first character in the line(Carriage Return?) - CHECK
+	ctrl+d		#deletes character ahead of the cursor
+	ctrl+p		#Goes to next channel
+	ctrl+n		#Goes to previous channel
 -------------------
 -------------------
 -------------------
@@ -29984,6 +30782,8 @@ Alternate Option B:
 
 Custom Option / Weechat Custom / WEECHAT MAC ADDRESS:
 	$ firejail --hostname=officepc3 --net=enp3s0 --mac=3a:01:76:36:1a:b4 --whitelist=~/.config/weechat --whitelist=~/Documents/Private/Apps/MORE/.cache/weechat weechat
+
+	$ firejail --hostname=officepc3 --net=enp3s0 --mac=3a:01:76:36:1a:b4 --whitelist=${ROOTPATH}/home/${USER}/.config/weechat --whitelist=${ROOTPATH}/home/${USER}/.cache/weechat weechat
 
 Valid Mac Address:
 		----START----
@@ -33400,6 +34200,341 @@ THE ONION WEB / TOR WEB
 ---------------------
 ---------------------
 ---------------------
+SOME WINDOWS STUFF
+	SOME WINDOWS UTILITIES
+		cmd
+		regedit
+		msconfig
+		services
+		dxdiag
+		winget				#Windows Commandline Package Manager
+		runas				#Allows running programs/commands as a different user.
+						example: 
+							$ runas /user:Administrator "cmd"
+
+		SystemPropertiesAdvanced.exe	#Manages Environment Variable and Virtual Memory
+		sysdm.cpl			#Same as above
+		tasklist				#Lists all running processes
+		taskkill /im <program_name> /t /f	#Kills runnning process by it's name
+		taskkill /pid <prorgam_pid> /t /f	#Kills runnning process by it's PID
+
+
+	RUNNINNG COMMAND AS ADMINISTRATOR
+		$ runas /user:Administrator "cmd"
+	
+	SOME WINDOWS 11 HOTKEYS
+		system_key + tab		#Virtual Desktops
+		system_key + I			#Access to system settings, developer mode, etc
+	
+	RECOMMENDED ARCHLINUX PACKAGES FOR WSL
+		NOTE: Depending on how long this has.'t been updated, some packages might be unavailable at the time.
+		since archlinux is a rolling release distro, some packages might just not work anylonger.
+
+		These are merely options, you can either opt in or out of one or more of these packages depending on your needs:
+
+		A) Archlinux Repository
+			# pacman -S wget curl man-pages base coreutils util-linux binutils zsh iptables-nft \
+			  vi neovim par2cmdline ntfs-3g netwatch texinfo whowatch xnviewmp xsel xclip \
+			  smartmontools pcmanfm-gtk3 mpv vlc kdenlive yt-dlp distrobox broot pavucontrol \
+			  sudo fscrypt htop konsole git cdparanoia firejail firefox vivaldi opera chromium \
+			  clamav clamtk arch-install-scripts apparmor wireshark-qt screen testdisk \
+			  clock-tui cool-retro-term dosbox podman gimp glances torbrowser-launcher systemd-ui \
+			  scrot ugrep ripgrep sed memtester lsof hwinfo cowsay gdb cmus ibus flatpak
+ 
+		B) AUR(Archlinux User Repository)
+			This requires yay package manager to be installed on the system:
+				$ yay -S oh-my-zsh zsh-theme-powerlevel10k archey4 ddd xnview-xnsketch-bin \
+				  scc-bin dbgl  
+
+			This requires compilation, so doing them individually is the best:
+				$ yay -S dosbox-x-sdl2 qmplay2 memstat pcmanx-gtk2 syncterm cheat svp-bin ssed dar
+
+
+		BASICS ON HOW TO USE PACMAN
+			Just a few tips and hints for new archlinux users.
+
+			RECOMMENDED READING:
+				PACMAN, THE MAIN ARCHLINUX PACKAGE MANAGER
+
+			note 1 - display remote information about a package:
+				$ pacman -Si sed
+					and
+				$ yay -Si pcmanx-gtk2
+
+			note 2 - you may want to check which files belong to a certain package:
+				$ pacman -Ql systemd-ui
+					and
+				$ yay -Ql syncterm
+
+			note 3 - if you don't know how to execute a certain utility belonging to a certain package:
+				$ pacman -Ql binutils | grep "/bin/"
+					and
+				$ yay -Ql syncterm | grep "/bin/"
+
+			note 4 - checking package integrity
+				# pacman -Qqk
+					and
+				$ yay -Qqk
+		
+			note 5 - listing all user installed packages
+				# pacman -Qe
+					and
+				$ yay -Qe
+
+			note 6 - Uprading packages:
+				# pacman -Syu
+					and
+				$ yay -Syu
+
+			note 7 - Upgrading only AUR packages:
+				$ yay -Syua
+
+	RUNNING CLAMAV ANTI-VIRUS IN WSL
+		Recommended readings:
+			CLAMAV ANTI-VIRUS
+					ALLOW FILE DESCRIPTOR PASS | ALLOWING CLAMAV TO SCAN DIFFERENT FILE SYSTEM TREES
+
+	LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
+		In windows power shell, type: 
+			$ Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
+
+	ENABLING DBUS-BROKER IN WSL
+		Most up-to-date linux distributions are now using dbus-broker, however there's always the chance you might 
+	still be on a linux system without dbus-broker.
+
+		Install:
+			# pacman -Syu dbus-broker
+
+		Enable it:
+			# systemctl --global enable dbus-broker.service && systemctl start dbus-broker.service
+
+		Verify:
+			# systemctl status dbus-broker
+
+
+	ENABLING CLIPBOARD FOR NVIM EDITOR
+
+		Recommended reading:
+			SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
+
+	MOUNTING DEVICES IN WSL
+		FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
+			$ GET-CimInstance -query "SELECT * from Win32_DiskDrive"
+
+		MOUNTING DEVICES ON WSL
+			1) Fetch devices using:
+				$ GET-CimInstance -query "SELECT * from Win32_DiskDrive"
+
+			2) Mount device using:
+				Note: Hard Disks with multiple partition need to specify the partition to be mounted as below.
+
+				$ wsl --mount \\.\PHYSICALDRIVE0 --partition 2
+			
+		COPYING AND MOVING FILES FROM WITHIN WSL
+			1) First, start your wsl distro:
+				$ wsl -d <distro_name>
+
+			2) Access the following directory to get access to your system's drive:
+				$ cd /mnt/c/<username>
+					or
+				$ cd /mnt/c/
+
+			3) Copy using 'cp' or 'mv' for moving:
+				This will copy the Pictures folder from the windows directory into the running WSL Distro.
+					$ cp -R /mnt/c/<username>/Pictures ~/
+
+	INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
+		It is recommended to install 'zsh' and 'zsh-theme-powerlevel10k', the default 'bash' shell is too slow and unoptimized.
+			USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
+
+	MANAGING ALIASES IN WINDOWS POWER SHELL
+		Source: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-alias?view=powershell-7.5
+
+		By default, aliases aren't permanently set when created.
+
+		LISTING ALL AVAILABLE ALIASES
+			$ Get-Alias -Name *
+
+		CREATING AN ALIAS IN WINDOWS POWER SHELL
+			This creates an alias called 'np':
+				$ Set-Alias -Name np -Value C:\Windows\notepad.exe
+
+			NOTE: It's also possible to use 'New-Alias' for creating an alias, difference is that New-Alias will not create
+		an override an alias with new values when it already exists, whereas 'Set-Alias' will update and change 
+		pre-existing aliases.
+
+		CREATING ALIAS FOR A COMMAND
+			This will create a function called 'CD32', then 'set-alias' will create an alias 'go' that calls on that function:
+				$ function CD32 {Set-Location -Path C:\Windows\System32}
+				$ Set-Alias -Name Go -Value CD32
+
+		UPDATING ALIASES
+			This will update an alias and set it to 'readonly' mode, further changes and updates will have to be 
+			made using the 'Force' parameter; the 'private' option makes it only available under the current scope.
+				$ Set-Alias -Name Go -Option ReadOnly, Private
+
+		
+		HOW TO PERMANENTLY SET ALIASES
+			You'll need to choose a user/system profile and create your aliases there
+
+			LISTING ALL PROFILES AVAILABLE
+				$ $profile | select *
+
+			CREATE THE FILE USING NVIM OR NOTEPAD
+				If you choose an administration profile, then create and/or edit the profiles:
+
+				$ runas /user:Administrator "nvim C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1"
+					or
+				$ runas /user:Administrator "notepad C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1"
+			
+			
+				example:
+					[file: C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1]
+						Set-Alias -Name dar -Value "C:\Program Files\DAR\dar.exe"
+						Set-Alias -Name dar_slave -Value "C:\Program Files\DAR\dar_slave.exe"
+						Set-Alias -Name dar_cp -Value "C:\Program Files\DAR\dar_cp.exe"
+						Set-Alias -Name dar_manager -Value "C:\Program Files\DAR\dar_manager.exe"
+						Set-Alias -Name dar_split -Value "C:\Program Files\DAR\dar_split.exe"
+						Set-Alias -Name dar_xform -Value "C:\Program Files\DAR\dar_xform.exe"
+						Set-Alias -Name par2 -Value "C:\Program Files\PAR2\par2.exe"
+
+						function sudo_f {
+							param (
+								[Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+								[string]$exec="",
+								[switch]$askpass
+							)
+
+							if($askpass){
+								<# HOW TO USE: $ sudo -askpass   OR $ sudo -askpass $true
+								 This has no practical use here, Im just adding this here for fun #>
+								param (
+									[Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+									[string]$password = $( Read-Host "Input password, please" )
+								) 
+							}
+
+							C:\Windows\System32\runas.exe /user:Administrator $exec
+						}
+
+						Set-Alias -Name sudo -Value sudo_f
+					[/file]
+
+			ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
+				$ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+				You can then disable if you don't want it:
+					$ Set-ExecutionPolicy Restricted
+	
+	SETTING UP NEW DEFAULT USER FOR WSL DISTRO
+		Most often this breaks some stuff like when launching GUI Programs: 
+			$ wsl --manage <distro> --set-default-user <username>
+
+		It's advisable to just use 'sudo' to log into another user
+
+	ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
+
+		Add this to your /etc/environment file:
+			[file: /etc/environment ]
+				PULSE_SERVER=unix:/mnt/wslg/PulseServer
+			[/file]
+
+	COMPILING WSL KERNEL
+		source: https://github.com/microsoft/WSL2-Linux-Kernel
+
+		1 - First, Install and update WSL:
+			$ wsl --install --no-distribution
+
+		2 - Restart the computer if necessary, then update it to latest version:
+			$ wsl --update --pre-release
+
+		3 - Compilation requires an ubuntu installation:
+			$ wsl --install Ubuntu
+
+		4 - Once installation is complete, start the distro:
+			$ wsl -d ubuntu
+
+		6 - Install required packages as needed:
+			# apt install build-essential flex bison libssl-dev libelf-dev bc python3 pahole cpio libncurses-dev pkg-config
+
+			6.1 - Alternate packages(may be old):
+				# apt install build-essential flex bison dwarves libssl-dev libelf-dev cpio qemu-utils
+					or
+				$ sudo apt install build-essential flex bison dwarves libssl-dev libelf-dev cpio qemu-utils
+
+			VERY IMPORTANT: Required packages might change from time to time, so checking on github might be necessary:
+				https://github.com/microsoft/WSL2-Linux-Kernel
+
+		7 - Clone the git repository:
+			$ git clone https://github.com/microsoft/WSL2-Linux-Kernel
+
+			7.1 - (Alternate Option) Git cloning a specific an kernel version:
+				This isn't recommended, always download the newest one,
+			Older kernel versions may contain bugs and problems that can permanently cause damage.
+
+				$ git clone https://github.com/microsoft/WSL2-Linux-Kernel.git --depth=1 -b linux-msft-wsl-6.X.Y
+
+				HOW TO SELECT THE RIGHT KERNEL VERSION FOR YOU:
+					Let's pretend a new Kernel just came out 1 month ago: Kernel 6.0.0
+
+					If a kernel is new and too 'young', it's deemed as immature and not good for use, 
+				and only meant for testing, example: Kernel 6.1.6 or Kernel 6.1.12
+				Reason is that new 'young' kernels may contain bugs and problems that haven't been found yet
+				by the devs. Some of these bugs can break your system and even wreck your hard drive completely.
+
+				When a kernel is too old and not from an LTS (Long Term Stability) Branch, there is a bigger chances
+				bugs have never been fixed. For Example: Kernel 3.2
+
+				A Kernel is good for use when it's both new and mature, for example(in this case): Kernel 5.9.0.
+
+				If you still want to use 6.X.Y version, it's recommended to wait until it has matured and reached
+				around 6.5.0 or 6.6.0, at this point most of the features meant to be on the new 6.0 Kernel have 
+				both been implemented and tested, completely mitigating the chances of something going wrong in your
+				system. The more it mature, the lesser the chances you're going to have problems with it.
+
+		8 - Change directory into the git repository you just cloned:
+			$ cd ~/WSL2-Linux-Kernel
+
+		9 - Select Kernel options to be included in the compilation:
+			$ make menuconfig KCONFIG_CONFIG=Microsoft/config-wsl
+
+		10 - Compile using this:
+			$ make -j$(nproc) KCONFIG_CONFIG=Microsoft/config-wsl && make INSTALL_MOD_PATH="$PWD/modules" modules_install
+
+		11 - Once it's finished, Copy the compiled kernel to your windows directory located in /mnt/c/ on WSL:
+			11.1) First create a new directory in your user directory:
+				$ mkdir -p /mnt/c/Users/<username>/.wsl-kernels/
+
+			11.2) Copy the compiled kernel to the newly created directory:
+				$ cp arch/x86/boot/bzImage /mnt/c/Users/<username>/.wsl-kernels/
+			
+			NOTE: Replace <username> with an existing username.
+
+		12 - Create the file '.wslconfig' in your user directory:
+			At this point, if you wish to do so, you can rename the kernel name from 'bzImage' to anything you'd like.
+
+			[file: C:\Users\USER\<username>\.wslconfig ]
+				[wsl2] 
+				kernel=C:\\Users\\<username>\\.wsl-kernels\\bzImage
+			[/file]
+
+			NOTE: Replace <username> with an existing username.
+
+		13 - Now terminate/shutdown ALL running WSL distributions:
+			$ wsl --shutdown
+				or
+			$ wsl --terminate <distribution>
+
+		14 - Now you can finally use any distribution you want with your new custom compiled kernel:
+			$ wsl -d archlinux
+
+		15 - Verify Kernel version 
+			$ uname -rv
+
+---------------------
+---------------------
+---------------------
+---------------------
 ADVANCED REGEX PART 3
 DIFFERENCE BETWEEN SED AND GREP
 	GREP can be used to select lines that match a given regex pattern, 
@@ -33622,8 +34757,6 @@ TEMPORARY 2:
 
 6 - Write something about POLKIT
 	https://wiki.archlinux.org/title/Polkit
-
-7 - TODO: Write PARCHIVE topic about DAR
 
 ---
 VERY IMPORTANT/TASK  LOGS:
