@@ -34202,25 +34202,70 @@ THE ONION WEB / TOR WEB
 ---------------------
 SOME WINDOWS STUFF
 	SOME WINDOWS UTILITIES
-		cmd
-		regedit
-		msconfig
-		services
-		dxdiag
-		winget				#Windows Commandline Package Manager
-		runas				#Allows running programs/commands as a different user.
+		These tools are located under C:\Windows\System32\
+
+		perfmon.msc			#Performance Monitor
+		tpm.msc				#TPM Manager
+		certlmgr.msc			#System Certification Manager
+		certmgr.msc			#Local User Certification Manager
+		comexp.msc			#Component Services
+		compmgmt.msc			#Computer Management
+		devmgmt.msc			#Device Manager
+		DevModeRunAsUserConfig.msc
+		diskmgmt.msc			#Disk Manager
+		fsmgmt.msc			#File Share Manager
+		gpedit.msc			#Group Policy Editor
+		lusrmgr.msc			#Local Users and Groups Manager
+		printmanagement.msc		#Printer Manager
+		rsop.msc			#Resultant Set of Policy (RSoP) - group policies applied to a user. 
+		secpol.msc			#Local Security Policy
+		taskschd.msc			#Task Scheduler
+		WF.msc				#Windows Firewall
+		WmiMgmt.msc			#WMI Management
+		eventvwr.msc			#System Event Log Viewer
+		services.msc			#Services 
+
+		appwiz.cpl			#Application Wizard - Uninstall programs
+		desk.cpl			#Monitor Settings
+		Firewall.cpl			#Firewall Manager (Same as WF.msc)
+		hdwwiz.cpl			#Hardware Wizard - Device Manager
+		inetcpl.cpl			#Internet Control Panel - Internet Properties
+						Note: This is only meant for 'Internet Explorer' web browser.
+		intl.cpl			#International Settings and Language
+		joy.cpl				#Joystick/Gamepad Settings
+		main.cpl			#Mouse Settings
+		mmsys.cpl			#Audio Settings
+		ncpa.cpl			#Network Control Panel Applet
+		powercfg.cpl			#Power Configuration
+		RTSnMg64.cpl			#RealTek Sound Manager
+		timedate.cpl			#System Clock/Date
+		irprops.cpl			#Infrared Control Panel
+		bthprops.cpl  			#Bluetooth Control Panel
+
+		cmd.exe
+		chkdsk.exe			#Check Disk Utility
+		chkntfs.exe			#Can be used to set up automatic disk verification during boot
+		doskey.exe			#Configure aliases for Command Prompt
+		regedit.exe			#Register Editor
+		regedt32.exe			#Same as Regedt32.exe
+		msconfig.exe			#Services initialization, Program initialization, System initialization
+		OptionalFeatures.exe		#Enable/Disable Windows Features
+		dxdiag.exe			#Direct X Diagnostics - Provides Basic System Diagnostics
+		winget.exe			#Windows Commandline Package Manager
+		runas.exe			#Allows running programs/commands as a different user.
 						example: 
 							$ runas /user:Administrator "cmd"
+		msinfo32.exe			#Some system resources: physical/virtual memory
 
 		SystemPropertiesAdvanced.exe	#Manages Environment Variable and Virtual Memory
 		sysdm.cpl			#Same as above
-		tasklist				#Lists all running processes
-		taskkill /im <program_name> /t /f	#Kills runnning process by it's name
-		taskkill /pid <prorgam_pid> /t /f	#Kills runnning process by it's PID
+		tasklist.exe				#Lists all running processes
+		taskkill.exe /im <program_name> /t /f	#Kills runnning process by it's name
+		taskkill.exe /pid <prorgam_pid> /t /f	#Kills runnning process by it's PID
 
 
 	RUNNINNG COMMAND AS ADMINISTRATOR
-		$ runas /user:Administrator "cmd"
+		$ runas.exe /user:Administrator "cmd"
 	
 	SOME WINDOWS 11 HOTKEYS
 		system_key + tab		#Virtual Desktops
