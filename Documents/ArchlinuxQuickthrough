@@ -975,6 +975,7 @@ USE LICENSE:
 		ADDING AND USING A NEW REGULAR USER
 			ADDING A NEW USER TO SUDOERS LIST
 		SETTING UP NEW DEFAULT STARTER USER FOR WSL DISTRO
+		LISTING USER AND GROUP ENTITIES ON THE LINUX DISTRO
 		RECOMMENDED ARCHLINUX PACKAGES FOR WSL
 			BASICS ON HOW TO USE PACMAN
 		RUNNING CLAMAV ANTI-VIRUS IN WSL
@@ -34422,6 +34423,143 @@ THE ONION WEB / TOR WEB
 		From this point forward you'll have to look for things on your own:
 			SETTING UP SYSTEM LANGUAGE | SYSTEM LOCALE (NOT MANDATORY FOR KEYBOARD LAYOUT)
 
+	LISTING USER AND GROUP ENTITIES ON THE LINUX DISTRO
+		1) Listing all users on the system:
+			# compgen -u 
+				or
+			# getent passwd
+				or
+			# getent shadow
+
+		2) Listing all groups on the system:
+			# getent group
+	
+	A FEW OTHER BEGINNER COMMANDS
+		Aside from a few of the commands already mentioned in the other topics,
+		there are still a few ones worth mentioning:
+
+		1) Cheats sheet for any command(s) in linux ( Requires installing package 'tldr' ) 
+			$ tldr <command_name>
+			
+			Example:
+				$ tldr gpg
+
+		2) Listing all logins in the system
+			$ lslogins
+
+		3) Listing file descriptors
+			Lists all files hold by running or zombie processes:
+				$ lsfd
+				   or
+				$ lsof
+
+		4) Listing files in a directory
+			$ lsa
+			  or
+			$ ls -la
+		
+		5) Listing files and directory in tree style (Requires installing package 'tree')
+			$ tree
+
+		6) Commandline File Explorer ( requires installing package 'broot')
+			This program uses vi modular keys - This requires knowing VI / VIM / NVIM a bit:
+				$ broot
+
+		7) Listing Block Devices mounted/unmounted
+			$ lsblk
+
+		8) Listing current file locks in the filesystem
+			$ lslocks
+
+		9) Listing extended attributes of data from EXT Filesystems
+			$ lsattr
+
+		10) Setting access control list for file/directories
+			$ setfacl
+
+		11) Getting Access Control List(ACLs) for File/Directories
+			$ getfacl
+
+		12) Fetching info on CPU
+			$ lscpu
+
+		13) Fetching short info on memory
+			$ lsmem
+			  or
+			$ free -h
+			  or
+			$ zramctl
+
+		14) Listing enabled and disabled kernel features:
+			$ zless /proc/config.gz
+				or
+			$ zcat /proc/config.gz | less
+
+		15) Searching for specific kernel features:
+			Note: Options for zgrep and grep are the same, so use 'man grep' for access to more options.
+			$ zgrep -i 'encrypt' /proc/config.gz
+				and
+			$ zgrep -i 'hyperv' /proc/config.gz
+
+				OR
+
+			$ zcat /proc/config.gz | grep -i "encrypt"
+				and
+			$ zcat /proc/config.gz | grep -i "hyperv"
+			
+		16) Listing all available Kernel Modules:
+			This is not available on WSL(Windows Subsystem for Linux) 
+				# lsmod
+
+		17) OpenPGP encryption and signing tool (GNU PGP - gpg)
+			Manages public and private OpenPGP Encryption keys on the system.
+				$ gpg
+
+		18) Archiving Tools ( require installing both )
+			$ tar
+			  and
+			$ dar
+			
+		19) Advanced Text Editor ( requires installing neovim )
+			$ nvim
+		
+		20) Reads Information on Executable and Linkable files:
+			$ readelf --all /bin/cp
+				and
+			$ readelf --file-header /bin/cp
+
+		21) Displays all shared objects/libraries required for a running program:
+			$ ldd -v /bin/cp
+
+		22) Read user input from commandline
+			Useful if you ever need to create user shell scripts.
+			Syntax:
+				$ read <environment_variable>
+
+			Example:
+				This code asks, reads the user password from the keyboard, then displays it back to the user and clears 
+				the password variable:
+					$ echo "Please type your password: " && read -s password && 
+					  echo "\nYour password is:\n\t${password}\n\n" && password=''
+			
+		23) Make pipes appear in your terminal ( Requires installing it from AUR - pipes.sh package ):
+			$ pipes.sh
+
+		24) Make a cow say something on commandline:
+			$ cowsay -y -W 12 "Archlinux is NOT for everyone"
+
+			Resulting output will be:
+				 ____________
+				/ Archlinux  \
+				| is NOT for |
+				\ everyone   /
+				 ------------
+					\   ^__^
+					 \  (..)\_______
+					    (__)\       )\/\
+						||----w |
+						||     ||
+
 	SETTING UP NEW DEFAULT STARTER USER FOR WSL DISTRO
 		This is optional.
 
@@ -34444,12 +34582,12 @@ THE ONION WEB / TOR WEB
 			  sudo fscrypt htop konsole git cdparanoia firejail firefox vivaldi opera chromium \
 			  clamav clamtk arch-install-scripts apparmor wireshark-qt screen testdisk \
 			  clock-tui cool-retro-term dosbox podman gimp glances torbrowser-launcher systemd-ui \
-			  scrot ugrep ripgrep sed memtester lsof hwinfo cowsay gdb cmus ibus flatpak
+			  scrot ugrep ripgrep sed memtester lsof hwinfo cowsay gdb cmus ibus flatpak cowsay
  
 		B) AUR(Archlinux User Repository)
 			This requires yay package manager to be installed on the system:
 				$ yay -S oh-my-zsh zsh-theme-powerlevel10k archey4 ddd xnview-xnsketch-bin \
-				  scc-bin dbgl  
+				  scc-bin dbgl pipes.sh 
 
 			This requires compilation, so doing them individually is the best:
 				$ yay -S dosbox-x-sdl2 qmplay2 memstat pcmanx-gtk2 syncterm cheat svp-bin ssed dar
