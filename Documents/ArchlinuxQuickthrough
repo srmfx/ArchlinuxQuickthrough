@@ -1,6 +1,6 @@
 {USE LICENSE}
 {S-INDEX, [INDEX], INDEX SYNTAX}
-{STACK OF THINGS DONE}
+{S-CHANGELOG}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
 {OPTIMIZATION, TWEAK, PERFORMANCE, [PERFORMANCE]}
 {RECOMMENDED, PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
@@ -207,7 +207,7 @@ USE LICENSE:
 
 		SECURITY
 			SECURITY CONCERN
-			LINUX FIREWALLING WITH IPTABLES
+			LINUX FIREWALLING WITH IPTABLES | NFTABLES
 				BASIC CONCEPTS
 				OPTIONAL TOOLS FOR IPTABLES
 				HOW DOES IPTABLES WORK | VERY IMPORTANT
@@ -711,7 +711,7 @@ USE LICENSE:
 			ENABLING VSYNC FOR NVIDIA
 			PLAYING VIDEOS ON THE TERMINAL / VIDEOS COMMAND LINE
 			FETCHING EVERY SINGLE FRAME FROM VIDEO
-			SETTING UP SYSTEM LANGUAGE | SYSTEM LOCALE
+			SETTING UP SYSTEM LANGUAGE | SYSTEM LOCALE (NOT MANDATORY FOR KEYBOARD LAYOUT)
 				CHANGING SYSTEM LOCALE PROTON AND WINE
 
 		--OTHER STUFF
@@ -961,33 +961,47 @@ USE LICENSE:
 		DECREASING/CAPPING/LIMITING FPS IN GAMES
 		HOW TO CHECK GNOME SETTING
 
---SOME WINDOWS STUFF:
+---SOME WINDOWS STUFF:
 	SOME WINDOWS UTILITIES
 	RUNNINNG COMMAND AS ADMINISTRATOR
 	SOME WINDOWS 11 HOTKEYS
-	RECOMMENDED ARCHLINUX PACKAGES FOR WSL
-		BASICS ON HOW TO USE PACMAN
-	RUNNING CLAMAV ANTI-VIRUS IN WSL
-	LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
-	ENABLING DBUS-BROKER IN WSL
-	MOUNTING DEVICES IN WSL
-		FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
-		MOUNTING DEVICES ON WSL
-		COPYING AND MOVING FILES FROM WITHIN WSL
-	INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
-	MANAGING ALIASES IN WINDOWS POWER SHELL
-		LISTING ALL AVAILABLE ALIASES
-		CREATING AN ALIAS IN WINDOWS POWER SHELL
-		CREATING ALIAS FOR A COMMAND
-		UPDATING ALIASES
-		HOW TO PERMANENTLY SET ALIASES
-			LISTING ALL PROFILES AVAILABLE
-			CREATE THE FILE USING NVIM OR NOTEPAD
-			ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
-	SETTING UP A NEW DEFAULT USER FOR WSL DISTRO
-	ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
-	COMPILING WSL KERNEL
-		HOW TO SELECT THE RIGHT KERNEL VERSION FOR YOU
+
+	---SOME INTRODUCTION TO WSL AND ARCHLINUX
+		INSTALLING ARCHLINUX DISTRIBUTION IN WSL
+			WSL DEFAULT WINDOWS LOCATION FOR LINUX DISTROS
+			LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
+		SETTING UP SYSTEM LOCALE IN A WSL LINUX DISTRO
+		REMOVING A WSL DISTRIBUTION
+		ADDING AND USING A NEW REGULAR USER
+			ADDING A NEW USER TO SUDOERS LIST
+		SETTING UP NEW DEFAULT STARTER USER FOR WSL DISTRO
+		RECOMMENDED ARCHLINUX PACKAGES FOR WSL
+			BASICS ON HOW TO USE PACMAN
+		RUNNING CLAMAV ANTI-VIRUS IN WSL
+		SETTING UP A FIREWALL WITH IPTABLES/NFTABLES IN WSL
+		ENABLING DBUS-BROKER IN WSL
+		MOUNTING DEVICES IN WSL
+			FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
+			MOUNTING DEVICES ON WSL
+				BARE MOUNTS
+					BARE MOUNTING DEVICES
+					BARE MOUNTING WSL .VHDX IMAGES
+			COPYING AND MOVING FILES FROM WITHIN WSL
+		INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
+		ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
+		COMPILING WSL KERNEL
+			HOW TO SELECT THE RIGHT KERNEL VERSION FOR YOU
+
+	---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
+		MANAGING ALIASES IN WINDOWS POWER SHELL
+			LISTING ALL AVAILABLE ALIASES
+			CREATING AN ALIAS IN WINDOWS POWER SHELL
+			CREATING ALIAS FOR A COMMAND
+			UPDATING ALIASES
+			HOW TO PERMANENTLY SET ALIASES
+				LISTING ALL PROFILES AVAILABLE
+				CREATE THE FILE USING NVIM OR NOTEPAD
+				ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
 
 --MISCALENEOUS:
 	MONITORING LOG FILES IN REAL TIME
@@ -1203,19 +1217,22 @@ New Syntax(2023):
 
 
 ------------------------------
-========================================END INDEX SYNTAX========================================
-========================================METADATA / META-DATA / META DATA:=======================
+========================================END INDEX SYNTAX============================================
+========================================METADATA / META-DATA / META DATA:===========================
 ====================================================================================================
 
 ====================================================================================================
-===================================STACK OF THINGS DONE==========================================
+========================================S-CHANGELOG=================================================
 ====================================================================================================
 
 2025 - May:
 	--Day 30:
 		SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
-		SOME WINDOWS STUFF
-		CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
+		---SOME WINDOWS STUFF
+		---SOME INTRODUCTION TO WSL AND ARCHLINUX
+			CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
+		---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
+
 
 2025 - April:
 	--Day 21:
@@ -1555,24 +1572,43 @@ rm /etc/vconsole.conf
 rm /etc/X11/xorg.conf.d/00-keyboard.conf
 
 SETTING UP SYSTEM LANGUAGE | SYSTEM LOCALE (NOT MANDATORY FOR KEYBOARD LAYOUT)
-	1 - edit: /etc/locale.gen
-		1.1 - uncomment en_US.UTF-8 UTF8  and pt_BR.UTF-8 UTF8 or any other locale you may want
-	2 - then type: # locale-gen
-	3 - last step: # localectl set-locale LANG=EN_us.utf-8
-	VERY IMPORTANT: currently, localcectl set-locale is only applied after system reboot.
-		or
-	alternatively to last step(not recommended): nvim /etc/locale.conf 
-					ex.: add LANG=en_US.UTF-8
 
-	4 - CHANGING SYSTEM LOCALE FOR PROTON AND WINE
-		This is here, since some games may require japanese locale in order to work:
+	1(Optional) If you want, you can check available locale settings:
+		$ vi /etc/locale.gen
 
-		4.0 - Uncomment ja_JP.UTF-8 on /etc/locale.gen
+		1.1(Optional) If you have a missing /etc/locale.gen, you can re-download it by installing glibc package:
+			# pacman -S glibc
 
-		4.1 - Generate locale
+		1.2(Optional) You can list pre-generate locales:
+			$ localectl list-locales
+				or
+			$ locale --all-locales
+
+	2 -  Set locale using:
+		VERY IMPORTANT: whenever you set a new locale, it'll define it as the main locale settings,
+		so if you want en_US.utf-8 as the main locale, you have to type it for last:
+
+		# localectl set-locale LANG=ja_JP.utf-8
+		# localectl set-locale LANG=pt_BR.utf-8
+		# localectl set-locale LANG=en_US.utf-8
+
+		2.1 - (Alternative and Optional) You can edit locale straight from the /etc/locale.gen file
+		Simply uncomment each locale you want by removing the '#' character from the beginning of each line
+			$ vi /etc/locale.gen
+
+	3 - Finally, generate a new locale.conf file:
+		This will simply generate a new /etc/locale.conf file based on the choices you have made in step #2 above:
 			# locale-gen
 
-		4.2 - Install japanese fonts
+	4 - CHANGING SYSTEM LOCALE FOR PROTON AND WINE
+		This is here, since some windows games may require japanese locale in order to work:
+
+		4.0 - (Maybe optional) If you haven't done it already, generate a locale for 'ja_JP.utf-8'
+
+		4.1 - (Maybe optional) Generate a new /etc/locale.conf for 'ja_JP.utf-8'
+			# locale-gen
+
+		4.2 - Install japanese fonts for wine
 			$ winetricks cjkfonts
 
 		4.3 - Launch wine:
@@ -28198,7 +28234,7 @@ ALA Repository Website: https://archive.archlinux.org/
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
-LINUX FIREWALLING WITH IPTABLES
+LINUX FIREWALLING WITH IPTABLES | NFTABLES
 
 	UPDATE INFO - VERY IMPORTANT - :
 		source: 
@@ -28217,7 +28253,7 @@ LINUX FIREWALLING WITH IPTABLES
 
 
 BASIC CONCEPTS
-	Is a port bound to a socket?
+	1) Is a port bound to a socket?
 		A socket is one endpoint of a two-way communication link between two programs running on the network. A socket is bound to a port number so that the TCP layer can identify the application that data is destined to be sent to. An endpoint is a combination of an IP address and a port number.
 
 OPTIONAL TOOLS FOR IPTABLES
@@ -34200,7 +34236,7 @@ THE ONION WEB / TOR WEB
 ---------------------
 ---------------------
 ---------------------
-SOME WINDOWS STUFF
+---SOME WINDOWS STUFF
 	SOME WINDOWS UTILITIES
 		These tools are located under C:\Windows\System32\
 
@@ -34271,8 +34307,132 @@ SOME WINDOWS STUFF
 		system_key + tab		#Virtual Desktops
 		system_key + I			#Access to system settings, developer mode, etc
 	
+
+
+---SOME INTRODUCTION TO WSL AND ARCHLINUX
+	INSTALLING ARCHLINUX DISTRIBUTION IN WSL
+		Note: You might need to install and update WSL depending on your windows version.
+
+		1) Install WSL without a distribution
+			$ wsl --install --no-distribution
+
+		2) Update WSL
+			$ wsl --update --pre-release
+
+		4) Install archlinux
+			$ wsl --install archlinux --name archlinux_dist
+
+		5) Use the distro post-install
+			$ wsl -d archlinux_dist
+
+		WSL DEFAULT WINDOWS LOCATION FOR LINUX DISTROS
+			The Default Location for WSL Linux Distros is:
+				C:\Users\<YOUR_USERNAME>\AppData\Local\wsl\
+
+			Always make a backup from time to time to avoid data loss upon image getting corrupted.
+			Also read about WSL filesystem corruption on this topic:
+				BARE MOUNTS
+
+		LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
+			Inside a windows power shell session, type: 
+				$ Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
+
+	REMOVING A WSL DISTRIBUTION
+		Do not use '--uninstall' as it'll completely erase WSL from existence instead.
+			$ wsl --unregister <distro_name> 
+	
+	ADDING AND USING A NEW REGULAR USER
+		
+		1) Start your already installed distro:
+			$ wsl -d archlinux_dist
+
+		2) Install 'zsh' and 'sudo':
+			# pacman -S zsh sudo
+
+		3) Create new user:
+			# useradd --shell /usr/bin/zsh --create-home <user_name>
+
+		4) Change password for user:
+			# passwd <user_name>
+
+		5) Log into user
+			# sudo -iu <user_name>
+
+			Note: you can use 'run0' and 'su' too instead of 'sudo'.
+
+		6) Type 'exit' if you want to exit the user shell
+			$ exit
+		
+		ADDING A NEW USER TO SUDOERS LIST
+			
+			1) Install 'visudo'
+				# pacman -S vi sudo
+
+			2) Run 'visudo'
+				# visudo
+
+			3) How to Use VI - For Complete Beginners - 
+				3.1 - Press 'ESC' to ensure you're in normal-mode, useful for navigating through text file and also for 
+				selecting other available vi modes: insert-mode, command-mode, visual-mode and select-mode.
+				3.2 - In normal mode, you can navigate using h, k, j, l / left, down, up, right
+				3.3 - In normal mode, You can also use CTRL+F to scroll forward and CTRL+U to scroll up the screen.
+				3.4 - you can edit text using 'i' to go into insert-mode, press 'esc' to go back to normal-mode.
+				3.6 - To save data in visudo, press ':' and then type 'w!' and press enter.
+				needless to say, pressing ':' sends you into command-mode, press 'ESC' to leave command-mode.
+				3.7 - you can quit by going into command-mode and then pressing 'q' or 'q!
+
+			4) Use the instructions from Step #3 to Find the line that says:
+				[file: /etc/sudoers ]
+					##
+					## User privilege specification
+					##
+					root ALL=(ALL:ALL) ALL
+				[/file]
+
+			5) Use instructions from step #3 to add a single new 
+			   line right below the 'root ALL=(ALL:ALL) ALL' text like this:
+
+				[file: /etc/sudoers ]
+					##
+					## User privilege specification
+					##
+					root ALL=(ALL:ALL) ALL
+					YOUR_USERNAME ALL=(ALL:ALL) ALL
+				[/file]
+
+			6) Create group 'wheel' and 'sudo'
+				Note: 'sudo' group should already exist due to 'sudo' being installed on step #1.
+
+				# groupadd wheel & groupadd sudo
+			
+				6.1 - You can check to see if groups have been succesfully created:
+					
+			7) Modify your user to participate in 'wheel' and 'sudo' groups:
+				# usermod -aG wheel,sudo <YOUR_USERNAME>
+
+			8) Log into your user:
+				# sudo -iu <YOUR_USERNAME>
+
+			9) Test it by installing texinfo through pacman:
+				$ sudo pacman -S texinfo
+
+				Note: if installation succeeds, then you've successfully added yourself to sudoers list.
+
+	SETTING UP SYSTEM LOCALE IN A WSL LINUX DISTRO
+		From this point forward you'll have to look for things on your own:
+			SETTING UP SYSTEM LANGUAGE | SYSTEM LOCALE (NOT MANDATORY FOR KEYBOARD LAYOUT)
+
+	SETTING UP NEW DEFAULT STARTER USER FOR WSL DISTRO
+		This is optional.
+
+		Most often this breaks some stuff like when launching GUI Programs,
+		Note: I'll check later how to fix it, but for now avoid this:
+			$ wsl --manage <distro> --set-default-user <username>
+
+		IMPORTANT: It's advisable to just use 'sudo' to log into another user, for now.
+		
 	RECOMMENDED ARCHLINUX PACKAGES FOR WSL
-		NOTE: Depending on how long this has.'t been updated, some packages might be unavailable at the time.
+		NOTE: Depending on how long this has been updated, some packages might be unavailable at the time.
 		since archlinux is a rolling release distro, some packages might just not work anylonger.
 
 		These are merely options, you can either opt in or out of one or more of these packages depending on your needs:
@@ -34335,13 +34495,13 @@ SOME WINDOWS STUFF
 				$ yay -Syua
 
 	RUNNING CLAMAV ANTI-VIRUS IN WSL
-		Recommended readings:
+		From this point forward you'll have to look for things on your own:
 			CLAMAV ANTI-VIRUS
 					ALLOW FILE DESCRIPTOR PASS | ALLOWING CLAMAV TO SCAN DIFFERENT FILE SYSTEM TREES
 
-	LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
-		In windows power shell, type: 
-			$ Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
+	SETTING UP A FIREWALL WITH IPTABLES/NFTABLES IN WSL
+		From this point forward you'll have to look for things on your own:
+			LINUX FIREWALLING WITH IPTABLES | NFTABLES
 
 	ENABLING DBUS-BROKER IN WSL
 		Most up-to-date linux distributions are now using dbus-broker, however there's always the chance you might 
@@ -34375,6 +34535,85 @@ SOME WINDOWS STUFF
 
 				$ wsl --mount \\.\PHYSICALDRIVE0 --partition 2
 			
+
+			BARE MOUNTS
+				Bare mounts allows to load a storage device without actually mounting it,
+				this is important for running 'fsck' on Power Blackouts; 
+
+				NOTE: WSL at the current state simply doesn't care about running 'fsck' on partitions 
+				for doing filesystem checks during boot.
+
+				VERY IMPORTANT: It's very important to run 'fsck' on partitions/disks that have been abruptly umounted,
+				or else you'll end up with a damaged disk/image/partition, rendering impossible any kind of access or data
+				backup.
+				
+				HINT: Besides running 'fsck' on a bare mounted device, it's also possible to use 'dd_rescue'/'dddrescue', 
+				'testdisk' and 'smartctl'.
+
+				BARE MOUNTING DEVICES
+					You can bare mount a partition as followed:
+						note: the '#' and '$' are merely reference to root and user,
+						it's not necessary to type them in your windows shell/session.
+
+						1) Run a windows power shell session as administrator:
+							You'll be unable to mount devices otherwise.
+
+						2) Fetch available devices using:
+							# GET-CimInstance -query "SELECT * from Win32_DiskDrive"
+
+						3) Inside a Windows Power Shell session, type: 
+							VERY IMPORTANT:
+								MAKE SURE NO OTHER VM(Virtual Machine) OR WSL INSTANCE IS 
+								RUNNING THE DISK BEFORE MOUNTING!
+
+							# wsl --mount \\.\PHYSICALDRIVE0 --bare
+
+						4) Go into another linux distro and finallly list and mount it from there:
+							4.1 - Listing
+								$ lsblk
+								# blkid
+
+							4.2 - (Optional - EXT4 Filesystems only) If you so desire, you can run 'fsck' to 
+							perform a filesystem check and fix:
+								# fsck.ext4 -Dfy /dev/sdX2
+
+							4.3 - Mounting
+								# mount --mkdir /dev/sdX2 /mnt/my_linux_mount_point
+									or
+								# mount --mkdir -t auto /dev/sdX2 /mnt/my_linux_mount_point
+
+				BARE MOUNTING WSL .VHDX IMAGES 
+					Mounting WSL .VHDX is useful for running 'fsck'.
+					
+					1) Run a windows power shell session as administrator:
+						You'll be unable to mount devices otherwise.
+
+					2) Listing available WSL .VHDX Images on your system:
+						# Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
+
+					3) Bare mounting a .VHDX image:
+							VERY IMPORTANT:
+								MAKE SURE NO OTHER VM(Virtual Machine) OR WSL INSTANCE IS 
+								RUNNING THE IMAGE BEFORE MOUNTING!
+
+						# wsl --mount --vhd --bare \
+						  "C:\Users\sebas\AppData\Local\wsl\{44cec59d-a5b3-4326-8171-f9218b2ae285}\ext4.vhdx"
+
+					4) Go into another linux distro and finallly list and mount it from there:
+						4.1 - Listing
+							$ lsblk
+							# blkid
+
+						4.2 - (Optional - EXT4 Filesystems only) If you so desire, you can run 'fsck' to 
+						perform a filesystem check and fix:
+							# fsck.ext4 -Dfy /dev/sdX2
+
+						4.3 - Mounting
+							# mount --mkdir /dev/sdX2 /mnt/my_linux_mount_point
+								or
+							# mount --mkdir -t auto /dev/sdX2 /mnt/my_linux_mount_point
+
+
 		COPYING AND MOVING FILES FROM WITHIN WSL
 			1) First, start your wsl distro:
 				$ wsl -d <distro_name>
@@ -34392,90 +34631,6 @@ SOME WINDOWS STUFF
 		It is recommended to install 'zsh' and 'zsh-theme-powerlevel10k', the default 'bash' shell is too slow and unoptimized.
 			USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
 
-	MANAGING ALIASES IN WINDOWS POWER SHELL
-		Source: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-alias?view=powershell-7.5
-
-		By default, aliases aren't permanently set when created.
-
-		LISTING ALL AVAILABLE ALIASES
-			$ Get-Alias -Name *
-
-		CREATING AN ALIAS IN WINDOWS POWER SHELL
-			This creates an alias called 'np':
-				$ Set-Alias -Name np -Value C:\Windows\notepad.exe
-
-			NOTE: It's also possible to use 'New-Alias' for creating an alias, difference is that New-Alias will not create
-		an override an alias with new values when it already exists, whereas 'Set-Alias' will update and change 
-		pre-existing aliases.
-
-		CREATING ALIAS FOR A COMMAND
-			This will create a function called 'CD32', then 'set-alias' will create an alias 'go' that calls on that function:
-				$ function CD32 {Set-Location -Path C:\Windows\System32}
-				$ Set-Alias -Name Go -Value CD32
-
-		UPDATING ALIASES
-			This will update an alias and set it to 'readonly' mode, further changes and updates will have to be 
-			made using the 'Force' parameter; the 'private' option makes it only available under the current scope.
-				$ Set-Alias -Name Go -Option ReadOnly, Private
-
-		
-		HOW TO PERMANENTLY SET ALIASES
-			You'll need to choose a user/system profile and create your aliases there
-
-			LISTING ALL PROFILES AVAILABLE
-				$ $profile | select *
-
-			CREATE THE FILE USING NVIM OR NOTEPAD
-				If you choose an administration profile, then create and/or edit the profiles:
-
-				$ runas /user:Administrator "nvim C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1"
-					or
-				$ runas /user:Administrator "notepad C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1"
-			
-			
-				example:
-					[file: C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1]
-						Set-Alias -Name dar -Value "C:\Program Files\DAR\dar.exe"
-						Set-Alias -Name dar_slave -Value "C:\Program Files\DAR\dar_slave.exe"
-						Set-Alias -Name dar_cp -Value "C:\Program Files\DAR\dar_cp.exe"
-						Set-Alias -Name dar_manager -Value "C:\Program Files\DAR\dar_manager.exe"
-						Set-Alias -Name dar_split -Value "C:\Program Files\DAR\dar_split.exe"
-						Set-Alias -Name dar_xform -Value "C:\Program Files\DAR\dar_xform.exe"
-						Set-Alias -Name par2 -Value "C:\Program Files\PAR2\par2.exe"
-
-						function sudo_f {
-							param (
-								[Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-								[string]$exec="",
-								[switch]$askpass
-							)
-
-							if($askpass){
-								<# HOW TO USE: $ sudo -askpass   OR $ sudo -askpass $true
-								 This has no practical use here, Im just adding this here for fun #>
-								param (
-									[Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-									[string]$password = $( Read-Host "Input password, please" )
-								) 
-							}
-
-							C:\Windows\System32\runas.exe /user:Administrator $exec
-						}
-
-						Set-Alias -Name sudo -Value sudo_f
-					[/file]
-
-			ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
-				$ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-				You can then disable if you don't want it:
-					$ Set-ExecutionPolicy Restricted
-	
-	SETTING UP NEW DEFAULT USER FOR WSL DISTRO
-		Most often this breaks some stuff like when launching GUI Programs: 
-			$ wsl --manage <distro> --set-default-user <username>
-
-		It's advisable to just use 'sudo' to log into another user
 
 	ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
 
@@ -34575,6 +34730,88 @@ SOME WINDOWS STUFF
 
 		15 - Verify Kernel version 
 			$ uname -rv
+
+
+---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
+	MANAGING ALIASES IN WINDOWS POWER SHELL
+		Source: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-alias?view=powershell-7.5
+
+		By default, aliases aren't permanently set when created.
+
+		LISTING ALL AVAILABLE ALIASES
+			$ Get-Alias -Name *
+
+		CREATING AN ALIAS IN WINDOWS POWER SHELL
+			This creates an alias called 'np':
+				$ Set-Alias -Name np -Value C:\Windows\notepad.exe
+
+			NOTE: It's also possible to use 'New-Alias' for creating an alias, difference is that New-Alias will not create
+		an override an alias with new values when it already exists, whereas 'Set-Alias' will update and change 
+		pre-existing aliases.
+
+		CREATING ALIAS FOR A COMMAND
+			This will create a function called 'CD32', then 'set-alias' will create an alias 'go' that calls on that function:
+				$ function CD32 {Set-Location -Path C:\Windows\System32}
+				$ Set-Alias -Name Go -Value CD32
+
+		UPDATING ALIASES
+			This will update an alias and set it to 'readonly' mode, further changes and updates will have to be 
+			made using the 'Force' parameter; the 'private' option makes it only available under the current scope.
+				$ Set-Alias -Name Go -Option ReadOnly, Private
+
+		
+		HOW TO PERMANENTLY SET ALIASES
+			You'll need to choose a user/system profile and create your aliases there
+
+			LISTING ALL PROFILES AVAILABLE
+				$ $profile | select *
+
+			CREATE THE FILE USING NVIM OR NOTEPAD
+				If you choose an administration profile, then create and/or edit the profiles:
+
+				$ runas /user:Administrator "nvim C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1"
+					or
+				$ runas /user:Administrator "notepad C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1"
+			
+			
+				example:
+					[file: C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1]
+						Set-Alias -Name dar -Value "C:\Program Files\DAR\dar.exe"
+						Set-Alias -Name dar_slave -Value "C:\Program Files\DAR\dar_slave.exe"
+						Set-Alias -Name dar_cp -Value "C:\Program Files\DAR\dar_cp.exe"
+						Set-Alias -Name dar_manager -Value "C:\Program Files\DAR\dar_manager.exe"
+						Set-Alias -Name dar_split -Value "C:\Program Files\DAR\dar_split.exe"
+						Set-Alias -Name dar_xform -Value "C:\Program Files\DAR\dar_xform.exe"
+						Set-Alias -Name par2 -Value "C:\Program Files\PAR2\par2.exe"
+
+						function sudo_f {
+							param (
+								[Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+								[string]$exec="",
+								[switch]$askpass
+							)
+
+							if($askpass){
+								<# HOW TO USE: $ sudo -askpass   OR $ sudo -askpass $true
+								 This has no practical use here, Im just adding this here for fun #>
+								param (
+									[Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+									[string]$password = $( Read-Host "Input password, please" )
+								) 
+							}
+
+							C:\Windows\System32\runas.exe /user:Administrator $exec
+						}
+
+						Set-Alias -Name sudo -Value sudo_f
+					[/file]
+
+			ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
+				$ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+				You can then disable if you don't want it:
+					$ Set-ExecutionPolicy Restricted
+	
 
 ---------------------
 ---------------------
