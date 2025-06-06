@@ -989,6 +989,12 @@ USE LICENSE:
 					BARE MOUNTING WSL .VHDX IMAGES
 			COPYING AND MOVING FILES FROM WITHIN WSL
 		INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
+		CREATING AN ENVIRONMENT VARIABLE FOR WSL LINUX DISTRO
+			PRACTICAL EXAMPLE 1 - STORING THE SCRIPT AS A STRING IN A ENV. VARIABLE
+			PRACTICAL EXAMPLE 2 - POPULATING /ETC/ENVIRONMENT USING SHELL FUNCTION/METHOD
+				FULL SCRIPT 1-1
+			LOADING THE NEWLY CREATED ENVIRONMENT VARIABLES
+			TESTING THE NEWLY ADDED VAR
 		ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
 		COMPILING WSL KERNEL
 			HOW TO SELECT THE RIGHT KERNEL VERSION FOR YOU
@@ -1035,9 +1041,9 @@ USE LICENSE:
 		SETTING PERMANENT COLORSCHEMES FOR NVIM
 		WINDOW COMMANDS / WINDOW SHORTCUT KEYS
 		ADDING VIM CLIPBOARD FUNCTION
-			ENABLING CLIPBOARD TEMPORARILY:
-			ENABLING CLIPBOARD PERMANENTLY ON NVIM:
-			TROUBLESHOOTING ISSUES NVIM:
+			ENABLING CLIPBOARD TEMPORARILY
+			ENABLING CLIPBOARD PERMANENTLY ON NVIM
+			TROUBLESHOOTING ISSUES NVIM
 			CLIPBOARD TOOLS
 			SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
 			MANUALLY SETTING UP NVIM CLIPBOARD
@@ -1046,7 +1052,7 @@ USE LICENSE:
 				***: WAYLAND CLIPBOARD TOOL
 			CLIPBOARD MANAGER
 			NVIM BINARIES & CUSTOMIZATION PACKAGES
-		Change Encoding in a File
+		CHANGE ENCODING IN A FILE
 		VIM NEW 2020.2-T VIM TUTORIAL EDITION 2(old, edition 1 better!), MADE ON WINDOWS
 		VIM HINTS 2021.1-T
 		VERY OLD NVIM TUTORIAL
@@ -9881,12 +9887,6 @@ TUTORIAL INSTALLING ARCHLINUX ON USB DISK / EFI INSTALLATION / UEFI INSTALLATION
 
 ---------------
 -----------ALTERNATE CONFIGURATIONS(between 17-19):--------
-nvim /etc/locale.gen
-uncomment en_US.UTF-8 UTF8  and pt_BR.UTF-8 UTF8
-then type: locale-gen
-finally last step: localectl set-locale LANG=en_US.UTF-8
-alternatively to last step: nvim /etc/locale.conf 
-				ex.: add LANG=en_US.UTF-8
 
 RECOMMENDED ARCHLINUX PACKAGES:
 	pacman -Syu neovim man-db man-pages texinfo dhcpcd firewalld clamav nano tldr linux-utils systemd-ui systemdgenie coreutils base linux-zen linux-zen-headers linux-zen-docs xterm terminology linux-lts linux-lts-headers linux-lts-docs linux-hardened linux-hardened-headers linux-hardened-docs sddm awesomewm i3 nvidia-dkms nvidia-settings nvidia-utils git edk2-ovmf qemu-full sudo v4l2loopback xorg-xinit
@@ -34765,10 +34765,177 @@ THE ONION WEB / TOR WEB
 				This will copy the Pictures folder from the windows directory into the running WSL Distro.
 					$ cp -R /mnt/c/<username>/Pictures ~/
 
-	INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
-		It is recommended to install 'zsh' and 'zsh-theme-powerlevel10k', the default 'bash' shell is too slow and unoptimized.
-			USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
+		INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
+			It is recommended to install 'zsh' and 'zsh-theme-powerlevel10k', the default 'bash' shell is too slow and 
+		unoptimized. Read topic:
+				USING BOTH POWERLEVEL10K AND OH-MY-ZSH FOR EXTRA FEATURES | PERFORMANCE | RECOMMENDED
 
+		CREATING AN ENVIRONMENT VARIABLE
+			You can create both 'user environment variables' and 'system wide environment variables'; 
+			for WSL however I'm only covering 'system wide environment'.
+
+			You can use either '3A - Easy' or '3B - Intermediate/Advanced method', but if you choose '3A - Easy Method' 
+			you'll first need to use your root/admin account in linux:
+
+				1) Using sudo
+					Use your own user password if you have added yourself on the /etc/sudoers file:
+						$ sudo -iu root
+
+				2) (alternate option) Using su
+					Use your root/admin password instead:
+						$ su -- root
+
+			Option 3A - EASY Method:
+				3A.1) - Use vi, vim or nvim to edit the /etc/environment file: 
+					# vi /etc/environment
+						or
+					# vim /etc/environment
+						or
+					# nvim /etc/environment
+					
+				3A.2) - Create the following environment variables by adding them, replace <USERNAME> with your windows
+				username:
+					[file: /etc/environment ]
+						WIN_USERNAME="<USERNAME>"
+						WUSER_PATH="/mnt/c/Users/<USERNAME>"
+						WIN_USERS_PATH="/mnt/c/Users"
+						WDIR_PATH="/mnt/c"
+						WPROGRAM_FILES="/mnt/c/Program Files"
+						WPROGRAM_FILES_X86="/mnt/c/Program Files (x86)"
+						WSYSTEM="/mnt/c/Windows/System"
+						WSYSTEM32="/mnt/c/Windows/System32"
+						WSL_STORAGE="/mnt/c/Users/<USERNAME>/AppData/Local/wsl"
+						WAPP_DATA="/mnt/c/Users/<USERNAME>/AppData"
+					[/file]
+
+			Option 3B - INTERMEDIATE/ADVANCED method:
+				This method uses both 'printf' and 'tee' to add a new environment var,
+			the only disadvantage is that you'll need to use the EASY Method to make corrections if you make any mistake; 
+			there's always the option of using 'SED' to correct mistakes as well, but i'm not going to cover it here.
+
+				VERY IMPORTANT: Check 'PRACTICAL EXAMPLE 2' for the full script!
+
+				3B.1)  - First, create an env. var for your windows username, replace <USERNAME> with 
+				your windows username:
+					# printf "WIN_USERNAME=\"%s\"" "<USERNAME>" | tee -a /etc/environment
+
+				3B.2) - Second, create a windows_user variable, no need to do anything else here:
+					# printf "WUSER=\"/mnt/c/${WIN_USERNAME}\"" | tee -a /etc/environment
+					  printf "WDIR=/mnt/c/" | tee -a /etc/environment
+
+				Then whole script would be:
+					# printf "WIN_USERNAME=\"%s\"\n" "<USERNAME>" | tee -a /etc/environment &&
+					  printf "WUSER_PATH=\"/mnt/c/${WIN_USERNAME}\"\n" | tee -a /etc/environment &&
+					  printf "WDIR_PATH=\"/mnt/c/\"\n" | tee -a /etc/environment
+
+			Personal Notes:
+				In my honest opnion, the '3B - Intermediate/Advanced method' is better, because there is less 
+			steps involved; on the other hand '3A - Easy method' requires manually going into root/admin mode,
+			manually openning the file, and manually copying, pasting and saving it.
+				
+				The '3B' Method is better despite being harder to implement, because one can simply run the entire 
+			thing as script and it will do the entire work; Therefore it's faster than '3A'. 
+
+			---- PRACTICAL EXAMPLE 1 - STORING THE SCRIPT AS A STRING IN A ENV. VARIABLE ----
+				Note: In this example, i've made a few modifications to allow the script to be stored as text
+			by simply replacing 'printf's  arguments with '' instead of "" characters
+
+				You can store a full script in an environment variable as a string, 
+			then executing it with 'zsh -c $SCRIPT' as follows:
+
+				$ export MINI_SCRIPT="printf 'WIN_USERNAME=\"%s\"\n' '<USERNAME>' | tee -a /etc/environment &&
+						    printf 'WUSER_PATH=\"/mnt/c/${WIN_USERNAME}\"\n' | tee -a /etc/environment &&
+						    printf 'WDIR_PATH=\"/mnt/c/\"\n' | tee -a /etc/environment"
+				  sudo zsh -c $MINI_SCRIPT
+
+			---- PRACTICAL EXAMPLE 2 - POPULATING /ETC/ENVIRONMENT USING SHELL FUNCTION/METHOD -----
+				While it is easier to just write a script and then execute it as root/admin,
+			I'll still be describing this special example here that resolves around using Environment variables only!
+
+				1) First, Create the function:
+					Note: Replace only <USERNAME> with your actual username!
+
+					$ cmd_funct(){  
+						export WIN_USERNAME="<USERNAME>";
+
+						tee_funct(){
+							tee -a /etc/environment;
+						};
+						printf "WIN_USERNAME=\"%s\"\n" "${WIN_USERNAME}" | tee_funct &&
+						printf "WUSER_PATH=\"/mnt/c/Users/${WIN_USERNAME}\"\n" | tee_funct &&
+						printf "WIN_USERS_PATH=\"/mnt/c/Users\"\n" | tee_funct &&
+						printf "WDIR_PATH=\"/mnt/c\"\n" | tee -a /etc/environment &&
+						printf "WPROGRAM_FILES=\"/mnt/c/Program Files\"\n" | tee_funct &&
+						printf "WPROGRAM_FILES_X86=\"/mnt/c/Program Files (x86)\"\n" | tee_funct &&
+						printf "WSYSTEM=\"/mnt/c/Windows/System\"\n" | tee_funct &&
+						printf "WSYSTEM32=\"/mnt/c/Windows/System32\"\n" | tee_funct &&
+						printf "WSL_STORAGE=\"/mnt/c/Users/${WIN_USERNAME}/AppData/Local/wsl\"\n" | tee_funct &&
+						printf "WAPP_DATA=\"/mnt/c/Users/${WIN_USERNAME}/AppData\"\n" | tee_funct;
+
+					  };
+
+				2) Store function declaration in an environment variable:
+					Note: Unlike 'environment variables', Functions aren't exported by default when initializing
+				a new shell session for running the script we created as root/admin.
+
+					$ FUNC=$(declare -f cmd_funct);
+
+				3) Finally use 'sudo' to run it as root/admin:
+					Note: it's not possible to run a function/method directly as root using 'sudo', 
+				at least not without creating a file for it first. 
+
+					HOWEVER, it's possible to tell sudo to execute 'zsh -c' or 'bash -c' 
+				which will in turn execute a script:
+
+					$ sudo zsh -c "${FUNC}; cmd_funct" 
+
+				NOTE: Don't forget to read the RECOMMENDED TOPIC right below the full script!
+
+				---FULL SCRIPT 1-1:
+					$ cmd_funct(){  
+						export WIN_USERNAME="<USERNAME>";
+
+						tee_funct(){
+							tee -a /etc/environment;
+						};
+						printf "WIN_USERNAME=\"%s\"\n" "${WIN_USERNAME}" | tee_funct &&
+						printf "WUSER_PATH=\"/mnt/c/Users/${WIN_USERNAME}\"\n" | tee_funct &&
+						printf "WIN_USERS_PATH=\"/mnt/c/Users\"\n" | tee_funct &&
+						printf "WDIR_PATH=\"/mnt/c\"\n" | tee -a /etc/environment &&
+						printf "WPROGRAM_FILES=\"/mnt/c/Program Files\"\n" | tee_funct &&
+						printf "WPROGRAM_FILES_X86=\"/mnt/c/Program Files (x86)\"\n" | tee_funct &&
+						printf "WSYSTEM=\"/mnt/c/Windows/System\"\n" | tee_funct &&
+						printf "WSYSTEM32=\"/mnt/c/Windows/System32\"\n" | tee_funct &&
+						printf "WSL_STORAGE=\"/mnt/c/Users/${WIN_USERNAME}/AppData/Local/wsl\"\n" | tee_funct &&
+						printf "WAPP_DATA=\"/mnt/c/Users/${WIN_USERNAME}/AppData\"\n" | tee_funct;
+
+					  };
+					  FUNC=$(declare -f cmd_funct);
+					  sudo zsh -c "${FUNC}; cmd_funct";
+
+
+				RECOMMENDED TOPIC READINGS:
+					LOADING THE NEWLY CREATED ENVIRONMENT VARIABLES
+
+				---FINAL CONSIDERATIONS:
+					While it's harduous to make a script for automating simple tasks,
+				it pays off in speed.
+				
+				The only downside is that, depending on the script, it might take tons of time getting 
+				everything right and correct in place until it starts working 100%.
+
+			4 - LOADING THE NEWLY CREATED ENVIRONMENT VARIABLES
+				You can either start a new shell environment or use the 'source' command:
+					$ zsh 
+					  or
+					$ source /etc/environment
+					  and
+					$ zsh -s /etc/environment
+
+			5 - TESTING THE NEWLY ADDED VAR
+				$ echo $WINDOWS_USER
+					or
+				$ echo ${WINDOWS_USER}
 
 	ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
 
