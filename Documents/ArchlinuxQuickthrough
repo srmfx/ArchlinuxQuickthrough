@@ -970,13 +970,25 @@ USE LICENSE:
 		INSTALLING ARCHLINUX DISTRIBUTION IN WSL
 			WSL DEFAULT WINDOWS LOCATION FOR LINUX DISTROS
 			LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
-		SETTING UP SYSTEM LOCALE IN A WSL LINUX DISTRO
 		REMOVING A WSL DISTRIBUTION
 		ADDING AND USING A NEW REGULAR USER
 			ADDING A NEW USER TO SUDOERS LIST
-		SETTING UP NEW DEFAULT STARTER USER FOR WSL DISTRO
+		SETTING UP TIME AND DATE ON THE LINUX SYSTEM
+		SETTING UP SYSTEM LOCALE IN A WSL LINUX DISTRO
+		SETTING UP TEXT FONT FAMILIES IN THE SYSTEM
+			LOOKING FOR AND FINDING NEW FONT FAMILIES AND FONT TYPES FOR INSTALLATION
+				LOOKING FOR HANDWRITTEN FONTS FOR INSTALLATION
+			INSTALLING NEW FONTS ON THE SYSTEM
+			LISTING USER INSTALLED FONTS ON THE SYSTEM
 		LISTING USER AND GROUP ENTITIES ON THE LINUX DISTRO
+		A FEW OTHER BEGINNER COMMANDS
+		SETTING UP NEW DEFAULT STARTER USER FOR WSL DISTRO
 		RECOMMENDED ARCHLINUX PACKAGES FOR WSL
+		ARCHLINUX REPOSITORY
+			INSTALLING UTILITIES
+				INSTALLING UTILITIES
+				INSTALLING FONTS
+			AUR(ARCHLINUX USER REPOSITORY)
 			BASICS ON HOW TO USE PACMAN
 		RUNNING CLAMAV ANTI-VIRUS IN WSL
 		SETTING UP A FIREWALL WITH IPTABLES/NFTABLES IN WSL
@@ -990,12 +1002,24 @@ USE LICENSE:
 			COPYING AND MOVING FILES FROM WITHIN WSL
 		INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
 		CREATING AN ENVIRONMENT VARIABLE FOR WSL LINUX DISTRO
-			PRACTICAL EXAMPLE 1 - STORING THE SCRIPT AS A STRING IN A ENV. VARIABLE
+			PRACTICAL EXAMPLE 1 - STORING THE SCRIPT AS A STRING IN AN ENV. VARIABLE
 			PRACTICAL EXAMPLE 2 - POPULATING /ETC/ENVIRONMENT USING SHELL FUNCTION/METHOD
 				FULL SCRIPT 1-1
 			LOADING THE NEWLY CREATED ENVIRONMENT VARIABLES
 			TESTING THE NEWLY ADDED VAR
 		ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
+		THE VERY BASICS ABOUT USER AND GROUP OWNERSHIP
+			LISTING OWNERSHIP AND PERMISSIONS OF A GIVEN FILE OR DIRECTORY USING 'GETFACL'
+			LISTING USER PERMISSIONS, MASK AND OTHERS USING 'LS'
+			CHANGING USER-OWNER AND GROUP-OWNER OF A GIVEN DATA USING 'CHOWN'
+			CHANGING FILE MODE BITS | CHANGING PERMISSIONS/RIGHTS FOR A GIVEN DATA USING 'CHMOD'
+			GIVING EXTRA PERMISSION FOR OTHER USERS AND GROUPS IN A FILE/DIRECTORY USING 'SETFACL'
+				PRACTICAL 'SETFACL' EXAMPLES
+					ADDING NEW USER-OWNER AND GROUP-OWNER TO A GIVEN FILE/DIRECTORY
+					MODIFYING CURRENT USER-OWNER AND GROUP-OWNER TO A GIVEN FILE/DIRECTORY
+					REMOVING AN EXISTING ACL
+					MODIFYING MASK OF A GIVEN/DIRECTORY FILE
+			SHARING SINGLE DIRECTORY WITH ANOTHER USER | RESTRICTING SOME PERMISSIONS WHILE GIVING ACCESS | RECOMMENDED
 		COMPILING WSL KERNEL
 			HOW TO SELECT THE RIGHT KERNEL VERSION FOR YOU
 
@@ -34419,9 +34443,73 @@ THE ONION WEB / TOR WEB
 
 				Note: if installation succeeds, then you've successfully added yourself to sudoers list.
 
+
+	SETTING UP TIME AND DATE ON THE LINUX SYSTEM
+		If you're using Linux on WSL(Windows Subsystem for Linux) you do not have to setup time/date.
+		However, i'm still leaving this here for reference for those who might wish to do something.
+
+		Read more on:
+			ADJUSTING HARDWARE & SYSTEM CLOCK USING HWCLOCK
+
 	SETTING UP SYSTEM LOCALE IN A WSL LINUX DISTRO
 		From this point forward you'll have to look for things on your own:
 			SETTING UP SYSTEM LANGUAGE | SYSTEM LOCALE (NOT MANDATORY FOR KEYBOARD LAYOUT)
+	
+	SETTING UP TEXT FONT FAMILIES IN LINUX SYSTEM
+		'fontconfig' comes installed by default and provides these lists of tools:
+
+		1) Scans system for new fonts and sets them up:
+			# fc-cache
+
+		1) Listing all available fontconfig tools:
+			$ pacman -Ql fontconfig | grep -i "/usr/bin/..*"
+
+		2) Lists all processed (+) and ignored (-) fonts on the system:
+			$ fc-conflist
+
+		3) Lists fonts and styles available on the system for applications using Fontconfig:
+			$ fc-list
+
+			Example 1: Listing all available fonts for the enlgish language
+				$ fc-list :lang=us
+
+			Example 2: Listing all available fonts for the japanese language
+				$ fc-list :lang=ja
+		
+		LOOKING FOR AND FINDING NEW FONT FAMILIES AND FONT TYPES FOR INSTALLATION
+			Note: you'll probably have to install YAY Package Manager for the AUR(Archlinux User Repository),
+			since standard package manager will not find any in the default archlinux repository.
+
+				$ yay -sS font | grep -i -P "[ot]tf|font" | less
+					or
+				$ pacman -sS font | grep -i -P "[ot]tf|font" | less
+
+			LOOKING FOR HANDWRITTEN FONTS FOR INSTALLATION
+			
+				$ yay -sS font | grep -i -B2 -A1 -P "handw" | less
+					or
+				$ pacman -sS font | grep -i -B2 -A1 -P "handw" | less
+
+		INSTALLING NEW FONTS ON THE SYSTEM
+			1) Installing a few known fonts:
+				# pacman -S noto-fonts noto-fonts-extra noto-fonts-emoji fonts-noto-hinted nerd-fonts
+					or
+				$ sudo pacman -S noto-fonts noto-fonts-extra noto-fonts-emoji fonts-noto-hinted nerd-fonts
+
+				NOTE - Read More on Topic:
+					INSTALLING FONTS
+
+			2) Updating the fonts cache:
+				# fc-cache
+					or
+				$ sudo fc-cache
+
+		LISTING USER INSTALLED FONTS ON THE SYSTEM
+			While fc-list can display all available fonts, 
+		there's a way for displaying only user installed fonts:
+				# pacman -Ss font | grep -i -B2 -A1 -P "installed"
+					or
+				$ yay -Ss font | grep -i -B2 -A1 -P "installed"
 
 	LISTING USER AND GROUP ENTITIES ON THE LINUX DISTRO
 		1) Listing all users on the system:
@@ -34575,16 +34663,28 @@ THE ONION WEB / TOR WEB
 
 		These are merely options, you can either opt in or out of one or more of these packages depending on your needs:
 
-		A) Archlinux Repository
-			# pacman -S wget curl man-pages base coreutils util-linux binutils zsh iptables-nft \
-			  vi neovim par2cmdline ntfs-3g netwatch texinfo whowatch xnviewmp xsel xclip \
-			  smartmontools pcmanfm-gtk3 mpv vlc kdenlive yt-dlp distrobox broot pavucontrol \
-			  sudo fscrypt htop konsole git cdparanoia firejail firefox vivaldi opera chromium \
-			  clamav clamtk arch-install-scripts apparmor wireshark-qt screen testdisk \
-			  clock-tui cool-retro-term dosbox podman gimp glances torbrowser-launcher systemd-ui \
-			  scrot ugrep ripgrep sed memtester lsof hwinfo cowsay gdb cmus ibus flatpak cowsay
+		A) ARCHLINUX REPOSITORY
+			1) INSTALLING UTILITIES
+				# pacman -S wget curl man-pages base coreutils util-linux binutils zsh iptables-nft \
+				  vi neovim gvim par2cmdline ntfs-3g netwatch texinfo whowatch xnviewmp xsel xclip \
+				  smartmontools pcmanfm-gtk3 mpv vlc kdenlive yt-dlp distrobox broot pavucontrol \
+				  sudo fscrypt htop konsole git cdparanoia firejail google-chrome firefox vivaldi opera \
+				  clamav clamtk arch-install-scripts apparmor wireshark-qt screen testdisk \
+				  clock-tui cool-retro-term dosbox podman gimp glances torbrowser-launcher systemd-ui \
+				  scrot ugrep ripgrep sed memtester lsof hwinfo cowsay gdb cmus ibus flatpak \
+				  calc libreoffice icu
  
-		B) AUR(Archlinux User Repository)
+		
+				Note: When installing firefox, choose 'wireplumber' for audio support.
+
+			2) INSTALLING FONTS
+				# pacman -S noto-fonts noto-fonts-extra noto-fonts-emoji fonts-noto-hinted nerd-fonts \
+				  gnu-free-fonts ttf-arphic-uming ttf-indic-otf  
+
+				Note: Everytime you install new fonts, update the cache using:
+					# fc-cache
+
+		B) AUR(ARCHLINUX USER REPOSITORY)
 			This requires yay package manager to be installed on the system:
 				$ yay -S oh-my-zsh zsh-theme-powerlevel10k archey4 ddd xnview-xnsketch-bin \
 				  scc-bin dbgl pipes.sh 
@@ -34656,7 +34756,6 @@ THE ONION WEB / TOR WEB
 
 
 	ENABLING CLIPBOARD FOR NVIM EDITOR
-
 		Recommended reading:
 			SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
 
@@ -34943,6 +35042,288 @@ THE ONION WEB / TOR WEB
 			[file: /etc/environment ]
 				PULSE_SERVER=unix:/mnt/wslg/PulseServer
 			[/file]
+
+	THE VERY BASICS ABOUT USER AND GROUP OWNERSHIP
+		Any data on your hard disk contains meta-data about who and which group it belongs to and what they 
+		can both do with the given data; it also contains information regarding what other users can do 
+		with the data.
+
+		Note: While just the basics are given here, know that you can use 'find', 'awk' and even 'sed' to do
+		more things regarding ownership and permissions.
+
+		LISTING OWNERSHIP AND PERMISSIONS OF A GIVEN FILE OR DIRECTORY USING 'GETFACL'
+			SYNTAX:
+				$ getfacl ./<path_to_directory_or_file>
+
+			Example 1: - Simple Use - :
+				$ getfacl ./path/to/file
+
+			Example 2: - Retrieving Numeric IDs for user and group instead of names - :
+				$ getfacl --numeric ./path/to/file
+
+		LISTING USER PERMISSIONS, MASK AND OTHERS USING 'LS'
+			Using 'lsa' or 'ls -la' will display data in the following format:
+				$ lsa
+				  or
+				$ ls -la
+
+			Output:
+				drwxr-xr-x   2 user_name group_name 4.0K Jul 31  2023  'Directory Name'
+
+			
+			1 - 'Jul 31 2023' refers to the mdate, which is the Modification Date for given directory/file. 
+			On linux systems, Modification Date can't be changed and is created during file creation.
+			It's the actual birth date or creation date of the file/directory.
+
+			2 - Interpreting 'drwxr-xr-x' from left to right: 
+				2.1 - 'd' refers to directory.
+				2.2 - 'rwx' refers to 'user permission/rights' over the given directory.
+				2.3 - 'r-x' usually refers to group; HOWEVER, when a MASK exists, it always refer to the 
+				       mask permission set instead of 'group'. (Very Important)
+				2.4 - 'r-x' refers to 'other' permissions
+			
+
+		CHANGING USER-OWNER AND GROUP-OWNER OF A GIVEN DATA USING 'CHOWN'
+			It's possible to use 'chown' to change both group and user owner of a data.
+
+			A) Changing user and group of a given directory and it's files:
+				This will change the user-owner and group-owner of the file/directory.
+
+				SYNTAX:
+					# chown <username>:<groupname> -R ./<directory_name>
+
+				Example:
+					# chown another_username:another_group -R ./my_directory
+
+			B) Changing group alone for a given directory and files:
+				In here, just ommiting the <username> will suffice to change the group name:
+				SYNTAX:
+					# chown :<groupname> ./<directory_name>
+				Example:
+					# chown -R :another_group ./my_directory
+
+
+			C) Changing user alone for a given directory and files:
+				SYNTAX:
+					# chown another_username: ./<directory_name>
+				Example:
+					# chown -R another_username: ./my_directory
+
+		CHANGING FILE MODE BITS | CHANGING PERMISSIONS/RIGHTS FOR A GIVEN DATA USING 'CHMOD'
+			It's possible to change what user-owner, group-owner and 'other users' can do with the file:
+			
+				SYNTAX:
+					# chmod <[u|g|o|a]<[+|-]>[r|w|x]> -R ./<directory_name>
+
+			A) Changing what user-owner can do with a given directory and it's files:
+
+				Example 1 - Concatenating 'write' permission for user-owner - :
+					# chmod u+w -R ./my_directory
+
+				Example 2 - Removing all 'read', 'write', 'execute' permissions for 'others' - :
+					# chmod o-rwx -R ./my_directory
+
+				Example 3 - Changing Permission set for group-owner, setting it to 'read and execute' only -:
+					# chmod g=r-x -R ./my_directory
+
+				Example 4 - Adding (read, write and execute) Permission for all 3 User-owner, 
+					    group-owner and others in one single line - :
+							# chmod a+rwx -R ./my_directory
+								or
+							# chmod u+rwx,g+rwx,o+rwx -R ./my_directory
+
+		GIVING EXTRA PERMISSION FOR OTHER USERS AND GROUPS IN A FILE/DIRECTORY USING 'SETFACL'
+			It's possible to add new owners and new groups for a given data without modifying the actual user-owner,
+		group-owner or yet giving/taking permissions from 'others'.
+
+		By creating using the ACL(access control list) feature, it's super easy managing new onwers, groups and adding
+		new permissions/rights to a given data.
+
+		NOTE 1: 'setfacl' can also be used to change current owner/group permission rights
+			instead of 'chmod', the only requirement is that the user must be the actual owner, or else
+			a new ACL Entry will be created instead. Note that 'chgrp' and 'chown' may still have to be used
+			to change the actual primary ownerships about user-owner and group-owner.
+
+		NOTE 2: In practice, the only tools you need are these:
+			2.1 - 'chown' for changing primary user and group ownership. 'chgrp' not really needed.
+			2.2 - 'getfacl' for retrieving ACL List on a given data in the filesystem.
+			2.3 - 'setfacl' for either changing or setting a new ACL entry of a given data in the filesystem
+			2.4 - Even tho 'chmod' can be completely replaced by 'setfacl', 'setfacl' doesn't uses 'a' character 
+			to setup 'user-owner', 'group-owner' and 'others' in one go as in mentioned in the previous 'example 4'.
+
+
+			PRACTICAL 'SETFACL' EXAMPLES
+				SYNTAX:
+					$ setfacl -m <[u|g|o|m]>:[<username|groupname>]:<[r|w|x]> -R ./<my_directory>
+
+					VERY IMPORTANT: -n or --no-mask allows new ACLs to be created without
+					changing/updating the current mask. This is very important on environments
+					with pre-set or already existing ACLs, since custom masks might already exist.
+						
+						For an example, read more on: 
+							SHARING SINGLE DIRECTORY WITH ANOTHER USER | RESTRICTING SOME PERMISSIONS WHILE GIVING ACCESS | RECOMMENDED
+
+					
+				A) ADDING NEW USER-OWNER AND GROUP-OWNER TO A GIVEN FILE/DIRECTORY
+					Note, the new user must already exist on the system, or else this will fail.
+
+					Example 1 - Adding new user-onwer to a given directory along with all - :
+					it's belonging files:
+						This will give 'read' and 'execute' permissions for 'another_username'
+							$ setfacl -m u:another_username:rx -R ./my_directory
+								or
+							$ setfacl -m u:another_username:r-x -R ./my_directory
+
+
+					Example 2 - Adding new group-owner to a given directory along it's files - :
+						This will give 'read' and 'execute' permissions, but take away 'write' rights
+					for 'another_username'.
+							$ setfacl -m g:another_groupname:r-x -R ./my_directory
+						
+				B) MODIFYING CURRENT USER-OWNER AND GROUP-OWNER TO A GIVEN FILE/DIRECTORY
+
+					Example 1 - Changing just the User-owner of a given directory along it's given file - :
+						$ setfacl -m u:another_username -R ./my_directory
+						
+					Example 1 - Changing just the Group of a given directory along it's given files - :
+						$ setfacl -m g:another_groupname -R ./my_directory
+
+				C) REMOVING AN EXISTING ACL
+
+					Example 1 - Removing ACL Entry for a given username - :
+						$ setfacl -x u:another_username	./my_directory
+
+
+				D) MODIFYING MASK OF A GIVEN/DIRECTORY FILE
+					Masks allows limiting what new ACLs can do with a given data,
+				without actually changing the ACL Entries themselves.
+
+				NOTE 1: By default, a Mask is either added or modified whenever a new ACL Entry is created.
+				In this case, the mask is always set to the mode bit of the ACL that requires more
+				permission/rights over the data.
+
+				NOTE 2: The masks do not give rights/permissions, they only are used for limitting access
+				for new ACL Entries and group. For example, when a mask is created with 'rw' permissions,
+				it then limits 'eXecute' permissions, restricting users from 'x' mode bit permission.
+				
+				NOTE 3: Masks have no effect against the current user-owner of the data.
+				Masks also apply no effect against 'other' users. Read 'note 2' again.
+				Masks are only applied to extra newly user-owners and group-owners and the current group-owner.
+
+					SYNTAX:
+						$ setfacl -m <[u|g|o|m]>:[<username|groupname>]:<[r|w|x]> -R ./<my_directory>
+
+					Example 1 - Clearing all mode bits, taking away all permissions/rights using Mask - :
+						$ setfacl -m m::--- -R ./my_directory
+							or
+						$ setfacl -m m:--- -R ./my_directory
+
+					Example 2 - Removing Mask from ACL -
+						$ setfacl -x m -R ./my_directory
+							or
+						$ setfacl -x m:: -R ./my_directory
+							or
+						$ setfacl -x m: -R ./my_directory
+
+						
+					Example 3 - Creating a Mask - 
+						$ setfacl -m m::rw- -R ./my_directory	
+							or
+						$ setfacl -m m:rw- -R ./my_directory	
+
+						
+					
+		SHARING SINGLE DIRECTORY WITH ANOTHER USER | RESTRICTING SOME PERMISSIONS WHILE GIVING ACCESS | RECOMMENDED
+			For giving a user directory access, you'll need to follow these steps.
+
+				1) Pretend we want 'User_B' to access a single 'User_A' directory while restricting access
+				to all other directories, 
+
+					$ /home/User_A/Documents/pdf\ files/User\ B/
+
+					Note: the only directory 'User_B' should ever have access is the 'User A' 
+					folder/directory. None of the other directories should ever allow listing 
+					or lay any other type of access for 'User B'.
+
+				2) Now add the 'User_B' ACL for these directories:
+					$ setfacl -m u:User_B:r-x /home/{User_A,User_A/Documents,User_A/Documents/pdf\ files}
+
+				3) Now create a mask that only allows 'read' for all directories, 
+				except 'User B' dir.
+					$ setfacl -m m::--x /home/{User_A,User_A/Documents,User_A/Documents/pdf\ files}
+
+					Note: This mask is going to prevent 'User_B' from reading any of the contents, but still
+					allow path access for his shared user directory named 'User B'
+
+					Very Important: Masks will be reset whenever creating a new ACL for a new User or 
+					group when using 'setfacl', unless the option -n or --no-mask is given.
+
+				4) Finally, create an ACL that allows 'read' and 'execute' mode bits for the shared directory:
+					$ setfacl -m u:User_B:r-x -R /home/User_A/Documents/pdf\ files/User\ B/
+
+					Note: 
+					4.1 - 'x' allows 'User_B' to execute tools/aliases like 'cd' for changing directory,
+					4.2 - 'lsa' ( ls -la ) for listing directory contents.
+					4.3 - 'r' allows 'User_B' to open contents inside a directory for reading, 
+					      it's not possible to use programs like 'cat' without 'r' permission.
+					4.4 - without 'w' mode bit the user can't overwrite any of the files or append data 
+					      to any of the file contents, not even create directories. 
+					      HOWEVER, 'w' mode bit can be given if so desired.
+
+				5) (OPTIONAL STEP) - Since 'User_B' can't create/edit any of the files, 'User_B' will have to rely
+				on 'User_A' for adding, editing and creating files in this case. However, depenting on the program
+				being used to create/edit/copy files used by 'User_A', 'User_B' may still end up being unable 
+				to access them due to the file(or other sub-directories) permissions not allowing 'User_B' to 
+				'Read', 'Write' or 'eXecute' them when desired. 
+				
+				In this case, there are two solutions that can be choosen here:
+
+					A) Either Re-apply or change permissions recursively
+						$ setfacl -m u:User_B:r-x -R ./home/User_A/Documents/pdf\ files/User\ B/
+						
+						Note: this will re-apply 'r-x' mode bit to all new files created, allowing 'User_B'
+						to execute programs and read them. 'w' can be added at will if so desired.
+
+					B) Applying or changing permissions to new files only:
+						$ setfacl -m u:User_B:rwx -R ./home/User_A/Documents/pdf\ files/User\ B/{.*,*}
+
+						Note: this will apply 'rwx' mode bits to files, sub-directories, hidden files and 
+						hidden sub-directories only.
+
+						Important: In this case, 'User B' directory will remain untouched and unchanged
+						if you so desire to set 'w' mode bit without changing the permissions of 'User_B' dir.
+
+				6) (RECOMMENDED) Adding extra protection:
+					You should create a mask with '--x' mode bit, for your user files and dir:
+						$ cd ~ && setfacl -m m::--x ./{,*,.*}
+							or
+						$ cd ~ && setfacl -m m::--x ./ ./{*,.*}
+
+					Note: all arguments do the exact same thing here.
+
+				7) Create a symlink for allowing 'User_B' for easily accessing the directory
+					$ ln -sf /home/User_A/Documents/pdf\ files/User\ B /home/User_B/Desktop/Shared\ User\ A\ Dir/
+
+				8) (Optional) Creating an environment variable for easily accessing the directory
+					You can also create environment variables for User_B, however i'm not covering this here.
+					You can also create env. var for User_A, since he'll also be the one copying/sharing the files 
+					with 'User_B'.
+
+
+				FINAL CONSIDERATIONS:
+					As you can see, using ACL makes this task much simplier than actually changing permissions 
+				for 'others' or adding new 'groups'. The '--x' mask prevents 'User_B' from listing any other directory,
+				but still allowing him for accessing any 'r-x' directories.
+
+				This adds up flexibility when creating/sharing new directories not only for 'User_B' but also for other
+				users, you can easily have different sharing permissions without resorting to creating new groups for
+				each new user.
+
+				NOTE: If you so desire, you can revert the whole example and share a User_B directory so that 
+				User_A can copy his own stuff for User_B, allowing him full flexibility. However, if User_B messes up
+				permission settings, masks on his end, User_A will be unable to share or fix anything on his own 
+				without administrative rights.
+
 
 	COMPILING WSL KERNEL
 		source: https://github.com/microsoft/WSL2-Linux-Kernel
