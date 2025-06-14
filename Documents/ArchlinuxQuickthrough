@@ -3,7 +3,7 @@
 {S-CHANGELOG}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
 {OPTIMIZATION, TWEAK, PERFORMANCE, [PERFORMANCE]}
-{RECOMMENDED, PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
+{IMPROVEMENT, RECOMMENDED, PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
 
 NOTES:
 	MAN PAGE SAVES LIVES
@@ -965,6 +965,26 @@ USE LICENSE:
 	SOME WINDOWS UTILITIES
 	RUNNINNG COMMAND AS ADMINISTRATOR
 	SOME WINDOWS 11 HOTKEYS
+	SOME WSL CONFIGURATION FILES | WSL SETTINGS
+	MANAGING WINDOWS ACCOUNTS
+		WINDOWS REMOTE ACCOUNTS
+		LOCAL WINDOWS ACCOUNTS
+		CONVERTING REMOTE USER ACCOUNT INTO LOCAL USER ACCOUNT
+	SOME WINDOWS PERFORMANCE IMPROVEMENT
+		ENABLING DRIVERS FOR YOUR GPU
+		DISABLING XBOX GAME BAR
+		ENABLING GAME MODE
+		DISABLING GAME DVR
+		INSTALLING DIRECT-X
+		DISABLE ENERGY ECONOMY
+		ENABLE DIRECT PLAY
+		DISABLE HYPER-V
+		DISABLE CORTANA AND CO-PILOT
+		DISABLING PAGE FILE
+	SOME NVIDIA PERFORMANCE IMPROVEMENT
+	SOME LIFE QUALITY IMPROVEMENTS ON WINDOWS
+		ENABLING HDR(HIGH DYNAMIC RANGE) ON WINDOWS
+		ENABLING DSR(DYNAMIC SUPER RESOLUTION) FOR NVIDIA CARDS ON WINDOWS
 
 	---SOME INTRODUCTION TO WSL AND ARCHLINUX
 		INSTALLING ARCHLINUX DISTRIBUTION IN WSL
@@ -973,6 +993,13 @@ USE LICENSE:
 		REMOVING A WSL DISTRIBUTION
 		ADDING AND USING A NEW REGULAR USER
 			ADDING A NEW USER TO SUDOERS LIST
+		LOGIN AS ANOTHER USER IN A WSL LINUX DISTRO
+		BASIC USER AND GROUP MANAGEMENT
+			CREATING A NEW USER
+			MODIFYING EXISTING USER
+			CREATING A NEW GROUP
+			MODIFYING AN EXISTING GROUP
+		SETTING UP SEATD ON YOUR ARCHLINUX SYSTEM | PERFORMANCE
 		SETTING UP TIME AND DATE ON THE LINUX SYSTEM
 		SETTING UP SYSTEM LOCALE IN A WSL LINUX DISTRO
 		SETTING UP TEXT FONT FAMILIES IN THE SYSTEM
@@ -981,15 +1008,16 @@ USE LICENSE:
 			INSTALLING NEW FONTS ON THE SYSTEM
 			LISTING USER INSTALLED FONTS ON THE SYSTEM
 		LISTING USER AND GROUP ENTITIES ON THE LINUX DISTRO
-		A FEW OTHER BEGINNER COMMANDS
+		A FEW LINUX BEGINNER COMMANDS
 		SETTING UP NEW DEFAULT STARTER USER FOR WSL DISTRO
 		RECOMMENDED ARCHLINUX PACKAGES FOR WSL
-		ARCHLINUX REPOSITORY
-			INSTALLING UTILITIES
+			ARCHLINUX REPOSITORY
 				INSTALLING UTILITIES
-				INSTALLING FONTS
-			AUR(ARCHLINUX USER REPOSITORY)
-			BASICS ON HOW TO USE PACMAN
+					INSTALLING UTILITIES
+					INSTALLING FONTS
+				AUR(ARCHLINUX USER REPOSITORY)
+				BASICS ON HOW TO USE PACMAN
+		STARTING DESKTOP ENVIRONMENT FROM WSL USING ARCHLINUX
 		RUNNING CLAMAV ANTI-VIRUS IN WSL
 		SETTING UP A FIREWALL WITH IPTABLES/NFTABLES IN WSL
 		ENABLING DBUS-BROKER IN WSL
@@ -1008,7 +1036,7 @@ USE LICENSE:
 			LOADING THE NEWLY CREATED ENVIRONMENT VARIABLES
 			TESTING THE NEWLY ADDED VAR
 		ALLOWING AUDIO TO BE USED BY USERS OTHER THAN ROOT
-		THE VERY BASICS ABOUT USER AND GROUP OWNERSHIP
+		THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP
 			LISTING OWNERSHIP AND PERMISSIONS OF A GIVEN FILE OR DIRECTORY USING 'GETFACL'
 			LISTING USER PERMISSIONS, MASK AND OTHERS USING 'LS'
 			CHANGING USER-OWNER AND GROUP-OWNER OF A GIVEN DATA USING 'CHOWN'
@@ -6188,8 +6216,8 @@ mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sdc7 /dev/sda4
 note.: not in order, use search function to find it:
 
 	env, dd, 
-	pstree, lslogins, 
-	uname, ipmaddr, ifcfg(old), ifconfig, su, sudo
+	pstree, lslogins, userbdctl, atop, pgrep,
+	uname, ipmaddr, ifcfg(old), ifconfig, su, sudo,
 	history, hdparm, vi, visudo, nvim, gdb, tbclock 
 	printenv, watch, bash, source, zsh, echo, gcc, g++, ***dd, kill, tune2fs, print, curl,
 	sysctl, lsusb, lspci, wc, chsh, tldr, df, du, install, diff, cp, lsmod, cat, zcat, zgrep,
@@ -6215,7 +6243,7 @@ note.: not in order, use search function to find it:
 	*aplay, *arecord, *stat, *file, fscrypt, ghex,
 	debugfs, tree, dircolors, broot, pmap,  
 	diff, cmp, comm, join, uniq, *xdelta3, *parallel, args, xargs, awk,
-	*rclone, split, dar, tar, par2 (parchive).
+	*rclone, split, dar, tar, par2 (par2cmdline).
 
 	look later:
 		dircolors for setting colors to 'ls'
@@ -34331,8 +34359,183 @@ THE ONION WEB / TOR WEB
 	SOME WINDOWS 11 HOTKEYS
 		system_key + tab		#Virtual Desktops
 		system_key + I			#Access to system settings, developer mode, etc
-	
+		system_key + r			#Execute commands
 
+	SOME WSL CONFIGURATION FILES | WSL SETTINGS
+		Reference: https://learn.microsoft.com/en-us/windows/wsl/wsl-config#wslconf
+
+		WSL offers a few different configuration files, each of them containnning different settings and configurations:
+
+			1) In this file you can set up Swap Space, Total Ammount of RAM, Default username,
+			Number of Logical Processors and also set a path for custom kernel for all WSL Distributions:
+				C:\Users\<YOUR_USERNAME>\.wslconfig needs to be created by the user
+
+				EXAMPLE:
+					[file: C:\Users\<USERNAME>\.wslconfig ]
+						[wsl2]
+						kernel="C:\\Users\\User\\.wsl-kernel\\bzImage"
+						swap=0
+						memory=9GB
+					[/file]
+
+			2) WSL also creates some configuration files after installing any linux distribution:
+				These files contain different settings:
+
+				2.1 - This file containns Network, Interop, Username created on the first run, Boot, GPU and Time settings:
+					/etc/wsl.conf is created by default inside your WSL Linux Distro
+						EXAMPLE:
+							[file: /etc/wsl.conf]
+								[boot]
+								systemd=true
+
+								[gpu]
+								enabled=true
+
+								[system-distro-env]
+								WESTON_RDP_MONITOR_REFRESH_RATE=75
+
+							[/file]
+
+				2.2 - This file contians hostname
+					/etc/wsl-distribution.conf is created by default inside your WSL Linux distro
+
+					EXAMPLE:
+						[file: /etc/wsl-distribution.conf ]
+							[oobe]
+							command = /usr/lib/wsl/first-setup.sh
+							defaultName = archlinux
+
+							[shortcut]
+							icon = /usr/lib/wsl/archlinux.ico
+
+						[/file]
+
+			3) WSL2 is installed by default with WSLg which allows Graphical User Interface to be executed by the user.
+				C:\ProgramData\Microsoft\WSL\.wslgconfig needs to be created by the user
+						
+					EXAMPLE - Setting up default refresh rate of 75Hz - :
+						[file: C:\ProgramData\Microsoft\WSL\.wslgconfig ]
+							[system-distro-env]
+							WESTON_RDP_MONITOR_REFRESH_RATE=75
+						[/file]
+
+
+	TEST YOUR MONITOR'S REFRESH RATE
+		Due to the nature of WSL and WSLg at the current state, it may not display Higher than 60Hz Refresh Rates:
+
+		ONLINE TESTS:
+			https://refresh-rate-visualizer.vercel.app/
+			https://frameratetest.com/refresh-rate-tester/
+
+	MANAGING WINDOWS ACCOUNTS
+		system_key + r >> Type in 'netplwiz'
+
+		WINDOWS REMOTE ACCOUNTS
+			Windows remote accounts can only be be accessed with an internet connection;
+		that means being offline will render you without access to your PC.
+
+		You can tell you're on a remote account when your email address is listed in it.
+
+		LOCAL WINDOWS ACCOUNTS
+			Local Windows accounts can be accessed anytime.
+
+		CONVERTING REMOTE USER ACCOUNT INTO LOCAL USER ACCOUNT
+			It'd be wise - if you're not using one-drive at all to store your local data, then
+		convert the user account to a local account to prevent being locked away from your PC.
+
+			system_key + i >> click on 'view information'/'user information' >> Click on 'Enter with your Local Acount'.
+	
+	SOME WINDOWS PERFORMANCE IMPROVEMENT
+		ENABLING DRIVERS FOR YOUR GPU
+			Type 'devmgmt.msc' >> Video Adapters >> Right-Click on your GPU >> Go to 'Driver' Tab >> Click on 'Driver Details'
+			>> Click on 'Update Drivers' >> Click on 'Manually choose a driver on your PC' >> 
+			click on 'Choose your driver from a list of available drivers' >> Choose the newer driver  
+
+			NOTE: Always Choose the newest driver. You have to install your GPU Drivers first.
+
+		DISABLING XBOX GAME BAR
+			system_key + I	>> Games >> Xbox Game Bar >> disable it
+
+		ENABLING GAME MODE
+			system_key + I	>> Games >> Game Mode >> Enable it
+
+		DISABLING GAME DVR
+			1) Open regedit and edit:
+				Computer\HKEY_CURRENT_USER\System\GameConfigStore >> set GameDVR_Enabled to '0'
+
+
+			2) Open regedit and edit:
+				Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR
+				>> set value to '0'
+
+		INSTALLING DIRECT-X
+			https://www.microsoft.com/en-us/download/details.aspx?id=35
+
+		DISABLE ENERGY ECONOMY
+			system_key + I >> System >> Disable Energy Economy
+
+		ENABLE DIRECT PLAY
+			Type OptionalFeatures.exe >> Legacy Components >> Direct Play
+
+		DISABLE HYPER-V
+			If you're sure that you might not need 'Hyper-V', you can disable it:
+
+				Type OptionalFeatures.exe >> Uncheck 'Hyper-V' option.
+			
+			Note: Hyper-v is only meant for virtual machines(VMs) for better interfacing Storage Devices for better performance.
+			However, Hyper-V has huge impact on GPU, Memory and other hardware devices performances for programs/software that don't need Hyper-V.
+			
+		DISABLE CORTANA AND CO-PILOT
+			No instructions.
+
+		DISABLING PAGE FILE
+			Only disable the Page File / Disk Swap Cache if you have more than enough Physical RAM, otherwise you'll get BSODs often.
+				run 'SystemPropertiesAdvanced.exe' as administrator by typing on search box and right-clicking for to launch it with admin rights >> ...
+				... >> Go to "Advanced" tab >> go to "Performance" and click on "Settings" >> Click on "Advanced" >> ...
+				... >> Disable by choosing 'No Page File' and then apply it.
+
+	SOME NVIDIA PERFORMANCE IMPROVEMENT
+		1 - Go to Nvidia Settings >> 3D Settings >> Managing 3D Settings >> Global 3D Settings:
+			1.1 - Set Energy Management to: Maximum Performance
+			1.2 - Anti-Aliasing: Disabled
+			1.3 - Cache Shader: Disabled
+				Enabling it will allow faster loading, however it will "burn" your hard disk overtime, since lots of Disk I/O will be done in it.
+				If you have a good CPU and large ammounts of RAM, disable this for the best.
+				Hard Disks aren't faster than RAM, while disk caching might allow for some faster load times, it's no guarantee that execution will be faster. 
+				Whenever programs need access to disk cache(when available), they'll read data and/or copy it to RAM(for faster reads) at hard-disk speeds,
+				therefore creating a bottleneck.
+
+		2 - Go to Nvidia Settings >> Image Settings >> set to maximum Performance instead of quality.
+
+
+	SOME LIFE QUALITY IMPROVEMENTS ON WINDOWS
+
+		ENABLING HDR(HIGH DYNAMIC RANGE) ON WINDOWS
+			You need an HDR Enabled Monitor for this:
+				There are two ways for doing this:
+					A) Using windows:
+						System_Key + I >> Click on Display / Monitor >> HDR >> Enable it from there
+
+					B) When windows doesn't shows this option itself, you may have to enable it by hand by using the buttons on the monitor itself.
+						This should work the same, even if windows can't see it enabled.
+
+			Personal Note: In short words, HDR is a feature that enhances light parts of an image with a wider range of limunosity and dark spots of an image with less,
+			allowing image features that couldn't be well observed to be evenly seen.
+
+		ENABLING DSR(DYNAMIC SUPER RESOLUTION) FOR NVIDIA CARDS ON WINDOWS
+			If you're using a low/mid-end monitor, DSR allows you to use higher resolutions than your monitor can support.
+			It achieves this by using your display's native resolution and upscaling it internally with the GPU.
+
+			DSR also allows using unsupported 'Refresh Rates' at Higher Resolutions when your monitor can't support higher refresh rates outside the supported Native Resolution.
+			Example: Some monitor may allow 75Hz refresh rate at 720p resolutions but only allow 60Hz refresh rate at 1080p. HOWEVER, by using Nvidia's DSR this can be changed.
+			
+			Pretty much any Nvidia GPU beyond 400 series can support DSR.
+			The only trade cost is FPS(Frames Per Second) depending on your GPU some software might run slightly slower when running at higher resolutions.
+
+		
+			1 - Go to Nvidia Settings >> 3D Settings >> Managing 3D Settings >> Global 3D Settings:
+				1.1 - Go to 'DSR - Factor' >> Enable it >> Choose 1.20 Scaling for testing
+				1.2 - Go to 'Monitor' >> click 'Change Resolution' >> Choose one of the 'Super Dynamic Resolutions' and apply it.
 
 ---SOME INTRODUCTION TO WSL AND ARCHLINUX
 	INSTALLING ARCHLINUX DISTRIBUTION IN WSL
@@ -34444,6 +34647,155 @@ THE ONION WEB / TOR WEB
 				Note: if installation succeeds, then you've successfully added yourself to sudoers list.
 
 
+	LOGIN AS ANOTHER USER IN A WSL LINUX DISTRO
+		NOTE: Using machinectl is important for setting XDG_RUNTIME_DIR and some other WSL env. vars, just in case you ever need it.
+		
+		# machinectl shell --uid=<username>
+			or
+		$ sudo -iu <username>
+
+
+	BASIC USER AND GROUP MANAGEMENT
+
+			CREATING A NEW USER
+				1) First create the user:
+					Note: Choose 'A' or 'B'
+
+					A) Creating user using the default home directory /home/<USERNAME>/ :
+						# useradd --shell /usr/bin/zsh --create-home <user_name>
+							or
+						# useradd -s /usr/bin/zsh -m <user_name>
+
+					B) Creating user in a specific home directory
+						# useradd --shell /usr/bin/zsh --create-home --home-dir <path_to_home> <USERNAME>
+							or
+						# useradd -s /usr/bin/zsh -m -d <path_to_home> <USERNAME>
+							or
+						# useradd -s /usr/bin/zsh -md <path_to_home> <USERNAME>
+
+						EXAMPLE:
+							# useradd -s /usr/bin/zsh -md /home/NEW_USER NEW_USER
+						
+
+				2) Change password for the user:
+					# passwd <USERNAME>
+
+				3) Login as another user:
+					$ su - <username>
+						or
+					$ sudo -iu <username>
+						or
+					# machinectl shell --uid=<username>
+
+				4) (Optional) Run command or program as another user:
+					$ sudo -iu <username> <command>
+
+					example:
+						$ sudo -iu spamtla firefox
+
+				5) (Optional) Run command as another group:
+					$ sudo -ig <groupname> <command>
+
+				6) (Optional) Run command as different user and different group:
+					$ sudo -iu <username> -ig <groupname> <command>
+
+				7) (Optional) Running command as root/admin:
+					$ sudo <command>
+
+				8) (Optional) Running a she session as a different user:
+					$ sudo -iu <username>
+						or
+					$ sudo -iu <username> /usr/bin/zsh
+
+				9) (Optional) Running a program as different group:
+					$ sudo -g <username> <program_name>
+
+				NOTE: You can check the veracity of these optional commands by using 'pgrep' on a different terminal tab after running them:
+					$ pgrep --list-name -G <Groupname>
+						or
+					$ pgrep --list-name -U <Username>
+
+				HINT: you can use 'userdbctl' and 'lslogins' to list all users on a system.
+				'getent groups' to list all groups.
+				
+					RECOMMENDED READINGS:
+						ADDING A NEW USER TO SUDOERS LIST
+						LISTING USER AND GROUP ENTITIES ON THE LINUX DISTRO
+						A FEW LINUX BEGINNER COMMANDS
+
+			MODIFYING EXISTING USER
+				A) Adding user to an existing group
+					# usermod -aG group1 group2 <USERNAME>
+						or
+					# gpasswd -a <USERNAME> group1
+					# gpasswd -a <USERNAME> group2
+
+				B) Removing user from groups
+					# usermod -rG group1 group2 <USERNAME>
+						or
+					# gpasswd -d <USERNAME> group1
+					# gpasswd -d <USERNAME> group2
+
+				C) Changing a user's shell:
+					# usermod --shell <SHELL> <USERNAME>
+						or
+					# usermod -s <SHELL> <USERNAME>
+
+					example:
+						# usermod --shell /usr/bin/zsh <USERNAME>
+
+				D) Moving user's home to a new directory:
+					# usermod --move-home --home <PATH_TO_NEW_HOME> <USERNAME>
+						or
+					# usermod -m -d <PATH_TO_NEW_HOME> <USERNAME>
+						or
+					# usermod -md <PATH_TO_NEW_HOME> <USERNAME>
+
+			CREATING A NEW GROUP
+				A) Creating a regular group:
+					# groupadd <GROUPNAME>
+
+				B) Creating a system group:
+					# groupadd --system <GROUPNAME>
+
+			MODIFYING AN EXISTING GROUP
+				A) Changing a group's name:
+					# groupmod --new-name <NEW_GROUP_NAME> <CURRENT_GROUP_NAME>
+						or
+					# groupmod -n <NEW_GROUP_NAME> <CURRENT_GROUP_NAME>
+
+				B) Adding users to group list:
+					Note: This is the same as using 'usermod -aG'
+
+					# groupmod -aU group1 group2 <USERNAME>
+
+
+	SETTING UP SEATD ON YOUR ARCHLINUX SYSTEM | PERFORMANCE
+		'seatd', a compositor-agnostic session management daemon, can contribute to better performance on Linux systems, particularly in multi-seat or virtualized environments, 
+		by optimizing resource allocation and access to hardware. It allows for fine-grained control over which user has access to which hardware devices, reducing overhead and potential conflicts:
+
+		1) Install seatd
+			# pacman -S seatd
+		
+		2) Enable the service:
+			# systemctl enable seatd
+			# systemctl start seatd
+
+		2) Add user to both 'seat' and 'video' group:
+			# gpasswd -a <username> video
+			# gpasswd -a <username> seat
+				or
+			# usermod -aG video seat spamtla
+			 
+		3) Restart the service:
+			# systemctl restart seatd
+
+		4) restart your WSL Virtual Machine from scratch:
+			Save all your work before you progress with the following step.
+				From a Windows Power Shell session, type:
+					$ wsl --shutdown
+				
+
 	SETTING UP TIME AND DATE ON THE LINUX SYSTEM
 		If you're using Linux on WSL(Windows Subsystem for Linux) you do not have to setup time/date.
 		However, i'm still leaving this here for reference for those who might wish to do something.
@@ -34519,10 +34871,14 @@ THE ONION WEB / TOR WEB
 				or
 			# getent shadow
 
+			# userdbctl
+
+			# lslogins
+
 		2) Listing all groups on the system:
 			# getent group
 	
-	A FEW OTHER BEGINNER COMMANDS
+	A FEW LINUX BEGINNER COMMANDS
 		Aside from a few of the commands already mentioned in the other topics,
 		there are still a few ones worth mentioning:
 
@@ -34533,7 +34889,11 @@ THE ONION WEB / TOR WEB
 				$ tldr gpg
 
 		2) Listing all logins in the system
-			$ lslogins
+			2.1) Listing current logins in the system:
+				$ lslogins
+			
+			2.2) Listing all users in the system:
+				$ userdbctl
 
 		3) Listing file descriptors
 			Lists all files hold by running or zombie processes:
@@ -34633,7 +34993,11 @@ THE ONION WEB / TOR WEB
 		23) Make pipes appear in your terminal ( Requires installing it from AUR - pipes.sh package ):
 			$ pipes.sh
 
-		24) Make a cow say something on commandline:
+		24) Using pgrep to list processes by USER name or GROUP name:
+			24.1 - Lists all procceses executed by Group video:
+				$ pgrep --list-name -G video 
+
+		25) Make a cow say something on commandline:
 			$ cowsay -y -W 12 "Archlinux is NOT for everyone"
 
 			Resulting output will be:
@@ -34658,8 +35022,10 @@ THE ONION WEB / TOR WEB
 		IMPORTANT: It's advisable to just use 'sudo' to log into another user, for now.
 		
 	RECOMMENDED ARCHLINUX PACKAGES FOR WSL
-		NOTE: Depending on how long this has been updated, some packages might be unavailable at the time.
-		since archlinux is a rolling release distro, some packages might just not work anylonger.
+		NOTE: Depending on how long this list has been updated, some packages might be unavailable at the time.
+		since archlinux is a rolling release distro, some packages might just not work anylonger while some others might just be too old.
+
+		Note: You'll need to double check on what you need and what you don't need AND also check on what works and what doesn't works.
 
 		These are merely options, you can either opt in or out of one or more of these packages depending on your needs:
 
@@ -34672,7 +35038,7 @@ THE ONION WEB / TOR WEB
 				  clamav clamtk arch-install-scripts apparmor wireshark-qt screen testdisk \
 				  clock-tui cool-retro-term dosbox podman gimp glances torbrowser-launcher systemd-ui \
 				  scrot ugrep ripgrep sed memtester lsof hwinfo cowsay gdb cmus ibus flatpak \
-				  calc libreoffice icu
+				  calc libreoffice icu xfce4 glxinfo mesa-demos seatd atop
  
 		
 				Note: When installing firefox, choose 'wireplumber' for audio support.
@@ -34731,6 +35097,16 @@ THE ONION WEB / TOR WEB
 
 			note 7 - Upgrading only AUR packages:
 				$ yay -Syua
+
+
+	STARTING DESKTOP ENVIRONMENT FROM WSL USING ARCHLINUX
+		NOTE: At the current state, WSL defaults to wayland, so DEs that require Xorg/startx might not work at all.
+
+		Starting xfce4 directly without Using a Display Manager:
+			$ xfce4-session
+
+			Note: You can simply logout to shutdown the desktop environment,
+			
 
 	RUNNING CLAMAV ANTI-VIRUS IN WSL
 		From this point forward you'll have to look for things on your own:
@@ -35043,7 +35419,7 @@ THE ONION WEB / TOR WEB
 				PULSE_SERVER=unix:/mnt/wslg/PulseServer
 			[/file]
 
-	THE VERY BASICS ABOUT USER AND GROUP OWNERSHIP
+	THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP
 		Any data on your hard disk contains meta-data about who and which group it belongs to and what they 
 		can both do with the given data; it also contains information regarding what other users can do 
 		with the data.
