@@ -963,7 +963,14 @@ USE LICENSE:
 
 ---SOME WINDOWS STUFF:
 	SOME WINDOWS UTILITIES
-	RUNNINNG COMMAND AS ADMINISTRATOR
+	RUNNING COMMAND AS ADMINISTRATOR
+	VERY BASICS ON FILESYSTEM CHECK DISK AND OTHER TOOLS | RECOMMENDED READING
+		CHKDSK TOOL SUMMARY
+			SCHEDULING FILESYSTEM CHECK DISK
+		SFC TOOL SUMMARY
+		DISM TOOL SUMMARY
+		RUNNING FILESYSTEM CHECK ON A WSL DISTRO
+			FILESYSTEM CHECK FOR LINUX DISTROS | EXT4 ONLY
 	SOME WINDOWS 11 HOTKEYS
 	SOME WSL CONFIGURATION FILES | WSL SETTINGS
 	MANAGING WINDOWS ACCOUNTS
@@ -34353,9 +34360,158 @@ THE ONION WEB / TOR WEB
 		taskkill.exe /pid <prorgam_pid> /t /f	#Kills runnning process by it's PID
 
 
-	RUNNINNG COMMAND AS ADMINISTRATOR
+	RUNNING COMMAND AS ADMINISTRATOR
 		$ runas.exe /user:Administrator "cmd"
 	
+
+	VERY BASICS ON FILESYSTEM CHECK DISK AND OTHER TOOLS | RECOMMENDED READING
+		Three important tools exist for finding errors, fixing them and maintainning system health:
+
+			A) chkdsk:
+				Can fix filesystem errors.
+
+			B) sfc:
+				Can fix and repair Windows System Files, relies on the 'Component Store' for replacing files.
+
+			C) dism:
+				Can fix the 'component store' required by SFC.
+
+			NOTE: Use these tools often if your PC often suffers from Power Blackouts.
+			After power blackouts or full system crashes, most of the times windows will simply skip 
+			doing these tasks on it's own and will simply assume there are no errors.
+
+		CHKDSK TOOL SUMMARY
+			SOURCE: https://www.avg.com/en/signal/how-to-use-chkdsk-windows
+
+			SCHEDULING FILESYSTEM CHECK DISK
+				In a power shell terminal, type:
+					chkdsk /f
+
+			1) chkdsk /f
+				/f - The “f” stands for “fix,” and here it means fixing the file system information
+				so that it directs you to the right files.
+
+			2) chkdsk /r
+				Before running chkdsk '/r', you should backup important data to another storage device, 
+				they may get deleted after 'chkdsk' completes. '/r' gets rid of corrupt data in your hard disk.
+
+				running chkdsk /r implies in /f /r
+
+
+			3) chkdsk /x
+				Dismounts the drive before running CHKDSK, which may be necessary to get it to run.
+
+			4) chkdsk /f /r /x
+				Runs the /f and /r commands on a dismounted drive.
+
+			5) chkdsk /scan
+				Scans the disk without dismounting it (only possible with NTFS Filesystem).
+
+			6) chkdsk /b
+				Resets the list of bad clusters (damaged parts of the disk) and re-scans for the same.
+
+			7) chkdsk /v
+				Checks the disk, but displays the names of the files as it’s doing so.
+
+			8) chkdsk /i
+				A quicker and less thorough scan, where index entries are skimmed rather than checked deeply.
+
+			9) chkdsk /c
+				Another type of superficial scan, which doesn’t check cycles in folders.
+
+		SUMMARY OF SFC ARGUMENTS
+			SOURCE: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sfc
+
+			SFC can check the system files integrity and fix them. Running these commands requires Admin Rights.
+			
+			NOTE: SFC relies on component store to fix and replace files, if the component store is damaged,
+			'sfc' will fail repairing the windows system files. Because of this, it's important to use DISM tool,
+			to ensure that the component store is fully functional.
+
+			SFC can introduce even more system file corruption if the 'component store' is not 100% healthy.
+
+			VERY IMPORTANT: It's very important to execute DISM from time to time to ensure the component store is
+			healthy so that 'sfc' can fix windows system files when problem arises.
+
+			1) sfc /scannow
+				Scans the integrity of all protected system files and repairs files with problems when possible.
+
+			2) sfc /verifyonly
+				Scans the integrity of all protected system files, without performing repairs.
+
+			3) sfc /scanfile <file>
+				Scans the integrity of the specified file (full path and filename) and attempts to repair any 
+				problems if they're detected.
+
+			4) sfc /verifyfile <file>
+				Verifies the integrity of the specified file (full path and filename), without performing repairs.
+
+			5) sfc /scanfile=<file> /offbootdir=<offline boot directory>  /offwindir=<offline windows directory>
+				/offbootdir Specifies the location of the offline boot directory for offline repair.
+				/offwindir Specifies the location of the offline windows directory, for offline repair.
+
+				Example:
+					sfc /scanfile=D:\windows\system32\kernel32.dll /offbootdir=D:\ /offwindir=d:\windows
+
+			6) sfc /verifyfile /offlogfile=<log file path>
+				Specifies a location to store the log file other than the default.
+				
+				Example:
+					sfc /verifyfile /offlogfile=<log file path>
+
+			7) sfc /?
+				Displays help at the command prompt.
+
+		SUMMARY OF DISM ARGUMENTS
+			SOURCE: https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/what-is-dism?view=windows-11
+
+			DISM is a Deployment Image Servicing and Management. 
+
+			DISM can be used to mount and service a Windows image from a .wim, .ffu, .vhd, or a .vhdx file 
+			and also to update a running operating system.
+
+			VERY IMPORTANT: DISM can be used with target images of older Windows operating systems, 
+			but not with target images of operating systems that are more recent than the installed version of DISM. 
+
+			
+			1) DISM /Online /Cleanup-Image /CheckHealth
+				This will check health of the recovery image.
+
+			2) DISM /Online /Cleanup-Image /ScanHealth
+				Does the same as the above, but does a more advanced scan. Takes much longer to finish.
+
+			3) DISM /Online /Cleanup-Image /RestoreHealth
+				Scans and repairs common issues automatically.
+
+			4) DISM /Online /Cleanup-Image /RestoreHealth /Source:G\Sources\install.wim /LimitAccess
+				Restores recovery image using a .wim image. It limits windows auto-update.
+
+			Note 1: After a system checkup (Using instruction 1 or 2 above), DISM will let you know when the
+			'component store' is corrupt after finishing the scan.
+
+			Note 2: When reapiring the 'component store' DISM may get stuck, however it's possible to track down
+			the reason why it's stuck by typing on the terminal:
+				notepad.exe C:\WINDOWS\Logs\DISM\dism.log
+
+			It's highly suggested to wait until it's finished, since DISM can download huge files using windows update 
+			tool.
+
+			These are some known states for DISM downloaded files:
+				A) DISM_INSTALL_STATE_INSTALLED meaning that the file was completely missing and replaced.
+				B) DISM_INSTALL_STATE_SUPERSEDED meaning that the file was corrupted and replaced. 
+				C) DISM_INSTALL_STATE_STAGED meaning that the file has been downloaded.
+
+
+		RUNNING FILESYSTEM CHECK ON A WSL DISTRO
+			If you were using a Linux Distro in a virtual machine before a full system crash or power blackout,
+			you might need to execute 'fsck' as well.
+
+			FILESYSTEM CHECK FOR LINUX DISTROS | EXT4 ONLY
+				This will only cover how to run 'fsck' for both fixing and optimizing EXT4 partitions,
+			read the following topic for more information:
+				BARE MOUNTING DEVICES
+
+				
 	SOME WINDOWS 11 HOTKEYS
 		system_key + tab		#Virtual Desktops
 		system_key + I			#Access to system settings, developer mode, etc
@@ -34444,6 +34600,9 @@ THE ONION WEB / TOR WEB
 		convert the user account to a local account to prevent being locked away from your PC.
 
 			system_key + i >> click on 'view information'/'user information' >> Click on 'Enter with your Local Acount'.
+
+			NOTE: You might lose all your system restore points after migrating to a remote account, 
+			remember to do a new one.
 	
 	SOME WINDOWS PERFORMANCE IMPROVEMENT
 		ENABLING DRIVERS FOR YOUR GPU
@@ -35181,7 +35340,7 @@ THE ONION WEB / TOR WEB
 
 							# wsl --mount \\.\PHYSICALDRIVE0 --bare
 
-						4) Go into another linux distro and finallly list and mount it from there:
+						4)(OPTIONAL) Go into another linux distro and finallly list and mount it from there:
 							4.1 - Listing
 								$ lsblk
 								# blkid
