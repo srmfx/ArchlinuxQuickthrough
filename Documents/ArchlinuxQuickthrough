@@ -7190,13 +7190,23 @@ gpg --delete-secret-keys <keyname | username>
 gpg --delete-secret-and-public-key <keyname | username> 
 	#Deletes both public and secret keys!!! - VERY GOOD - VERY IMPORTANT COMMAND
 
-gpg --out <new_key> --export <username | keyname>
+
+gpg --out <new_key> --export <USERNAME>
+	or
+gpg --out <new_key> --export <KEYNAME>
 	#Export/Save key as a file - VERY GOOD - VERY IMPORTANT COMMAND
 		example:
 			#gpg --out /my_key_file --export fscrypt_key
 
+
+
 gpg --out <new_key> --export-secret-keys
+	or
 gpg --out <new_key> --export-secret-subkeys
+	or
+gpg --export-secret-keys <email_address> > ~/secret_key.key
+	or
+gpg --export-secret-keys <KEYNAME> > ~/secret_key.key
               Same  as --export, but exports the secret keys instead.  The exported keys are written to STDOUT or to
               the file given with option --output.  This command is often used along with the option --armor to  al‐
               low  for  easy  printing of the key for paper backup; however the external tool paperkey does a better
@@ -7211,7 +7221,12 @@ gpg --out <new_key> --export-secret-subkeys
 
               GnuPG may ask you to enter the passphrase for the key.  This is required, because the internal protec‐
               tion method of the secret key is different from the one specified by the OpenPGP protocol. - 
+
 	      ^ VERY IMPORTANT
+
+	      EXAMPLE:
+			gpg --export-secret-keys my_email@hotmail.com > ~/secret_key.key
+
 
 gpg --import <filename>
 	#Imports the given key to the local keyring - VERY GOOD - VERY IMPORTANT COMMAND
