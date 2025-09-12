@@ -1037,6 +1037,7 @@ USE LICENSE:
 		MOUNTING DEVICES IN WSL
 			FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
 			MOUNTING DEVICES ON WSL
+			UMOUNTING DEVICES ON WSL
 				BARE MOUNTS
 					BARE MOUNTING DEVICES
 					BARE MOUNTING WSL .VHDX IMAGES
@@ -35857,8 +35858,19 @@ SOME BROOT FILE EXPLORER
 				Note: Hard Disks with multiple partition need to specify the partition to be mounted as below.
 
 				Example: 
-					$ wsl --mount \\.\PHYSICALDRIVE0 --partition 2
+					$ wsl --mount \\.\PHYSICALDRIVE1 --partition 2
 			
+
+		UMOUNTING DEVICES ON WSL
+			VERY IMPORTANT: Before unmounting make sure to use 'lsblk' to ensure no loop devices or 
+			any other devices are mounted. Also make sure that no processes are using the physical device
+			using 'lsof' before umounting:
+
+				$ wsl --unmount \\.\PHYSICALDRIVE1 --partition 2
+
+
+				NOTE: You can optionally use 'wsl --shutdown' if you're 100% sure no running process
+				or mounted device is holding the device.
 
 			BARE MOUNTS
 				Bare mounts allows to load a storage device without actually mounting it,
