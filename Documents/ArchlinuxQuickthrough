@@ -5732,10 +5732,10 @@ CLEANING COMMIT HISTORY - THE EASIER WAY
 
 			git push --force
 				or
-			git push --force <branch> <remote>
+			git push --force <remote> <branch>
 
 			Example:
-				git push --force main origin
+				git push --force origin main
 
 		3 - (Optional) You might need to clean reference logs:
 				CLEANING REFERENCE LOGS
