@@ -707,6 +707,7 @@ USE LICENSE:
 			MOZILLA FIREFOX HOTKEYS
 			ENABLING CARET MODE  IN FIREFOX
 			WORKAROUND FOR FIREFOX IN RAMDISK
+			RESTORING MOZILLA SESSION
 
 		--BASICS PART 2
 			ENABLING VSYNC FOR NVIDIA
@@ -934,6 +935,8 @@ USE LICENSE:
 		HOW TO COMPILE YOUR PROGRAMS THROUGH YAY AND PACMAN FOR PERFORMANCE GAINS
 		SETTING CPU SCALING GOVERNOR TO MAXIMUM PERFORMANCE
 		INCREASING EMULATOR PERFORMANCE
+			FIXING AUDIO CRACKLING / AUDIO STUTTER FOR SNES9X UNDER WSL LINUX
+			FRAME INTERPOLATION | FRAME GENERATION
 		FILE UPLOAD
 		MISC LINKS
 			AI / ARTIFICIAL INTELLIGENCE
@@ -1002,6 +1005,7 @@ USE LICENSE:
 		INSTALLING ARCHLINUX DISTRIBUTION IN WSL
 			WSL DEFAULT WINDOWS LOCATION FOR LINUX DISTROS
 			LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
+			LISTING ALL AVAILABLE BLOCK DEVICES FOR MOUNTING IN WSL
 		REMOVING A WSL DISTRIBUTION
 		ADDING AND USING A NEW REGULAR USER
 			ADDING A NEW USER TO SUDOERS LIST
@@ -1038,6 +1042,7 @@ USE LICENSE:
 			FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
 			MOUNTING DEVICES ON WSL
 			UMOUNTING DEVICES ON WSL
+				UMOUNTING DEVICES MANUALLY ON WSL LINUX DISTRO
 				BARE MOUNTS
 					BARE MOUNTING DEVICES
 					BARE MOUNTING WSL .VHDX IMAGES
@@ -1098,7 +1103,7 @@ USE LICENSE:
 		MULTITAIL COMMAND - USING LESS FOR THE SAME TASK ABOVE
 	DIFFERENCE BETWEEN SUDO, SU AND RUN0
 	RUNNING COMMANDS MULTIPLE TIMES IN LINUX | ITERATIVE LOOPS | ITERATION
-	FRAME INTERPOLATION
+	FRAME INTERPOLATION | FRAME GENERATION
 	HTOP HOTKEYS
 	TOP HOTKEYS
 	WEECHAT HOTKEYS
@@ -1151,8 +1156,9 @@ USE LICENSE:
 		GIT OAUTH TOKEN | VERY IMPORTANT 2023
 		GIT GPG - SIGNING GITHUB COMMIT LOCALLY AND REMOTELY | VERY IMPORTANT(2024):
 		GIT TROUBLESHOOTING
+			CLEANING COMMIT HISTORY - THE EASIER WAY
 			CLEANING COMMIT HISTORY FROM MAIN BRANCH
-				CLEANING REFERENCE LOGS
+			CLEANING REFERENCE LOGS
 	TUTORIAL AWESOME-WM
 	TUTORIAL DWM / I3-WM 2020
 	NEW QEMU TUTORIAL 2020.2-T
@@ -1329,7 +1335,7 @@ New Syntax(2023):
 
 2025 - April:
 	--Day 21:
-		FRAME INTERPOLATION
+		FRAME INTERPOLATION | FRAME GENERATION
 		USING AND MANAGING DIFFERENT PROFILES ON MOZILLA
 		SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER | LIST OF UNSAFE DIRECTORIES
 		BATCH CONVERSION OF MULTIPLE VIDEOS INTO COMPRESSED FORMAT
@@ -5709,8 +5715,33 @@ git reflog example:
 
 GIT TROUBLESHOOTING 
 ------
-CLEANING COMMIT HISTORY FROM MAIN BRANCH:
-	Easiest way, but shouldn't be done on a public branch:
+CLEANING COMMIT HISTORY - THE EASIER WAY
+	Should be avoided on a public branch:
+		1 - Do a git reset to the initial commit or any other desired commit:
+			git reset <commit_id>
+				or
+			git reset --mixed <commit_id>
+
+			*as of this date, git reset defaults to --mixed
+
+			Examples:
+				git reset HEAD~3		## Resets branch to the third prior commit,
+								   keeps all current files and folders.
+
+		2 - Git push to remote repo:
+
+			git push --force
+				or
+			git push --force <branch> <remote>
+
+			Example:
+				git push --force main origin
+
+		3 - (Optional) You might need to clean reference logs:
+				CLEANING REFERENCE LOGS
+
+CLEANING COMMIT HISTORY FROM MAIN BRANCH
+	A more difficult way, should be avoided on a public branch:
 		1 - The Method in here deletes the main branch and re-creates it as an orphan branch, cleaning all of the commit's history:
 			1.1 - (Optional) If you want to clone the main branch into another branch for safety:
 				$ git checkout main
@@ -5743,30 +5774,35 @@ CLEANING COMMIT HISTORY FROM MAIN BRANCH:
 			throw away the branch created on step #1.1f:
 				$ git branch -df <branch_name_from_step_1>
 
-		
-			CLEANING REFERENCE LOGS
-				1 - (Optional) reference logs are still kept even after deleting a branch
-				you can check using the following command:
-				Note: Orphaned reference logs aren't kept on remote side at github.
-					$ git log --reflog
-						or
-					$ git log --reflog --graph --decorate --all --oneline
+			2 - (Optional) You might need to clean reference logs:
+					CLEANING REFERENCE LOGS
 
-				2 - (Optional) Create a branch to protect the creation orphaned commit
-					If you want to protect any of the orphaned reflog, you can use this here:
-					2.1 - First, checkout to the commit you want to save using this:
-						$ git checkout <commit_id_you_want_to_preserve> -b <branch_name>
 
-				3 - (Optional) - Use the garbage collection for removing everything that has no reference:
-					$ git gc --prune=now --aggressive
+CLEANING REFERENCE LOGS
+	Github doesn't stores any logs, only do this if you need to clean them on your local git repo.
 
-				4 - Clearing the reflog:
-					Note: Orphaned reference logs aren't kept on remote side at github, this command is only here
-				to clean it on the local repository:
-				 
-					$ git reflog expire --expire-unreachable=now --all
-						or
-					$ git reflog expire --expire=90.days.ago --expire-unreachable=now --all
+	1 - (Optional) reference logs are still kept even after deleting a branch
+	you can check using the following command:
+	Note: Orphaned reference logs aren't kept on remote side at github.
+		$ git log --reflog
+			or
+		$ git log --reflog --graph --decorate --all --oneline
+
+	2 - (Optional) Create a branch to protect the creation orphaned commit
+		If you want to protect any of the orphaned reflog, you can use this here:
+		2.1 - First, checkout to the commit you want to save using this:
+			$ git checkout <commit_id_you_want_to_preserve> -b <branch_name>
+
+	3 - (Optional) - Use the garbage collection for removing everything that has no reference:
+		$ git gc --prune=now --aggressive
+
+	4 - Clearing the reflog:
+		Note: Orphaned reference logs aren't kept on remote side at github, this command is only here
+	to clean it on the local repository:
+	 
+		$ git reflog expire --expire-unreachable=now --all
+			or
+		$ git reflog expire --expire=90.days.ago --expire-unreachable=now --all
 
 
 ------
@@ -6286,6 +6322,7 @@ note.: not in order, use search function to find it:
 	debugfs, tree, dircolors, broot, pmap,  
 	diff, cmp, comm, join, uniq, *xdelta3, *parallel, args, xargs, awk,
 	*rclone, split, dar, tar, par2 (par2cmdline).
+	*strace
 
 	look later:
 		dircolors for setting colors to 'ls'
@@ -6335,7 +6372,7 @@ $ man --apropos "search_string"  		#Search for manpages containing a search stri
 						^ ex.: man --apropos "xorg.conf"
 ---
 -------------------------------
-#!/usr/bin/env zsh				#Shebang line for executing scripts on linux distros.
+#!/usr/bin/env zsh				#Shebang line for executing zsh scripts on linux environmnents.
 						Note: A shebang must be added on the first line of a given script.
 						ex: 
 							#!/usr/bin/env -S python3 -c
@@ -13200,6 +13237,35 @@ MOZILLA FIREFOX TIPS
 	ctrl + mouse_click	#Opens link in new tab
 
 
+	RESTORING MOZILLA SESSION
+		Aside from using 'ctrl + shift + t', it's also possible to restore lost mozilla sessions by
+		retrieving the backup files, this method is the best one since the prior requires you to remember
+		which tabs you had open:
+
+		1) Shutdown Firefox
+
+		2) Default Location for Mozilla Profiles:
+			 ~/.mozilla/firefox
+
+		3) By launching firefox using the following argument 'firefox -P' from the commandline,
+		it's possible to fetch the name of the current default profile as well as other profiles.
+
+		4) From commandline, change directory to your mozilla profile:
+			$ cd ~/.mozilla/firefox/xky2do8r.default-release
+
+		5) Backup your mozilla session store directory:
+			$ cp -ar ./sessionstore-backup ./sessionstore-backup-1
+
+		6) (Optional) Just in case, backup your current session:
+			$ cp -ar ./sessionstorage.jsonlz4 ./sessionstorage.jsonlz4-1
+
+		7) Listing available sessions:
+			$ ls -lh ./sessionstore-backup-1
+
+		8) Restoring a previous session by picking up one of the '.jsonlz4' files:
+			$ cp -ar ./sessionstore-backup-1/upgrade.jsonlz4-2025080716105 ./sessionstorage.jsonlz4
+
+		9) Launch Firefox
 
 ---------------------------------------
 BROWSER/OPERA HOTKEYS 2020:
@@ -16147,6 +16213,9 @@ TERMINOLOGY/YAKUAKE/SOME TERMINALS SHORTCUT/HOTKEYS KEYS:
 		ctrl+shift+m	#Displays Menu Options
 				Note: Useful if your tab gets locked into read-only mode by accident.
 
+		ctrl+'+'	#Zooms in
+		ctrl+'-'	#Zooms out
+
 ctrl+shift+page_up		#[TERMINOLOGY] Creates a new window, splits terminal on the vertical
 ctrl+shift+page_down		#[TERMINOLOGY] Creates a new window, splits terminal on the horizontal.
 ctrl+shift+(			#[YAKUAKE] Splits terminal Horizontally
@@ -19033,7 +19102,7 @@ CREATING AND MOUNTING LOOP DEVICES
 1. Create a file to be used as loop-device, size 1GB (A)
 	$ dd if=/dev/zero of=<filename> bs=1G count=5
 		or
-	$ dd if=/dev/zero of=<filename> bs=200k count=2
+	$ dd if=/dev/zero of=<filename> bs=250k count=2
 
 2. Attach the file to loop device (A - optional for files larger than 500k?)
 	# losetup -f <filename>
@@ -21354,15 +21423,43 @@ example:
 				VERY IMPORTANT: you can use 'pw-top' for monitoring audio's quantum 
 				VERY IMPORTANT 2: Read topic "SETTING UP QUANTUM ON A PER APPLICATION BASIS" if you need it
 				
+			FIXING AUDIO CRACKLING / AUDIO STUTTER FOR SNES9X UNDER WSL LINUX
+				Under current WSL2 version, neither pipewire or pipewire-pulse is
+				being used. So the above work around for changing clock.force-quantum will not work and 
+				it's also not possible to setup a quantum value on a per application basis.
+
+				Because of this, you'll have to adjust the "Buffer Size" in the application manually.
+				
+				VERY IMPORTANT: 
+					Mind that this solution might not apply and work for every single use-case,
+				best thing to do is to avoid playing under WSL.
+
+				Options Tab > Preference > Sound:
+					1. Change Audio Driver from 'PulseAudio' to 'SDL'
+					2. Select and enable "Automatically Adjust Input Rate to Display"
+					3. Enable "Dynamic Rate Control"
+					4. Set "Buffer Size" as low as possible and test it in-game.
+					5. If audio is crackling, increase the value for "Buffer Size" and testing
+					until the audio crackling / audio stutter goes away.
+					6. (Optional) Set "dynamic rate limit" to "0.011". 
+					7. Restart snes9x.
+
+				You can find further troubleshooting if the problem persists:
+					https://github.com/snes9xgit/snes9x/wiki/Audio-is-crackling-or-skipping.
+-----
 		[file: /bin/snes9x-gamescope]
 			#!/bin/sh
 			#PIPEWIRE_QUANTUM doesn't works for  snes9x-gtk
 			#set -r to your actual refresh rate
 			PROTON_ENABLE_NVAPI=1 ENABLE_VKBASALT=1 gamescope --backend wayland --force-grab-cursor -w 1280 -h 768 -W 1280 -H 1024 -S stretch -f --force-windows-fullscreen -r 75 -- /bin/snes9x-gtk "$@"
 		[/file]
+
 		VERY IMPORTANT: Read topic "SETTING UP QUANTUM ON A PER APPLICATION BASIS" if you need it
 
-	6 - mupen64plus-qt(mupen64plus fork): F10 increases speed by 5% / F11 lowers speed by 5%
+	6 - bsnes-hd
+		Good alternative to snes9x
+
+	7 - mupen64plus-qt(mupen64plus fork): F10 increases speed by 5% / F11 lowers speed by 5%
 --------------------------------------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
@@ -32126,20 +32223,27 @@ HOW TO USE THE 'LESS' COMMANDLINE TOOL
 ---------------------
 ---------------------
 ---------------------
-FRAME INTERPOLATION
+FRAME INTERPOLATION | FRAME GENERATION
 	Frame Interpolation / Motion interpolation uses AI to generate +1 frame between 2 different frames.
-This increases perceived frame-rate when playing videos with lower framerate than the one offered by the monitor.
+This increases perceived frames when playing videos and games.
 
-	A Display capable of 60Hz(60 Frames per second) will run 30fps content(games/movies/videos) at 30 framerate per second,
-Frame interpolation / motion interpolation would then insert an extra frame for every existing frame, allowing it to run at display capable framerate instead (on this case).
+Frame interpolation / motion interpolation would then insert an extra frame for every existing frame.
 
-	Example: 1) Nvidia Smooth Motion.
+	Example: 
+		1) Lossless Scaling
+			Lossless Scaling can be found on the Steam Store Page,
+			It uses LSFG for frame generation. Works with all kinds of GPU.
+
+		1) Nvidia Smooth Motion.
 			Meant for DX11 and DX12 games only.
-		 2) Elise-ng
-		 	https://fly.elise-ng.net/news/fly-elise-ng-6-2-1-software-release/
-		 3) SVP Project
-		 	Meant for video play.
-			On archlinux, you can install it under 'svp-bin'.
+			Only works on Nvidia Smooth Motion Capable GPUs.
+
+		2) Elise-ng
+			https://fly.elise-ng.net/news/fly-elise-ng-6-2-1-software-release/
+
+		3) SVP Project
+		 	Meant for video play only.
+			On archlinux, you can install it under 'svp-bin' package.
 
 ---------------------
 ---------------------
@@ -35202,6 +35306,13 @@ SOME BROOT FILE EXPLORER
 			Inside a windows power shell session, type: 
 				$ Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
 
+		LISTING ALL AVAILABLE BLOCK DEVICES FOR MOUNTING IN WSL
+			Inside a windows power shell session, type: 
+				$ GET-CimInstance -query "SELECT * from Win32_DiskDrive"     
+
+			READ MORE ON:
+				MOUNTING DEVICES ON WSL
+
 	REMOVING A WSL DISTRIBUTION
 		Do not use '--uninstall' as it'll completely erase WSL from existence instead.
 			$ wsl --unregister <distro_name> 
@@ -35872,10 +35983,24 @@ SOME BROOT FILE EXPLORER
 				NOTE: You can optionally use 'wsl --shutdown' if you're 100% sure no running process
 				or mounted device is holding the device.
 
+			UMOUNTING DEVICES MANUALLY ON WSL LINUX DISTRO
+				You can use these steps if you're having trouble umounting using wsl itself.
+
+				1) List block devices, and choose a mounted device's mount point for umounting:
+					$ lsblk
+
+				2) Close all processes related to the mount device if you have any open.
+
+				3) Umount device using --lazy option:
+					# umount --lazy /mnt/sdX3
+						or
+					# umount -l /mnt/sdX3
+				
 			BARE MOUNTS
 				Bare mounts allows to load a storage device without actually mounting it,
 				this is important for running 'fsck' on filesystems after either Power Blackouts 
-				or System Crashes have occurred; 
+				or System Crashes have occurred; you can freely use 'e2fsck' to check if disk requires
+				fixing before running 'fsck'.
 
 				NOTE: WSL at the current state simply doesn't care about running 'fsck' on partitions 
 				for doing filesystem checks while mounting devices.
@@ -35905,16 +36030,23 @@ SOME BROOT FILE EXPLORER
 
 							# wsl --mount \\.\PHYSICALDRIVE0 --bare
 
-						4)(OPTIONAL) Go into another linux distro and finallly list and mount it from there:
-							4.1 - Listing
+						4)(OPTIONAL) Go into another linux distro and finallly list and mount it 
+						from there:
+
+							4.1 - Listing Block Devices
 								$ lsblk
+								   or
 								# blkid
 
-							4.2 - (Optional - EXT4 Filesystems only) If you so desire, you can run 'fsck' to 
-							perform a filesystem check and fix:
+							4.2 - (Optional - EXT Filesystems only) You can run 'e2fsck'
+							to check if an ext filesystem requires fixing:
+								# e2fsck /dev/sdX2
+
+							4.3 - (Optional - EXT4 Filesystems only) If you so desire, 
+							you can run 'fsck' to perform a filesystem check and fix:
 								# fsck.ext4 -Dfy /dev/sdX2
 
-							4.3 - Mounting
+							4.4 - Mounting
 								# mount --mkdir /dev/sdX2 /mnt/my_linux_mount_point
 									or
 								# mount --mkdir -t auto /dev/sdX2 /mnt/my_linux_mount_point
@@ -35929,23 +36061,28 @@ SOME BROOT FILE EXPLORER
 						# Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
 
 					3) Bare mounting a .VHDX image:
-							VERY IMPORTANT:
-								MAKE SURE NO OTHER VM(Virtual Machine) OR WSL INSTANCE IS 
-								RUNNING THE IMAGE BEFORE MOUNTING!
+						VERY IMPORTANT:
+							MAKE SURE NO OTHER VM(Virtual Machine) OR WSL INSTANCE IS 
+							RUNNING THE IMAGE BEFORE MOUNTING!
 
 						# wsl --mount --vhd --bare \
 						  "C:\Users\sebas\AppData\Local\wsl\{44cec59d-a5b3-4326-8171-f9218b2ae285}\ext4.vhdx"
 
 					4) Go into another linux distro and finallly list and mount it from there:
-						4.1 - Listing
+						4.1 - Listing Block Devices
 							$ lsblk
+							   or
 							# blkid
 
-						4.2 - (Optional - EXT4 Filesystems only) If you so desire, you can run 'fsck' to 
-						perform a filesystem check and fix:
+						4.2 - (Optional - EXT Filesystems only) You can run 'e2fsck'
+						to check if an ext filesystem requires fixing:
+							# e2fsck /dev/sdX2
+
+						4.3 - (Optional - EXT4 Filesystems only) If you so desire, 
+						you can run 'fsck' to perform a filesystem check and fix:
 							# fsck.ext4 -Dfy /dev/sdX2
 
-						4.3 - Mounting
+						4.4 - Mounting
 							# mount --mkdir /dev/sdX2 /mnt/my_linux_mount_point
 								or
 							# mount --mkdir -t auto /dev/sdX2 /mnt/my_linux_mount_point
@@ -35962,7 +36099,7 @@ SOME BROOT FILE EXPLORER
 
 			3) Copy using 'cp' or 'mv' for moving:
 				This will copy the Pictures folder from the windows directory into the running WSL Distro.
-					$ cp -R /mnt/c/<username>/Pictures ~/
+					$ cp -ar /mnt/c/<username>/Pictures ~/
 
 		INSTALLING ZSH AND POWERLEVEL10K FOR WSL DISTROS | PERFORMANCE | RECOMMENDED
 			It is recommended to install 'zsh' and 'zsh-theme-powerlevel10k', the default 'bash' shell is too slow and 
