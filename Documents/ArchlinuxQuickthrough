@@ -968,6 +968,7 @@ USE LICENSE:
 ---SOME WINDOWS STUFF:
 	SOME WINDOWS UTILITIES
 	INSTALLING WINDOWS WITHOUT A HOTMAIL OR MICROSOFT ACCOUNT
+		OLD METHOD OF BYPASSING INSTALLATION WITHOUT MICROSOFT ACCOUNT
 	RUNNING COMMAND AS ADMINISTRATOR
 	VERY BASICS ON FILESYSTEM CHECK DISK AND OTHER TOOLS | RECOMMENDED READING
 		CHKDSK TOOL SUMMARY
@@ -1006,6 +1007,11 @@ USE LICENSE:
 			WSL DEFAULT WINDOWS LOCATION FOR LINUX DISTROS
 			LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
 			LISTING ALL AVAILABLE BLOCK DEVICES FOR MOUNTING IN WSL
+			LISTING HYPER-V FIREWALL SETTINGS
+				LISTING WSL FIREWALLING RULES
+				CHANGING HYPER-V FIREWALL SETTINGS
+				CREATING AN HYPER-V FIREWALL RULE
+				ALLOWING INBOUND CONNECTIONS FOR TESTING
 		REMOVING A WSL DISTRIBUTION
 		ADDING AND USING A NEW REGULAR USER
 			ADDING A NEW USER TO SUDOERS LIST
@@ -1070,6 +1076,10 @@ USE LICENSE:
 		COMPILING WSL KERNEL
 			HOW TO SELECT THE RIGHT KERNEL VERSION FOR YOU
 
+		[[SETTING UP A VSFTP SERVER]]
+			[[SETTING UP VSFTPD SERVER FROM A WSL DISTRO | SETTING UP A SERVER IN WSL]]
+
+
 	---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
 		MANAGING ALIASES IN WINDOWS POWER SHELL
 			LISTING ALL AVAILABLE ALIASES
@@ -1082,6 +1092,29 @@ USE LICENSE:
 				ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
 
 --MISCALENEOUS:
+	SETTING UP A VSFTP SERVER
+		INTRODUCTION TO VSFTPD
+		TESTING A RUNNING VSFTPD SERVER BY DOING A LOCAL TEST
+			CONFIGURATION FILE REFERENCE
+		FTP USER PERMISSIONS
+		CONFIGURATION OPTIONS FOR VSFTPD
+			SETTING UP NO-PRIVILEGED USER FOR THE SERVER TO RUN AS
+			SETTING UP MAXIMUM NUMBER OF CONNECTED CLIENTS
+			ALLOWING LOCAL USERS TO CONNECT TO THE FTP CLIENT
+			DISABLING ANONYMOUS CONNECTIONS
+			DISABLING LOCAL ACCOUNTS FROM VSFTP ACCESS
+			ENABLING VSFTP PORT TO BE FOUND FROM A CONTAINER 
+		SETTING UP VSFTPD SERVER FROM A WSL DISTRO | SETTING UP A SERVER IN WSL
+			SETTING UP WINDOWS FIREWALL TO MAKE WSL DISTRO VISIBLE IN LAN
+				NOTE ON PORT-FORWARDING ON MICROSOFT WINDOWS FIREWALL
+				CREATING A NAT RULE FOR A WSL SERVER
+				PORT-FORWARDING FOR A WSL SERVER
+				DISABLING PUBLIC PROFILE FOR NETWORK DEVICE ADAPTER
+				DISABLING PUBLIC PROFILE FROM WINDOWS FIREWALL
+				DISABLING PUBLIC PROFILE ONLY FOR SPECIFIC NETWORK DEVICE
+				ENABLING WINDOWS FIREWALL LOGS FOR SAFETY
+				CREATING NEW INBOUND AND OUTBOUND FIREWALL RULES ON WINDOWS
+
 	SOME GOOGLE STUFF
 		GOOGLE PROMPTS
 			DISABLING GOOGLE PROMPTS
@@ -1272,6 +1305,8 @@ NOT ON INDEX		#Topics that haven't been set on Index.
 S-INDEX			#When queried/searched it will show the the beginning of this document Index.
 END INDEX		#Indicates the End of this document Index.
 SYNTAX INDEX		#When queried/searched it Will display this section here.
+[[TOPIC]]		#Used for describing that you should be able to read other sub-topics related to this topic 
+			on the INDEX. this is similar to [INDEX: ...TEXT...]
 [INDEX: ...TEXT...]	#This will indicate a topic or group of topics that can be found in this document INDEX.
 [start-of-file]		#When a configuration file has too many text, you can use this to go back to the BEGINNING.
 [end-of-file]		#When a configuration file has too many text, you can use this to go back to the ENDING.
@@ -1321,6 +1356,14 @@ New Syntax(2023):
 ========================================S-CHANGELOG=================================================
 ====================================================================================================
 
+2025 - October:
+	--Day 25:
+		SETTING UP A VSFTP SERVER
+		INSTALLING WINDOWS WITHOUT A HOTMAIL OR MICROSOFT ACCOUNT
+		RESTORING MOZILLA SESSION
+		FRAME INTERPOLATION | FRAME GENERATION
+		SETTING UP A VSFTP SERVER
+
 2025 - May/July:
 	--Day 30:
 		SOME THUNDERBIRD MAIL CLIENT STUFF
@@ -1335,7 +1378,6 @@ New Syntax(2023):
 
 2025 - April:
 	--Day 21:
-		FRAME INTERPOLATION | FRAME GENERATION
 		USING AND MANAGING DIFFERENT PROFILES ON MOZILLA
 		SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER | LIST OF UNSAFE DIRECTORIES
 		BATCH CONVERSION OF MULTIPLE VIDEOS INTO COMPRESSED FORMAT
@@ -4451,9 +4493,53 @@ packages on a broken linux.
 --------------------------------------
 ================================================================================
 IFCONFIG / IP ADDR:
-these commands can be used to find your IP Address in the network
-However a Few years back, ifconfig was the favorite way to know IP address in Linux. 
-Unfortunately, ifconfig command has been deprecated.(NOT TO BE MISTAKEN WITH ifcfg)
+	Current archlinux relies on 'ip' tool instead of 'ifconfig' for finding out your LAN IP Address.
+Other linux distros might use 'ifconfig'. 'curl' is available for fetching the WAN IP Address used,
+which is your internet IP Address. 'nmap' is also available to test if a given port is available for connection.
+
+
+	SOME NETWORK TOOLS
+		GETTING YOUR WAN IP ADDRESS USING 'CURL' TOOL
+			Your WAN IP Address represents your PC in the Internet.
+		This is how computers outside your Local Area Network(LAN) see you on the internet.
+
+		To use any of these methods, you must be connected to the internet.
+		If any of these fail, then your computer has not been set with a WAN IP Address:
+
+				$ curl icanhazip.com
+					or
+				$ curl api.ipify.org
+					or
+				$ curl ipinfo.io/ip
+					or
+				$ curl ifconfig.me
+
+		GETTING YOUR LAN IP ADDRESS AND GATEWAY USING 'IP' TOOL
+			Note: When your Network Device directly access the internet without
+			the use a router, then this method will get you access to your WAN IP Adress instead.
+
+			The LAN IP Address represents your PC in the local area network.
+
+			1) Fetching local GATEWAY:
+				$ ip route show
+					or
+				$ ip route show | grep -i default | awk '{ print $3}'
+
+			2) Fetching local IP:
+				$ ip addr
+					or
+				$ ip addr show eth0 | grep -oP '(?<= inet\s)\d+(\.\d+){3}'
+
+		
+		TESTING PORT AVAILABILITY FOR CONNECTION
+			'nmap' will scan for open, closed and filtered ports.
+
+			1) Scanning for Open Ports on a given IP Address:
+				$ nmap -p- -Pn <ip_address>
+
+			2) Scanning a single port from a given IP Address:
+				$ nmap -p 21 -Pn <ip_address> 
+
 
 	ALTERNATIVE OPTION(archlinux):
 		you can use 'archey4' to see your IP Address.
@@ -13232,9 +13318,12 @@ MOZILLA FIREFOX TIPS
 	MOZILLA FIREFOX HOTKEYS
 
 	ctrl + shift + n	#Restores Previously Closed Tabs if you have at least 1 window open
-	F7			#Enables Caret Mode: Allows cursor to be set on text when clicked | ENABLING CARET MODE IN FIREFOX
+	F7			#Enables Caret Mode: Allows cursor to be set on text when clicked 
+				 ENABLING CARET MODE IN FIREFOX
+
 	alt+<numbers>		#Changes tab
 	ctrl + mouse_click	#Opens link in new tab
+	ctrl + shift + s	#Built-in screenshot tool
 
 
 	RESTORING MOZILLA SESSION
@@ -32180,6 +32269,14 @@ LINKS TO CHECK:
 		https://cpu.userbenchmark.com/Compare/Intel-Core-i7-3770-vs-Intel-Core-i5-2500K/1979vs619 - CPU BENCHMARKING
 		https://github.com/BaRRaKudaRain/PCem-ROMs
 		https://makefiletutorial.com/#what-alternatives-are-there-to-make
+
+	OLD WINDOWS VERSIONS - useful for dosbox and/or other emulators:
+		https://archive.org/details/windows-98-se_202407	# For use with dosbox pure
+
+		https://winworldpc.com/home
+		https://winworldpc.com/product/windows-98/98-second-edition
+		https://archive.org/details/windows-98-se-unofficial-service-pack-3
+		https://winworldpc.com/product/microsoft-windows-boot-disk/98-se
 	
 	STUDY LINKS:
 		https://en.wikipedia.org/wiki/Percent-encoding	#Percent Encoding
@@ -34813,17 +34910,45 @@ SOME BROOT FILE EXPLORER
 ---------------------
 ---SOME WINDOWS STUFF
 	SOME WINDOWS UTILITIES
-		These tools are located under C:\Windows\System32\
+		Most of these tools are located under C:\Windows\System32\
+		Furhterover, some commands are only available on Command Prompt and will not work under 
+		Windows Power Shell.
+		You can auto-complete these commands with the tab-key.
 
-		NOTE: You can quick type for these using system_key + 'R'.
+		NOTE: You can quick launch some of the available Graphical Tools using: system_key + 'r'.
 
+
+		help				#[Command Prompt Only] Shows all commands available in the commandline.
+		help <program_name>		#[Command Prompt Only] Displays help for a given command in the commandline.
+		Title <window_title>		#[Command Prompt Only] Changes name of the title.
+
+		curl.exe <Hyperlink>		#Fetches and downloads the content pointed by the hyperlink.
+			or
+		curl.exe -L ascii.live/bomb -o bomb.txt
+								Example: 
+									$ curl.exe ascii.live/bomb
+										or
+									$ curl -L ascii.live/bomb -o bomb.txt
+		
+		cd				#Changes directory
+		pwd				#Prints current directory
+		cat <Text_File>			#Opens, Reads and Outputs text file on the commandline
+		ls				#Lists directory
+		tree.com [path]			#Prints current directory in tree-like structure
+		clip.exe			#Sends shell output to clipboard, useful for copy and pasting
+						large sums of text.
+						Example:
+							driverquery.exe | clip.exe
+
+		services.msc			#System Services 
+		mmsys.cpl			#Audio and Microphone Settings on Windows
+		devmgmt.msc			#Device Manager
 		perfmon.msc			#Performance Monitor
 		tpm.msc				#TPM Manager
 		certlmgr.msc			#System Certification Manager
 		certmgr.msc			#Local User Certification Manager
 		comexp.msc			#Component Services
 		compmgmt.msc			#Computer Management
-		devmgmt.msc			#Device Manager
 		DevModeRunAsUserConfig.msc
 		diskmgmt.msc			#Disk Manager
 		fsmgmt.msc			#File Share Manager
@@ -34836,7 +34961,6 @@ SOME BROOT FILE EXPLORER
 		WF.msc				#Windows Firewall
 		WmiMgmt.msc			#WMI Management
 		eventvwr.msc			#System Event Log Viewer
-		services.msc			#Services 
 
 		appwiz.cpl			#Application Wizard - Uninstall programs
 		desk.cpl			#Monitor Settings
@@ -34847,7 +34971,6 @@ SOME BROOT FILE EXPLORER
 		intl.cpl			#International Settings and Language
 		joy.cpl				#Joystick/Gamepad Settings
 		main.cpl			#Mouse Settings
-		mmsys.cpl			#Audio Settings
 		ncpa.cpl			#Network Control Panel Applet
 		powercfg.cpl			#Power Configuration
 		RTSnMg64.cpl			#RealTek Sound Manager
@@ -34879,28 +35002,73 @@ SOME BROOT FILE EXPLORER
 		taskkill.exe /im <program_name> /t /f	#Kills runnning process by it's name
 		taskkill.exe /pid <prorgam_pid> /t /f	#Kills runnning process by it's PID
 		ipconfig /all				#Lists DNS Addresses, DHCP Address, IP Address
+	
+		driverquery.exe			#Queries all currently installed drivers
+		whoami.exe			#Prints hostname and username
 
 	INSTALLING WINDOWS WITHOUT A HOTMAIL OR MICROSOFT ACCOUNT
-		If you don't have internet access, you'll not be able to normally install Windows 11.
-	There is however a way to bypass this, however it'll give you only limited access to windows 11
-	until you can activate it normally:
+		NOTE: Since windows11 25H2 update, it's not possible to use none of the old methods anylonger,
+		however you can still use this:
 
-		1 - On the screen that asks you to login with a hotmail account press: 
-			Shift + F10
-	
-		2 - Type the following in command prompt: 
-			OOBE\BYPASSNRO
+			1 - on the OOBE Screen setup press 'SHIFT + F10' and then type:
 
-		4 - At this point your PC will reboot.
+				1.1 - Choose one of the methods below only:
+					1.1.1 - Currently, this removes bloat packages from the installation process:
+						$ curl -L christitus.com/bypass -o skip.cmd
 
-		5 - After rebooting, you will now see the options: 
-			3.1 - "I don’t have internet" 
-				or
-			3.2 - "Continue with limited setup"
 
-		6 - Select either one or the other option
+					1.1.2 - This alternate fork removes no bloat packages/programs 
+					from windows installation:
+						$ curl -L felo.gg/bypassnro -o skip.cmd
 
-		7 - Create a local account
+				1.2 - (Optional) you can edit 'unattend.xml' before running skip.cmd
+				to accomodate windows installation to your needs including
+				adding a password.
+
+			2 - Finally run skip.cmd by typing:
+				$ skip.cmd
+
+			3 - Consider reading the following topic:
+				MANAGING WINDOWS ACCOUNTS
+
+			Source: 
+				https://www.youtube.com/watch?v=aEWb1otLVPo
+				https://github.com/ChrisTitusTech/bypassnro
+				https://github.com/Felitendo/bypassnro
+
+		OLD METHOD OF BYPASSING INSTALLATION WITHOUT MICROSOFT ACCOUNT 1
+
+			1 - During installation, press SHIFT + F10, then type:
+				$ start ms-cxh:localonly
+
+			2 - Consider reading the following topic:
+				MANAGING WINDOWS ACCOUNTS
+
+
+		OLD METHOD OF BYPASSING INSTALLATION WITHOUT MICROSOFT ACCOUNT 2
+			If you don't have internet access, you'll not be able to normally install Windows 11.
+		There is however a way to bypass this, however it'll give you only limited access to windows 11
+		until you can activate it normally:
+
+			1 - On the screen that asks you to login with a hotmail account press: 
+				Shift + F10
+		
+			2 - Type the following in command prompt: 
+				OOBE\BYPASSNRO
+
+			4 - At this point your PC will reboot.
+
+			5 - After rebooting, you will now see the options: 
+				3.1 - "I don’t have internet" 
+					or
+				3.2 - "Continue with limited setup"
+
+			6 - Select either one or the other option
+
+			7 - Create a local account
+
+			8 - Consider reading the following topic:
+				MANAGING WINDOWS ACCOUNTS
 			
 	RUNNING COMMAND AS ADMINISTRATOR
 		$ runas.exe /user:Administrator "cmd"
@@ -35055,8 +35223,11 @@ SOME BROOT FILE EXPLORER
 
 				
 	SOME WINDOWS 11 HOTKEYS
-		system_key + tab_key			#Cycles to next open program(Task View)
-		system_key + shift_key + tab_key	#Cycles to previous open program(Task View)
+		alt + tab_key				#Cycles to next open program(Task View)
+		alt + shift_key + tab_key		#Cycles to previous open program(Task View)
+		system_key + tab			#Displays all virtual desktops along with open programs
+		system_key + ctrl + d			#Creates new Virtual Desktop
+
 		system_key + I				#Access to system settings, developer mode, etc
 		system_key + r				#Execute commands
 		system_key + l				#Locks user
@@ -35098,6 +35269,49 @@ SOME BROOT FILE EXPLORER
 						kernel="C:\\Users\\User\\.wsl-kernel\\bzImage"
 						swap=0
 						memory=15GB
+
+						##Defaults to true - this doesn't work anymore:
+						#localhostForwarding=true
+
+						##Defaults to 'false' - allows windows firewalling on WSL:
+						#firewall=true
+
+						##Defaults to 'false' - Changes how DNS requests are proxied 
+						##from WSL to Windows.
+						## - ENABLE THIS FOR SERVERS
+						#dnsTunneling=true
+
+						##Defaults to 'false' - Enforces WSL to use Windows HTTP 
+						##proxy information.
+						## - ENABLE THIS FOR SERVERS
+						#autoProxy=true
+
+						##If the value is mirrored then this turns on mirrored networking mode.
+						##Default or unrecognized strings result in NAT networking. 
+						##Default value is NAT.
+						## - ENABLE THIS FOR SERVERS
+						#networkingMode=mirrored
+
+						##Defaults to 'null' - Only applicable when experimental.networkingMode 
+						##is set to 'mirrored'. Specifies which ports Linux applications can 
+						##bind to, even if that port is used in Windows. This enables 
+						##applications to listen on a port for traffic purely within Linux,
+						##so those application are not blocked even when that port is used
+						##for other purposes on Windows. For example, WSL will allow bind to
+						##port 53 in Linux for Docker Desktop, as it is listening only to
+						##requests from within the Linux container. Should be formatted in
+						##a comma seperated list, e.g: 3000,9000,9090
+						## - this doesn't work anymore:
+						#ignoredPorts=20,21
+
+						##Defaults to 'true' - Only applicable when experimental.networkingMode
+						##is set to 'mirrored'. When set to true, will allow the Container to
+						##connect to the Host, or the Host to connect to the Container, 
+						##by an IP address that's assigned to the Host. Note that the 
+						##127.0.0.1 loopback address can always be used - this option allows for
+						##all additionally assigned local IP addresses to be used as well.
+						## - this doesn't work anymore:
+						#hostAddressLoopback=true
 					[/file]
 
 			2) WSL also creates some configuration files after installing any linux distribution:
@@ -35106,19 +35320,50 @@ SOME BROOT FILE EXPLORER
 				2.1 - This file containns Network, Interop, Username created on the first run, Boot, GPU and Time settings:
 					/etc/wsl.conf is created by default inside your WSL Linux Distro
 						EXAMPLE:
-							[file: /etc/wsl.conf]
-								[boot]
-								systemd=true
+						[file: /etc/wsl.conf]
+							[boot]
+							systemd=true
 
-								[gpu]
-								enabled=true
+							## A string of the command that you would like to run 
+							## when the WSL instance starts. This command is run 
+							## as the root user. Only available for Windows 11.
+							#command=""
 
-								[system-distro-env]
-								WESTON_RDP_MONITOR_REFRESH_RATE=75
+							[network]
+							
+							## Defaults to 'true' - Setting to true will allow WSL
+							## to generate the /etc/hosts file, which contains a 
+							## static map of which hostnames correspond with a certain IP
+							## address.
+							#generateHosts=false
 
-							[/file]
+							## Defaults to 'true' - Setting to true will allow WSL 
+							## to generate the /etc/resolv.conf file, which contains
+							## a DNS list capable of resolving a given hostname to 
+							## its IP address.
+							#generateResolvConf=false
 
-				2.2 - This file contians hostname
+							## Sets hostname to be used for WSL distribution.
+							#hostname = wslhost
+
+							[gpu]
+							enabled=true
+
+							[system-distro-env]
+							WESTON_RDP_MONITOR_REFRESH_RATE=75
+
+							[interop]
+							## Defaults to 'true' - Setting this key will determine 
+							## whether WSL will support launching Windows processes.
+							#enabled=false
+
+							## Defaults to 'true' - Setting this key will determine 
+							## whether WSL will add Windows path elements to the 
+							## $PATH environment variable.
+							#appendWindowsPath=false
+						[/file]
+
+				2.2 - This file contians local hostname
 					/etc/wsl-distribution.conf is created by default inside your WSL Linux distro
 
 					EXAMPLE:
@@ -35150,7 +35395,7 @@ SOME BROOT FILE EXPLORER
 			https://frameratetest.com/refresh-rate-tester/
 
 	MANAGING WINDOWS ACCOUNTS
-		system_key + r >> Type in 'netplwiz'
+		Press 'system_key' + r >> Type in 'netplwiz'
 
 		WINDOWS REMOTE ACCOUNTS
 			Windows remote accounts can only be be accessed with an internet connection;
@@ -35179,10 +35424,10 @@ SOME BROOT FILE EXPLORER
 			NOTE: Always Choose the newest driver. You have to install your GPU Drivers first.
 
 		DISABLING XBOX GAME BAR
-			system_key + I	>> Games >> Xbox Game Bar >> disable it
+			system_key + i	>> Games >> Xbox Game Bar >> disable it
 
 		ENABLING GAME MODE
-			system_key + I	>> Games >> Game Mode >> Enable it
+			system_key + i	>> Games >> Game Mode >> Enable it
 
 		DISABLING GAME DVR
 			1) Open regedit and edit:
@@ -35197,7 +35442,7 @@ SOME BROOT FILE EXPLORER
 			https://www.microsoft.com/en-us/download/details.aspx?id=35
 
 		DISABLE ENERGY ECONOMY
-			system_key + I >> System >> Disable Energy Economy
+			system_key + i >> System >> Disable Energy Economy
 
 		ENABLE DIRECT PLAY
 			Type OptionalFeatures.exe >> Legacy Components >> Direct Play
@@ -35312,6 +35557,60 @@ SOME BROOT FILE EXPLORER
 
 			READ MORE ON:
 				MOUNTING DEVICES ON WSL
+
+		LISTING HYPER-V FIREWALL SETTINGS
+			Source: 
+				https://learn.microsoft.com/en-us/powershell/module/netsecurity/
+				https://learn.microsoft.com/pt-br/windows/security/operating-system-security/network-security/windows-firewall/hyper-v-firewall
+				https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan
+
+			Inside a windows power shell session, type:
+				$ Get-NetFirewallHyperVVMSetting -PolicyStore ActiveStore
+					or
+				$ Get-NetFirewallHyperVVMSetting -PolicyStore ActiveStore -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}'
+
+				Observation: You only need to provide '-Name' if you have more than one Hyper-V running.
+
+				[Output]
+					Name                  : {40E0AC32-46A5-438A-A0B2-2B479E8F2E90}
+					Enabled               : True
+					DefaultInboundAction  : Allow
+					DefaultOutboundAction : Allow
+					LoopbackEnabled       : True
+					AllowHostPolicyMerge  : True
+				[/Output]
+
+			LISTING WSL FIREWALLING RULES
+				Inside a WPS Session, type:
+					$ Get-NetFirewallHyperVRule -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}'
+
+			CHANGING HYPER-V FIREWALL SETTINGS
+
+				Inside a WPS Session, type:
+						
+					$ Set-NetFirewallHyperVVMSetting <PROPERTY> <VALUE> 
+						or
+					$ Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' <PROPERTY> <VALUE> 
+				Example:
+					$ Set-NetFirewallHyperVVMSetting -Enabled True
+
+			CREATING AN HYPER-V FIREWALL RULE
+				NOTE: This will only work if you add 'networkingMode=mirrored'
+				to .wslconfig file.
+
+				Inside a WPS Session, type:
+
+					$ New-NetFirewallHyperVRule -Name MyWebServer2 -DisplayName "My Web Server" -Direction Inbound -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -Protocol TCP -LocalPorts 21
+
+
+			ALLOWING INBOUND CONNECTIONS FOR TESTING
+				NOTE: This will only work if you add 'networkingMode=mirrored'
+				to .wslconfig file.
+
+				Inside a WPS Session, type:
+
+					$ Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
+
 
 	REMOVING A WSL DISTRIBUTION
 		Do not use '--uninstall' as it'll completely erase WSL from existence instead.
@@ -44971,6 +45270,407 @@ SOME BROOT FILE EXPLORER
 				You can then disable if you don't want it:
 					$ Set-ExecutionPolicy Restricted
 	
+----------------------------------
+----------------------------------
+----------------------------------
+----------------------------------
+SETTING UP A VSFTP SERVER
+
+	INTRODUCTION TO VSFTPD
+		VSFTPD is a FTP daemon for setting up FTP Server, it can run via a 'super-server' like 'inetd' or 'xinetd'.
+		it can also run as a service or in 'standalone' mode, the later requires 'listen=YES' to be passed as option
+
+		Example 1 - Launching vsftpd in 'standalone' mode:
+			$ vsftpd -olisten=YES -oftpd_banner=WELCOME\ TO\ SERVER
+		
+		A Configuration file defaults to /etc/vsftpd.conf and will overwrite(or overload) any options passed as
+		argument through the commandline.
+		
+		Example 2 - Using configuration file - :
+			$ vsftpd -olisten=YES /etc/vsftpd.conf -oftpd_banner=WELCOME\ TO\ SERVER
+		
+		In this case, if the configuration file contains 'listen=NO', the value passed by the first '-o' argument
+		in the commandline will not work. 
+
+		If no configuration file is ever passed as argument, then default configuration file in /etc/vsftpd.conf 
+		is loaded.
+
+		Example 3 - Running vsftpd as service in the background - 
+			# systemctl start vsftpd
+
+		Example 4 - Enabling vsftpd to run at system boot - 
+			# systemctl enable vsftpd
+	
+	TESTING A RUNNING VSFTPD SERVER BY DOING A LOCAL TEST
+		1) First things first, fetch the local IP Address where the server is running:
+			$ ip addr show <network_device> | grep -oP '(?<= inet\s)\d+(\.\d+){3}'
+
+			Example:
+				$ ip addr show eth0 | grep -oP '(?<= inet\s)\d+(\.\d+){3}'
+
+		
+		2) Use 'nmap' to test the connection availability on the given port,
+		the default port number is 21; port 20 is just used for data-transfers:
+			$ nmap -p <port_number> -Pn <ip_address>
+
+			Example:
+				$ nmap -p 21 -Pn 192.168.0.5
+
+		3) 'nmap' will retrieve one of the following STATES:
+			3.1 - STATE: Closed
+				This means port is closed, which means there's no running service listenning for it.
+
+			3.2 - STATE: Filtered
+				This means that the port is available, but connection is filtered by a firewall.
+
+			3.3 - STATE: Open
+				This means the port is open and ready for connection through a FTP Client.
+
+			A) If you get connection 'close', your server isn't running likely due to misconfiguration,
+			READ MORE ON:
+				CONFIGURATION OPTIONS FOR VSFTPD
+
+			B) If you get connection 'filtered', you may need to enable the port on your firewall, 
+			READ MORE ON TOPICS:
+				LINUX FIREWALLING WITH IPTABLES | NFTABLES
+				LISTING HYPER-V FIREWALL SETTINGS
+					CHANGING HYPER-V FIREWALL SETTINGS
+
+		4) Testing connection and transfer through an actual CLIENT:
+			NOTE: Only do this step if you got 'Open' connection on the 'nmap test on step #3
+
+			Install 'filezilla' FTP Client, set it up and finally connect.
+			You will need local users to be able to connect, so make sure you have this option enabled:
+				local_enable=YES
+
+			READ MORE ON TOPIC:
+				ALLOWING LOCAL USERS TO CONNECT TO THE FTP CLIENT
+
+
+		5) CONFIGURATION FILE REFERENCE:
+		[file: /etc/vsftpd.conf]
+			# Example config file /etc/vsftpd.conf
+			#
+			# The default compiled in settings are fairly paranoid. This sample file
+			# loosens things up a bit, to make the ftp daemon more usable.
+			# Please see vsftpd.conf.5 for all compiled in defaults.
+			#
+			# READ THIS: This example file is NOT an exhaustive list of vsftpd options.
+			# Please read the vsftpd.conf.5 manual page to get a full idea of vsftpd's
+			# capabilities.
+			#
+			# Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+			anonymous_enable=NO
+			#
+			# Uncomment this to allow local users to log in.
+			local_enable=YES
+			#
+			# Uncomment this to enable any form of FTP write command.
+			#write_enable=YES
+			#
+			# Default umask for local users is 077. You may wish to change this to 022,
+			# if your users expect that (022 is used by most other ftpd's)
+			#local_umask=022
+			#
+			# Uncomment this to allow the anonymous FTP user to upload files. This only
+			# has an effect if the above global write enable is activated. Also, you will
+			# obviously need to create a directory writable by the FTP user.
+			#anon_upload_enable=YES
+			#
+			# Uncomment this if you want the anonymous FTP user to be able to create
+			# new directories.
+			#anon_mkdir_write_enable=YES
+			#
+			# Activate directory messages - messages given to remote users when they
+			# go into a certain directory.
+			dirmessage_enable=YES
+			#
+			# Activate logging of uploads/downloads.
+			xferlog_enable=YES
+			#
+			# Make sure PORT transfer connections originate from port 20 (ftp-data).
+			connect_from_port_20=YES
+			#
+			# If you want, you can arrange for uploaded anonymous files to be owned by
+			# a different user. Note! Using "root" for uploaded files is not
+			# recommended!
+			#chown_uploads=YES
+			#chown_username=whoever
+			#
+			# You may override where the log file goes if you like. The default is shown
+			# below.
+			#xferlog_file=/var/log/vsftpd.log
+			#
+			# If you want, you can have your log file in standard ftpd xferlog format.
+			# Note that the default log file location is /var/log/xferlog in this case.
+			#xferlog_std_format=YES
+			#
+			# You may change the default value for timing out an idle session.
+			#idle_session_timeout=600
+			#
+			# You may change the default value for timing out a data connection.
+			#data_connection_timeout=120
+			#
+			# It is recommended that you define on your system a unique user which the
+			# ftp server can use as a totally isolated and unprivileged user.
+			nopriv_user=ftpsecure
+			#
+			# Enable this and the server will recognise asynchronous ABOR requests. Not
+			# recommended for security (the code is non-trivial). Not enabling it,
+			# however, may confuse older FTP clients.
+			#async_abor_enable=YES
+			#
+			# By default the server will pretend to allow ASCII mode but in fact ignore
+			# the request. Turn on the below options to have the server actually do ASCII
+			# mangling on files when in ASCII mode.
+			# Beware that on some FTP servers, ASCII support allows a denial of service
+			# attack (DoS) via the command "SIZE /big/file" in ASCII mode. vsftpd
+			# predicted this attack and has always been safe, reporting the size of the
+			# raw file.
+			# ASCII mangling is a horrible feature of the protocol.
+			#ascii_upload_enable=YES
+			#ascii_download_enable=YES
+			#
+			# You may fully customise the login banner string:
+			ftpd_banner=Welcome to FTP service.
+			#
+			# You may specify a file of disallowed anonymous e-mail addresses. Apparently
+			# useful for combatting certain DoS attacks.
+			#deny_email_enable=YES
+			# (default follows)
+			#banned_email_file=/etc/vsftpd.banned_emails
+			#
+			# You may specify an explicit list of local users to chroot() to their home
+			# directory. If chroot_local_user is YES, then this list becomes a list of
+			# users to NOT chroot().
+			# (Warning! chroot'ing can be very dangerous. If using chroot, make sure that
+			# the user does not have write access to the top level directory within the
+			# chroot)
+			#chroot_local_user=YES
+			#chroot_list_enable=YES
+			# (default follows)
+			#chroot_list_file=/etc/vsftpd.chroot_list
+			#
+			# You may activate the "-R" option to the builtin ls. This is disabled by
+			# default to avoid remote users being able to cause excessive I/O on large
+			# sites. However, some broken FTP clients such as "ncftp" and "mirror" assume
+			# the presence of the "-R" option, so there is a strong case for enabling it.
+			#ls_recurse_enable=YES
+			#
+			# When "listen" directive is enabled, vsftpd runs in standalone mode and
+			# listens on IPv4 sockets. This directive cannot be used in conjunction
+			# with the listen_ipv6 directive.
+			listen=YES
+			#
+			# This directive enables listening on IPv6 sockets. To listen on IPv4 and IPv6
+			# sockets, you must run two copies of vsftpd with two configuration files.
+			# Make sure, that one of the listen options is commented !!
+			#listen_ipv6=YES
+
+			# Set own PAM service name to detect authentication settings specified
+			# for vsftpd by the system package.
+			pam_service_name=vsftpd
+
+			## Custom Settings
+			max_clients=1
+
+			## This is a list of users not allowed to login:
+			userlist_enable=YES
+			userlist_file=/etc/vsftpd.userlist
+			#userlist_deny=NO -- this doesn't works
+
+			## This is required for WSL2
+			seccomp_sandbox=NO
+			isolate_network=NO
+
+			## Enables TLS for data encryption during transfers
+			#ssl_enable=YES
+		[/file]
+
+	FTP USER PERMISSIONS
+		VSFTPD uses PAM for user authentication, this means all local users and respective passwords 
+		are available as login for the VSFTPD server.
+		
+		FTP File and data permissions used are the same ones used on the filesystem.
+
+		In case you need to harden the permissions, READ MORE ON:
+			THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP
+
+	CONFIGURATION OPTIONS FOR VSFTPD
+		Configurations can be set on /etc/vsftpd.conf by either commenting or uncommenting and
+		by giving them a value.
+
+		SETTING UP NO-PRIVILEGED USER FOR THE SERVER TO RUN AS
+			This allows the server to run as an unprivileged user called 'ftpsecure',
+			so make sure to create the user by hand.
+
+			1) Create user as root:
+				# useradd --shell /usr/bin/zsh --create-home ftpsecure
+
+			2) Change password for the given user:
+				# passwd ftpsecure
+
+			Example:
+				nopriv_user=ftpsecure
+
+		SETTING UP MAXIMUM NUMBER OF CONNECTED CLIENTS
+			For increased security, you can setup maximum number of connected clients to '1',
+			this way only one user is allowed to connect at all times.
+
+			Example:
+				max_clients=1
+		
+		ALLOWING LOCAL USERS TO CONNECT TO THE FTP CLIENT
+			This will allow local users to connect to the FTP Client,
+			can be used for testing, and can be later disabled for extra security.
+
+			Example:
+				local_enable=YES
+
+		DISABLING ANONYMOUS CONNECTIONS
+			Disable "guest" users from connecting to the FTP Server.
+			by default, vsftpd uses local login passwords as FTP Accounts.
+
+			Example:
+				anonymous_enable=NO
+		
+		DISABLING LOCAL ACCOUNTS FROM VSFTP ACCESS
+			It's possible to disable local accounts from being accessed remotely from a client connection
+			to the server by creating a 'userlist' configuration file and enabling these options:
+
+			Example:
+				userlist_enable=YES
+				userlist_file=/etc/vsftpd.userlist
+
+		ENABLING VSFTP PORT TO BE FOUND FROM A CONTAINER 
+			This is a necessary step if you want the VSFTPD server to be found from container-like
+			environments like WSL or Firejail.
+
+			Example:
+				seccomp_sandbox=NO
+				isolate_network=NO
+
+	SETTING UP VSFTPD SERVER FROM A WSL DISTRO | SETTING UP A SERVER IN WSL
+		For a quick configuration, you'll have to ADD these settings to your .wslconfig file:
+
+		[file: /mnt/c/Users/<username>/.wslconfig
+			##Defaults to 'false' - allows windows firewalling on WSL
+			##- ENABLE THIS FOR SERVERS:
+			firewall=true
+
+			##Defaults to 'false' - Changes how DNS requests are proxied from WSL to Windows.
+			##- ENABLE THIS FOR SERVERS
+			dnsTunneling=true
+
+			##Defaults to 'false' - Enforces WSL to use Windows HTTP proxy information.
+			##- ENABLE THIS FOR SERVERS
+			autoProxy=true
+
+			##If the value is mirrored then this turns on mirrored networking mode.
+			##Default or unrecognized strings result in NAT networking. Default value is NAT.
+			##- ENABLE THIS FOR SERVERS
+			networkingMode=mirrored
+		[/file]
+
+		
+		1 - SETTING UP WINDOWS FIREWALL TO MAKE WSL DISTRO VISIBLE IN LAN
+			It's important to understand how microsoft firewall works at this point,
+		Microsoft Windows Firewall has 3 profiles:
+			A) Domain
+				This is the ideal profile if you're in a LAN that's under the administration
+			of a Domain Controller.
+
+			B) Private
+				This is a more loose security firewall profile, it assumes
+			you're using your PC from your Home Network and assumes devices in the LAN
+			can be trusted.
+
+			C) Public
+				The most secure firewall profile, will by defaul prevent your PC
+			from being found in the LAN and WAN and prevent most INBOUND connections
+			from happening.
+
+		All 3 firewall profiles can be active at the same time.
+		Although exceptions can be made by port-forwarding and NAT Rules, some pre-built default firewal
+		settings can not be overriden nor changed by the user nor the administration.
+
+		Because of this, if you want your Web/FTP/SSH Server to be visible in LAN you'll have
+		to consider these three points:
+
+			1) Disable the Public Profile on the Microsoft Windows Firewall and/or
+			use a 3rd party firewall for windows.
+
+			2) Besides Disabling the 'Public Profile', you also have to 
+			change your Network Device to the 'Private Profile'. The Network Device Profile works
+			similarly to how the firewall profiles does, except that there's no 'Domain' profile
+			for it.
+
+			3) Create NAT Rules nd Port-Fowarding rules in your Router if you want external network 
+			visibility. Only servers deployed in virtual sub-networks will require this step or
+			if one requires exposure of the server to the WAN.
+
+		1.2 - NOTE ON PORT-FORWARDING ON MICROSOFT WINDOWS FIREWALL
+			Port-Forwarding with 'Public Profile' turned on doesn't work.
+		As stated before, microsoft firewall has pre-built rules that can not be 
+		overriden/overloaded/overwritten/changed. 'Public Profile' has to be disabled and Network Device
+		also has to use 'Private Profile'.
+
+		IMPORTANT NOTE: Use a 3rd party commercial firewall if you dislike the lack of flexibility.
+		However, the use of a 3rd party firewall will disable microsoft windows firewalling and may add
+		further and more complex configuration options.
+
+		1.3 - (OPTIONAL) - CREATING A NAT RULE FOR A WSL SERVER
+			Setting up a NAT Rule is only a required step if you want 
+		server exposure to devices connected from an external networks.
+
+			To access your router configurations, use the instructions given by the router and use
+		it's admin username/password and setup a new NAT Rule from there.
+
+			Note: Since Routers have different ways of setting up NAT Rules and Port-Forward rules,
+		i'll not be covering this step-by-step.
+
+		1.4 - (OPTIONAL) - PORT-FORWARDING FOR A WSL SERVER
+			Port-forwarding is only required if you run into issues; it will likely not be a problem
+		when devices are connected to same LAN as the server.
+		
+		1.5 - DISABLING PUBLIC PROFILE FOR NETWORK DEVICE ADAPTER
+			From windows 11, press 'system_key + i', then go for 'Network and Internet',
+		finally choose your Network Device and then set your Network Profile to 'Private' for less
+		restrictive networking rules and visibility to other devices.
+
+		1.6 - DISABLING PUBLIC PROFILE FROM WINDOWS FIREWALL
+			From windows 11, press 'system_key + i', then go for 'Network and Internet',
+		click on 'Windows Firewall' option and wait for Windows Defender to launch.
+
+			Once Windows Defender is launched, click 'Firewall and Network Protection',
+		then finally disable 'Public Profile'.
+			
+		1.7 - (Optional) - DISABLING PUBLIC PROFILE ONLY FOR SPECIFIC NETWORK DEVICE
+			Windows allows disabling a Profile for the Virtual WSL Network Device.
+		You can use this and test as an alternate route to the above #5.1.5 step.
+
+			To do this, From windows 11, press 'system_key + r', type 'wf.msc' or 'WF.msc',
+		Right-Click on the option 'Windows Firewall Defender' located right above 'Inbound rules',
+		Click on 'Properties', then for 'Public profile' click on  'Protected Network Connections',
+		finally uncheck the Network Device for disabling the profile.
+
+		1.8 - ENABLING WINDOWS FIREWALL LOGS FOR SAFETY
+			From windows 11, press 'system_key + r', type 'wf.msc' or 'WF.msc',
+		Right-Click on the option 'Windows Firewall Defender' located right above 'Inbound rules',
+		Click on 'Properties' and then Enable Log for each active profiles: 'Domain', 'Public' 'Private'.
+
+			You can easily read the logs by clicking on 'Monitoring'; if you can't see this option,
+		then double-click on the 'Windows Firewall Defender' for expanding and making more options visible.
+
+			Note: you want this enabled if you're running any server.
+
+		1.9 - (OPTIONAL) - CREATING NEW INBOUND AND OUTBOUND FIREWALL RULES ON WINDOWS
+			Inbound and Outbound rules can be created from 'wf.msc' tool.
+---------------
+---------------
+---------------
+---------------
+---------------
 
 ---------------------
 ---------------------
@@ -45200,6 +45900,18 @@ TEMPORARY 2:
 	https://wiki.archlinux.org/title/Polkit
 
 ---
+----------------------------------
+----------------------------------
+----------------------------------
+----------------------------------
+USING SSH AGENT TO CONNECT
+	eval $(ssh-agent -s)
+	ssh-keygen -t ecdsa -C "email@servermail.com" 
+	ssh-copy-id -i ~/.ssh/id_ecdsa -s -p 2222 ftpsecure@192.168.1.95
+	copy fingerprint without the email address
+
+---
+---
 VERY IMPORTANT/TASK  LOGS:
 
 Feb-07-2025:
@@ -45211,6 +45923,11 @@ on /etc/modprobe.d/nvidia.conf file i just disabled Nvidia GSP Firmware, since '
 , but this was not the case. Turning the GSP option back to '1'.
 
 Furtherover, the reason you shouldn't completely disable EDID is because TTY only supports EDID resolutions. 
+------
+iptables -L; iptables -L -t nat; and iptables -L -t mangle;
+
+https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan:
+netsh interface portproxy add v4tov4 listenport=4000 listenaddress=0.0.0.0 connectport=4000 connectaddress=192.168.0.248
 -----
 ----
 Temporary 3:
