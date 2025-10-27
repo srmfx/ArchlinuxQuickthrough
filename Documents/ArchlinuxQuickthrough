@@ -1114,7 +1114,7 @@ USE LICENSE:
 				DISABLING PUBLIC PROFILE ONLY FOR SPECIFIC NETWORK DEVICE
 				ENABLING WINDOWS FIREWALL LOGS FOR SAFETY
 				CREATING NEW INBOUND AND OUTBOUND FIREWALL RULES ON WINDOWS
-
+				[*[LISTING HYPER-V FIREWALL SETTINGS]*]
 	SOME GOOGLE STUFF
 		GOOGLE PROMPTS
 			DISABLING GOOGLE PROMPTS
@@ -1305,6 +1305,7 @@ NOT ON INDEX		#Topics that haven't been set on Index.
 S-INDEX			#When queried/searched it will show the the beginning of this document Index.
 END INDEX		#Indicates the End of this document Index.
 SYNTAX INDEX		#When queried/searched it Will display this section here.
+[*[TOPIC]*]		#Denotes topics that contain sub-topics that belong to another topic.
 [[TOPIC]]		#Used for describing that you should be able to read other sub-topics related to this topic 
 			on the INDEX. this is similar to [INDEX: ...TEXT...]
 [INDEX: ...TEXT...]	#This will indicate a topic or group of topics that can be found in this document INDEX.
@@ -45666,6 +45667,10 @@ SETTING UP A VSFTP SERVER
 
 		1.9 - (OPTIONAL) - CREATING NEW INBOUND AND OUTBOUND FIREWALL RULES ON WINDOWS
 			Inbound and Outbound rules can be created from 'wf.msc' tool.
+
+		1.10 - (OPTIONAL) - WSL HYPER-V FIREWALL SETTINGS
+			Read more on:
+				LISTING HYPER-V FIREWALL SETTINGS
 ---------------
 ---------------
 ---------------
