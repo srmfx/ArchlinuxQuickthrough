@@ -1007,6 +1007,7 @@ USE LICENSE:
 			WSL DEFAULT WINDOWS LOCATION FOR LINUX DISTROS
 			LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
 			LISTING ALL AVAILABLE BLOCK DEVICES FOR MOUNTING IN WSL
+			LISTING ALL CONNECTED USB DEVICES IN WINDOWS POWER SHELL
 			LISTING HYPER-V FIREWALL SETTINGS
 				LISTING WSL FIREWALLING RULES
 				CHANGING HYPER-V FIREWALL SETTINGS
@@ -1080,6 +1081,7 @@ USE LICENSE:
 			[[SETTING UP VSFTPD SERVER FROM A WSL DISTRO | SETTING UP A SERVER IN WSL]]
 
 
+
 	---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
 		MANAGING ALIASES IN WINDOWS POWER SHELL
 			LISTING ALL AVAILABLE ALIASES
@@ -1090,6 +1092,9 @@ USE LICENSE:
 				LISTING ALL PROFILES AVAILABLE
 				CREATE THE FILE USING NVIM OR NOTEPAD
 				ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
+
+	---TROUBLESHOOTING WINDOWS
+		HOW TO FIX USB DEVICE NOT DETECTED
 
 --MISCALENEOUS:
 	SETTING UP A VSFTP SERVER
@@ -1221,8 +1226,6 @@ USE LICENSE:
 		SOME GAMES HAVE ISSUES RUNNING IN FULL SCREEN / GAME BLACK SCREEN ISSUE
 		WHAT HAPPENS TO CORRUPT SAVE DATA / CORRUPT PREFIX
 
-
-	
 	SOLVING STEAM FILE PICKING ISSUE / STEAM FILE PICKER NOT WORKING
 
 	PERFECT OBS STUDIO CONFIGURATION AND SETTINGS / PERFECT LIVE STREAMING CONFIGURATION
@@ -34944,6 +34947,8 @@ SOME BROOT FILE EXPLORER
 		services.msc			#System Services 
 		mmsys.cpl			#Audio and Microphone Settings on Windows
 		devmgmt.msc			#Device Manager
+		powercfg.cpl			#Power Configuration | Power Manager | Energy Economy
+		WF.msc				#Windows Firewall
 		perfmon.msc			#Performance Monitor
 		tpm.msc				#TPM Manager
 		certlmgr.msc			#System Certification Manager
@@ -34959,7 +34964,6 @@ SOME BROOT FILE EXPLORER
 		rsop.msc			#Resultant Set of Policy (RSoP) - group policies applied to a user. 
 		secpol.msc			#Local Security Policy
 		taskschd.msc			#Task Scheduler
-		WF.msc				#Windows Firewall
 		WmiMgmt.msc			#WMI Management
 		eventvwr.msc			#System Event Log Viewer
 
@@ -34973,7 +34977,6 @@ SOME BROOT FILE EXPLORER
 		joy.cpl				#Joystick/Gamepad Settings
 		main.cpl			#Mouse Settings
 		ncpa.cpl			#Network Control Panel Applet
-		powercfg.cpl			#Power Configuration
 		RTSnMg64.cpl			#RealTek Sound Manager
 		timedate.cpl			#System Clock/Date
 		irprops.cpl			#Infrared Control Panel
@@ -35558,6 +35561,11 @@ SOME BROOT FILE EXPLORER
 
 			READ MORE ON:
 				MOUNTING DEVICES ON WSL
+
+		LISTING ALL CONNECTED USB DEVICES IN WINDOWS POWER SHELL
+			Inside a windows power shell session, type: 
+				$ Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' } | Select-Object Status,Present,Class,FriendlyName,Service,InstanceId | Format-Table -AutoSize -Wrap
+
 
 		LISTING HYPER-V FIREWALL SETTINGS
 			Source: 
@@ -45270,7 +45278,33 @@ SOME BROOT FILE EXPLORER
 
 				You can then disable if you don't want it:
 					$ Set-ExecutionPolicy Restricted
-	
+
+
+	---TROUBLESHOOTING WINDOWS
+		HOW TO FIX USB DEVICE NOT DETECTED
+			Sometimes this issue can be easily fixed by disabling Power Savings for USB on Windows,
+		to do this follow the instructions:
+			
+			1) Launch Windows Power Device Manager and disable energy savings for USB Device.
+				press 'system_key + r', then type 'powercfg.cpl'.
+
+				1.2) Just for the current active Power Managing Profile, select 'Change Configurations'
+				and then click on 'Change Advanced Energy Settings', go to USB options and
+				finally disable 'USB selective suspend'.
+
+			2) Launch Device Manager and disable Power Management for USB Controllers.
+				press 'system_key + r', then type 'devmgmt.msc'.
+
+				2.1) expand 'Universal Serial Bus controllers', right-click each 'USB Root Hub', 
+				go to the 'Power Management' tab, 
+				finally uncheck 'Allow the computer to turn off this device to save power'
+
+			3) (Optional) Make sure your device is connected by using Windows Power Shell:
+				Launch a Windows Power Shell session and then type:
+					$ Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' } | Select-Object Status,Present,Class,FriendlyName,Service,InstanceId | Format-Table -AutoSize -Wrap
+
+			Hint: you can rollback steps #1 and #2 if your device still doesn't shows up.
+
 ----------------------------------
 ----------------------------------
 ----------------------------------
