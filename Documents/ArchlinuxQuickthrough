@@ -866,6 +866,14 @@ USE LICENSE:
 		HOW TO COMPILE YOUR PROGRAMS THROUGH YAY AND PACMAN FOR PERFORMANCE GAINS
 
 	--PERMISSION SETTINGS
+			USER CREATION SCHEME
+				BASIC STEPS FOR SETTING UP A USERNAME | CREATING A NEW USER
+				RUNNING PROGRAMS AS ANOTHER USER WITHOUT USER LOGIN
+				EFFECTIVELY REMOVING A USER
+				LISTING ALL USERS
+				LISTING ALL GROUPS
+			[*[BASIC USER AND GROUP MANAGEMENT]*]
+			[*[THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP]*]
 		USER AND GROUPS CREATION AND OWNERSHIP
 		DIFFERENCE BETWEEN SUDO, SU AND RUN0
 		TURNING OFF / DISABLE SPECIFIC LINUX BINARY && COMMANDS
@@ -969,7 +977,7 @@ USE LICENSE:
 	SOME WINDOWS UTILITIES
 	INSTALLING WINDOWS WITHOUT A HOTMAIL OR MICROSOFT ACCOUNT
 		OLD METHOD OF BYPASSING INSTALLATION WITHOUT MICROSOFT ACCOUNT
-	RUNNING COMMAND AS ADMINISTRATOR
+	RUNNING COMMAND AS ADMINISTRATOR ON WINDOWS
 	VERY BASICS ON FILESYSTEM CHECK DISK AND OTHER TOOLS | RECOMMENDED READING
 		CHKDSK TOOL SUMMARY
 			SCHEDULING FILESYSTEM CHECK DISK
@@ -1018,6 +1026,7 @@ USE LICENSE:
 			ADDING A NEW USER TO SUDOERS LIST
 		LOGIN AS ANOTHER USER IN A WSL LINUX DISTRO
 		BASIC USER AND GROUP MANAGEMENT
+			[*[PERMISSION SETTINGS]*]
 			CREATING A NEW USER
 			MODIFYING EXISTING USER
 			CREATING A NEW GROUP
@@ -1134,6 +1143,7 @@ USE LICENSE:
 		PARAGRAPH LINE BREAK
 		PASSWORD AND IDENTIFICATION SETTINGS
 			USING PRIMARY PASSWORD FOR THUNDERBIRD
+		SETTING UP THUNDERBIRD MAIL CLIENT ON ANDROID
 	SOME BROOT FILE EXPLORER
 	MONITORING LOG FILES IN REAL TIME
 		MULTITAIL COMMAND – MONITOR MULTIPLE LOG FILES IN REAL TIME
@@ -1362,6 +1372,9 @@ New Syntax(2023):
 
 2025 - October:
 	--Day 25:
+		PERMISSION SETTINGS	-> Minor Update
+			[*[BASIC USER AND GROUP MANAGEMENT]*]	-> Minor Update
+			[*[THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP]*]	-> Minor Update
 		SETTING UP A VSFTP SERVER
 		INSTALLING WINDOWS WITHOUT A HOTMAIL OR MICROSOFT ACCOUNT
 		RESTORING MOZILLA SESSION
@@ -10210,10 +10223,15 @@ id <user_name>							#Lists all groups and ids that belong to that user
 
 ===========SU AND SUDO:
 su <username>							#SU allows to login as another user
-sudo <command>							#Sudo allows to run a given command as root for the requesting user, all uses are logged.
-sudo su <username>						#Runs su command as a sudo,
-								 this can help when a given a user can't login as another user into the system, this will then allow them
-								 to login as another user as a sudo/root user.
+
+sudo <command>							#Sudo allows to run a given command as root for 
+								the requesting user, all uses are logged.
+
+sudo su <username>						#Runs su command as a sudo, this can help when a given 
+								a user can't login as another user into the system,
+								this will then allow them to login as another user as
+								a sudo/root user.
+
 sudo -iu							#allows a sudoer to login as another user in the system
 
 Protip.: if no username is given it'll login as root.
@@ -10239,20 +10257,85 @@ Secure Group Account Information:
 Shadow password suite configuration: 
 	/etc/login.defs
 
-============USER CREATION:
-Creating Non-System Users:
-useradd <username> -m -p <password> -g <group_name> 		#creates a user guest, -m creates it's home directory, and add Primary Group called games.
-useradd -p <password> -U <username_and_groupname_are_same> -m   #creates a new user which belongs to a group of it's same name, -m creates it's userspace directory inside /home/ 
+--PERMISSION SETTINGS
+============USER CREATION SCHEME:
+--SUMMARY:
+	Creating users require administrative rights.
 
-Creating System Users:
-useradd <username> -r -m -p <password> -g <group_name>		#-r allows for the creation of System User, System users are allowed to execute programs.
+	BASIC STEPS FOR SETTING UP A USERNAME | CREATING A NEW USER
+
+		1) Login as root user
+			$ su
+			  or
+			$ su - root
+			  or
+			$ sudo -iu root
+
+		2) Creating a user 
+			# useradd --create-home UserName
+				or
+			# useradd --shell /usr/bin/zsh --create-home UserName
+				or
+			# useradd --home-dir /mnt/user_home_dir --shell /usr/bin/zsh --create-home UserName
+
+
+		3) Add password to the newly created user
+			# passwd UserName
+
+		4) Login as the user for testing
+			# su - UserName
+
+		5) Quit the user shell after the test
+			$ exit
+
+		6) Quit the root shell used for adding new user
+			# exit
+
+
+	RUNNING PROGRAMS AS ANOTHER USER WITHOUT USER LOGIN
+		$ su - UserName --command "echo \"hello world\""  
+			or
+		$ sudo -iu UserName echo "hello world" 
+	
+	EFFECTIVELY REMOVING A USER
+		This will remove user, mail spool and home directory for the given user:
+
+			$ su --command "userdel --remove UserName"
+				or
+			$ sudo userdel --remove UserName
+
+	LISTING ALL USERS
+		$ getent passwd
+	
+	LISTING ALL GROUPS
+		$ getent group
+	
+	
+READ MORE ON:
+		[*[BASIC USER AND GROUP MANAGEMENT]*]
+		[*[THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP]*]
+----------------------------------------------------------------------------------
+--CREATING NON-SYSTEM USERS:
+useradd <username> -m -p <password> -g <group_name> 		#creates a user guest, -m creates it's home directory, 
+								and add Primary Group called games; 
+
+useradd -p <password> -U <username_and_groupname_are_same> -m 	#creates a new user which belongs to a group of 
+								it's same name, -m creates it's userspace directory 
+								/home/ directory.
+
+--CREATING SYSTEM USERS:
+useradd <username> -r -m -p <password> -g <group_name>		#-r allows for the creation of System User, 
+								System users are allowed to execute programs.
 								^ automatically sets a System UID for the given username.
 
-Creating Secret Users:
-useradd <username> -p -g <groupname>				#Creates a Secret User, #Users without a home-directory can not execute programs!
-useradd <username> -p <password> -U <user_group_name>		#Same as above, but creates a group whose name is the username.
+--CREATING SECRET USERS:
+useradd <username> -p -g <groupname>				#Creates a Secret User, users without a home-directory
+								can not execute certain programs.
 
-Creating User with Shell Name:
+useradd <username> -p <password> -U <user_group_name>		#Same as above, but creates a group whose name is the 
+								username.
+
+CREATING USER AND ADD A DIFFERENT SHELL:
 useradd <username> -s <shellname> 				#The name of the users login shell
 
 User Account Information:
@@ -34833,6 +34916,10 @@ THE ONION WEB / TOR WEB
 			An access password can be set for 'thunderbird' on the same section.
 
 		
+	SETTING UP THUNDERBIRD MAIL CLIENT ON ANDROID
+		After adding an account, go to settings by clicking on the 'clog' icon,
+	then select the email account, click on the 'Fetching mail' option, 
+	click on 'Incoming Server' and finally setup the incoming server settings, then click 'next'.
 	
 ---------------------
 ---------------------
@@ -35074,7 +35161,7 @@ SOME BROOT FILE EXPLORER
 			8 - Consider reading the following topic:
 				MANAGING WINDOWS ACCOUNTS
 			
-	RUNNING COMMAND AS ADMINISTRATOR
+	RUNNING COMMAND AS ADMINISTRATOR ON WINDOWS
 		$ runas.exe /user:Administrator "cmd"
 	
 
@@ -35640,13 +35727,18 @@ SOME BROOT FILE EXPLORER
 			# passwd <user_name>
 
 		5) Log into user
+			# su - <username>
+				or
 			# sudo -iu <user_name>
 
-			Note: you can use 'run0' and 'su' too instead of 'sudo'.
+			Note: you can use 'run0' too instead of 'sudo' or 'su'.
 
 		6) Type 'exit' if you want to exit the user shell
 			$ exit
 		
+		7) Optionally Read More on: 
+			BASIC STEPS FOR SETTING UP A USERNAME | CREATING A NEW USER
+
 		ADDING A NEW USER TO SUDOERS LIST
 			
 			1) Install 'visudo'
