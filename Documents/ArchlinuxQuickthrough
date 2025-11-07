@@ -1372,6 +1372,7 @@ New Syntax(2023):
 
 2025 - October:
 	--Day 25:
+		SHARING SINGLE DIRECTORY WITH ANOTHER USER | RESTRICTING SOME PERMISSIONS WHILE GIVING ACCESS | RECOMMENDED -> Update
 		PERMISSION SETTINGS	-> Minor Update
 			[*[BASIC USER AND GROUP MANAGEMENT]*]	-> Minor Update
 			[*[THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP]*]	-> Minor Update
@@ -36884,18 +36885,49 @@ SOME BROOT FILE EXPLORER
 
 				2) Now add the 'User_B' ACL for these directories:
 					$ setfacl -m u:User_B:r-x /home/{User_A,User_A/Documents,User_A/Documents/pdf\ files}
+						or
 
-				3) Now create a mask that only allows 'read' for all directories, 
-				except 'User B' dir.
+					$ setfacl -n -m u:User_B:r-x /home/{User_A,User_A/Documents,User_A/Documents/pdf\ files}
+					note: '-n' prevents setfacl from recalculating masks.
+					useful when adding new users to ACLs that already contains pre-defined mask.
+
+				3)(Maybe Optional - Read Note 2) Now create a mask that only allows 'read' 
+				for all directories, except 'User B' dir:
 					$ setfacl -m m::--x /home/{User_A,User_A/Documents,User_A/Documents/pdf\ files}
 
-					Note: This mask is going to prevent 'User_B' from reading any of the contents, but still
-					allow path access for his shared user directory named 'User B'
+					Note: This mask is going to prevent 'User_B' from reading any of the contents,
+					but still.
+
+					Note 2: Only use step 3 if you didn't use '-n' to avoid recalculating mask.
+					But make sure the existing mask still gives you 'x'; otherwise you must
+					follow step 3. Keep this in mind when adding new users in order to not
+					modify existing mask.
+
+					Note 3: You can also create a group and add the user to the group instead,
+					this way it's much easier to create new users and share the same directories
+					under the same permissions with them. Ex:
+						3.0) Create user:
+							# useradd --shell /usr/bin/zsh --create-home <username>
+							
+						3.1) Set new user pass:
+							# passwd <username>
+
+						3.2) Append/add new group to existing user:
+							# usermod -aG <groupname> <username>
+
+						3.3) Create ACL for the given group:
+							# setfacl -n -m g:<groupname>:rx /home/{User_A,User_A/Documents,User_A/Documents/pdf\ files}
+						3.4) Create read-only mask:
+							# setfacl -m m::x /home/{User_A,User_A/Documents,User_A/Documents/pdf\ files}
+						3.5) Conclusion: any user participating on the given group will inherit
+						the same permission set for the given folder.
+
 
 					Very Important: Masks will be reset whenever creating a new ACL for a new User or 
 					group when using 'setfacl', unless the option -n or --no-mask is given.
 
-				4) Finally, create an ACL that allows 'read' and 'execute' mode bits for the shared directory:
+				4) Finally, create an ACL that allows 'read' and 'execute' mode bits for the 
+				shared directory:
 					$ setfacl -m u:User_B:r-x -R /home/User_A/Documents/pdf\ files/User\ B/
 
 					Note: 
@@ -36907,28 +36939,31 @@ SOME BROOT FILE EXPLORER
 					      to any of the file contents, not even create directories. 
 					      HOWEVER, 'w' mode bit can be given if so desired.
 
-				5) (OPTIONAL STEP) - Since 'User_B' can't create/edit any of the files, 'User_B' will have to rely
-				on 'User_A' for adding, editing and creating files in this case. However, depenting on the program
-				being used to create/edit/copy files used by 'User_A', 'User_B' may still end up being unable 
-				to access them due to the file(or other sub-directories) permissions not allowing 'User_B' to 
-				'Read', 'Write' or 'eXecute' them when desired. 
+				5) (OPTIONAL STEP) - Since 'User_B' can't create/edit any of the files, 'User_B' 
+				will have to rely on 'User_A' for adding, editing and creating files in this case.
+				However, depenting on the program being used to create/edit/copy files used by 'User_A',
+				'User_B' may still end up being unable to access them due to the file(or other
+				sub-directories) permissions not allowing 'User_B' to 'Read', 'Write' or 'eXecute' 
+				them when desired. 
 				
 				In this case, there are two solutions that can be choosen here:
 
 					A) Either Re-apply or change permissions recursively
 						$ setfacl -m u:User_B:r-x -R ./home/User_A/Documents/pdf\ files/User\ B/
 						
-						Note: this will re-apply 'r-x' mode bit to all new files created, allowing 'User_B'
-						to execute programs and read them. 'w' can be added at will if so desired.
+						Note: this will re-apply 'r-x' mode bit to all new files created, 
+						allowing 'User_B' to execute programs and read them. 'w' can be added 
+						at will if so desired.
 
 					B) Applying or changing permissions to new files only:
 						$ setfacl -m u:User_B:rwx -R ./home/User_A/Documents/pdf\ files/User\ B/{.*,*}
 
-						Note: this will apply 'rwx' mode bits to files, sub-directories, hidden files and 
-						hidden sub-directories only.
+						Note: this will apply 'rwx' mode bits to files, sub-directories, hidden 
+						files and hidden sub-directories only.
 
-						Important: In this case, 'User B' directory will remain untouched and unchanged
-						if you so desire to set 'w' mode bit without changing the permissions of 'User_B' dir.
+						Important: In this case, 'User B' directory will remain untouched
+						and unchanged if you so desire to set 'w' mode bit without changing
+						the permissions of 'User_B' dir.
 
 				6) (RECOMMENDED) Adding extra protection:
 					You should create a mask with '--x' mode bit, for your user files and dir:
@@ -36942,24 +36977,28 @@ SOME BROOT FILE EXPLORER
 					$ ln -sf /home/User_A/Documents/pdf\ files/User\ B /home/User_B/Desktop/Shared\ User\ A\ Dir/
 
 				8) (Optional) Creating an environment variable for easily accessing the directory
-					You can also create environment variables for User_B, however i'm not covering this here.
-					You can also create env. var for User_A, since he'll also be the one copying/sharing the files 
-					with 'User_B'.
+					You can also create environment variables for User_B, however i'm not covering
+					this here.
+
+					You can also create env. var for User_A, since he'll also be the one 
+					copying/sharing the files with 'User_B'.
 
 
 				FINAL CONSIDERATIONS:
-					As you can see, using ACL makes this task much simplier than actually changing permissions 
-				for 'others' or adding new 'groups'. The '--x' mask prevents 'User_B' from listing any other directory,
-				but still allowing him for accessing any 'r-x' directories.
+					As you can see, using ACL makes this task much simplier than actually changing
+				permissions for 'others'. The '--x' mask prevents 'User_B' or 'Group_B' from
+				listing any other directory, but still allowing them to completely access permissive 
+				directories.
 
-				This adds up flexibility when creating/sharing new directories not only for 'User_B' but also for other
-				users, you can easily have different sharing permissions without resorting to creating new groups for
-				each new user.
+				This adds up flexibility when creating/sharing new directories not only for 'User_B'
+				or 'Group B" but also for other users/groups as you can easily have different sharing 
+				permissions.
 
-				NOTE: If you so desire, you can revert the whole example and share a User_B directory so that 
-				User_A can copy his own stuff for User_B, allowing him full flexibility. However, if User_B messes up
-				permission settings, masks on his end, User_A will be unable to share or fix anything on his own 
-				without administrative rights.
+				NOTE: If you so desire, you COULD revert the whole example and share a User_B/Group_B 
+				directory so that User_A/Group_A can copy his own stuff for User_B, allowing him full 
+				flexibility. HOWEVER, if User_B messes up permission settings or masks on his end,
+				User_A will NOT BE ABLE ANYLONGER to share or fix anything on his own without
+				administrative rights.
 
 
 	COMPILING WSL KERNEL
