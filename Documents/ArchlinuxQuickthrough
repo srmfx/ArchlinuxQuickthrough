@@ -1116,10 +1116,16 @@ USE LICENSE:
 
 --MISCALENEOUS:
 	FILESYSTEM ENCRYPTION USING ENCFS
+		ENCFS REQUIREMENTS
 		ADVANTAGES OF ENCFS
-		CREATING AN ENCRYPTED STORAGE
-		UMOUNTING ENCFS MOUNT POINT
-			KILLING ALL PROCESSES USING OR HOLDING DATA IN A DIRECTORY
+		CREATING AN ENCRYPTED STORAGE AND MOUNT-DECRYPTING IT WITH ENCFS
+			MODPROBING REQUIRED ENCFS MODULES
+			CREATING AN ENCRYPTED ENCFS DIRECTORY
+				SETTING UP CUSTOM LOCAL STORAGE PATH FOR ENCFS KEYS
+			MOUNTING ENCRYPTED ENCFS DIRECTORY
+			BACKING UP ENCFS KEY FILE
+		UMOUNTING ENCFS DIRECTORY
+			KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
 	CREATING OTP AUTHENTICATION FOR GDRIVE
 	MANAGING GPG KEYS
 		CREATING GPG KEYS
@@ -32379,6 +32385,7 @@ USEFUL LINKS TO CHECK:
 	https://sourceforge.net/projects/dar/				#DAR Archive Repository
 	https://github.com/Parchive/par2cmdline				#PAR2CMDLINE
 	https://www.gpg4win.org/					#OpenPGP for Windows
+	https://genr8rs.com/Generator/Fun/LeetSpeakGenerator		#L33t speak generator
 	http://tinycorelinux.net/welcome.html				#Tiny Core Linux, 32bit only
 	https://ufile.io						#UPLOAD FILES WITH DATE/TIME EXPIRATION
 	https://genr8rs.com/Generator/Fun/LeetSpeakGenerator		#L33t language generator | Leet language generator
@@ -46026,40 +46033,144 @@ SETTING UP A VSFTP SERVER
 FILESYSTEM ENCRYPTION USING ENCFS
 	ENCFS REQUIREMENTS 
 		EncFS requires a 'Fuse' enabled kernel and also 'fuse' to be installed on the linux system.
+	Here's a small list of packages required on archlinux:
+
+		1 - fuse2
+			Older fuse version, allows for backwards compatibility.
+
+		2 - fuse3
+			Newer version of fuse.
+
+		3 - psmisc
+			Allows 'fuser' to be used for killing/shutting down processes that have kept
+			a hold on files/data even tho they have been closed. On archlinux, 'psmisc' is installed
+			alongside the 'base' package.
+			
 	
 	ADVANTAGES OF ENCFS
-		EncFS is a fuse based virtual encrypted layer. 
+		source: https://en.wikipedia.org/wiki/EncFS
+
+		A) EncFS is a fuse based virtual encrypted layer. 
 		EncFS doesn't requires specific filesystem features and it doesn't requires the whole
 		block-device to be used, allowing directories within already partitioned filesystems to be used
 		for encryption, this means EncFS works on top of literally any 
 		known filesystem(BTRFS, Ext4, XFS, NFS, etc).
 
-		EncFS allows disk size to be shrinked or expanded on-the-fly as data is either added or removed 
-		without requiring any commands or extra tools.
+		B) EncFS allows disk size to be shrinked or expanded on-the-fly as data is either added or removed 
+		without requiring any commands or extra tools. This refers to scalable storage.
 
-		Can be directly used on remote cloud storages, allowing the user to read the stored cloud data
+		C) EncFS can be directly used on remote cloud storages, allowing the user to read the stored cloud data
 		without ever exposing the decrytped data to the cloud service when used alongside tools like 'rclone'.
 
+		D) EncFS is able to store each unique volume key anywhere else than the actual encrypted data, such as 
+		on a USB flash drive, network mount, optical disc or cloud. In addition to that a password could 
+		be required to decrypt this volume key. By default, key file is stored on the encrypted directory as
+		a hidden file named .encfs6.xml.
 
-	CREATING AN ENCRYPTED STORAGE
-		Note: EncFS only accepts absolute paths, not relative ones; in other words, 
-		using characters like '~' or './' is not allowed.
+		E) EncFS is available on multiple different platforms. Again, it's not tied to the kernel or specific
+		filesystem features.
 
-		Setting up EncFS for a given directory is as easy as this:
-			$ encfs /path/to/storage /path/to/mount
+		F) A Faster Backup on cloud storage is possible, since only the modified data will be uploaded.
+
+		G) Reduced Data corruption, since filesystem utilities like 'fsck'(for EXT4 filesystems only) can be 
+		normally utilized to fix filesystem problems and fix data encrypted with EncFS. EncFS also offers bitrot
+		detection.
+
+		H) Files can be accessed at random. You can, for example, skip to the middle of a very large encrypted 
+		video without decrypting the whole file.
+
+		I) Features from most modern available File Systems can be fully utilized when accessing
+		and reading both the encrypted/decrypted data.
+
+	CREATING AN ENCRYPTED STORAGE AND MOUNT-DECRYPTING IT WITH ENCFS
+		1) MODPROBING REQUIRED ENCFS MODULES
+			Some linux distros might requiring modprobing first on the fuse module:
+				# modprobe fuse
+
+		2) CREATING AN ENCRYPTED ENCFS DIRECTORY
+			Note: EncFS only accepts absolute paths, not relative ones; in other words, 
+			using characters like '~' or './' is not allowed.
+
+			Setting up EncFS for a given directory is as easy as this:
+				$ encfs /path/to/storage /path/to/mount
 
 
-		Note: /path/to/mount is only used as a pseudo directory for exposing the decrypted data to the user.
-		/path/to/storage is used as actual data storage where the data is encrypted and stored on-the-fly
-		as the user uses the data on /path/to/mount.
+			2A) Note: /path/to/mount is only used as a pseudo directory for exposing the decrypted data 
+			to the user. /path/to/storage is used as actual data storage where the data is encrypted 
+			and stored on-the-fly as the user uses the data on /path/to/mount.
 
-	UMOUNTING ENCFS MOUNT POINT
+			2B) Note: 'Block MAC headers' has to be enabled if bit-rot detection is desired.
+			This same option can also be disabled for performance when doing read and writes on data.
+			EncFS only offers error detection, but no way to fix it or repair it.
+			bit-rot detection is done by checksums.
+
+			2C) Note: Environment variable 'ENCFS6_CONFIG' can be set before setting up a new encrypted
+			directory, this allows the Key File to be used on encryption/decryption to be stored or read 
+			from a different directory other than the default directory /path/to/storage.
+
+				Example 1 - Mounting an already encrypted storage on decryption mount-point - :
+					$ ENCFS6_CONFIG=/home/me/.encfs6.xml encfs /path/to/storage /path/to/mount
+
+				Example 2 - Setting up a new encryption using custom directory for .encfs6.xml:
+					$ ENCFS6_CONFIG=/home/me/.google-myaccount.xml encfs /path/to/storage /path/to/mount
+
+
+			2.1) SETTING UP CUSTOM LOCAL STORAGE PATH FOR ENCFS KEYS
+				As seen in Example 2 above, you can set a different directory for the key file
+			and give it a different name. 
+
+				2.1.1) Create the new encfs directory:
+					# mkdir /etc/my_encfs_keys/
+
+				2.1.2) Give yourself access to the directory by setting up read/write/execute modes:
+					# setfacl -m u:${USER}:rwx /etc/my_encfs_keys/
+
+				2.1.3) Simplify the task by setting the path as an environment variables:
+				you can later use auto-completion features from zsh/bash:
+
+					[file: /etc/environment]
+						GOOGLEDRIVE_COUGAR="/etc/my_encfs_keys/.google-cougar.xml"
+					[/file]
+
+					Note: you can load /etc/environment straight to your current shell session
+					using source command as follows:
+						$ source /etc/environment
+
+				2.1.4) Create the new encrypted directory:
+					$ ENCFS6_CONFIG=${GOOGLEDRIVE_COUGAR} encfs /path/to/storage /path/to/mount
+
+				2.1.5) Now mount the encrypted data:
+						$ ENCFS6_CONFIG=${GOOGLEDRIVE_COUGAR} encfs /path/to/storage /path/to/mount
+
+		3) MOUNTING ENCRYPTED ENCFS DIRECTORY
+			It can be done the same way, encfs will automatically detect when setup has already occurred,
+			and simply mount encrypted data on the decryption mount-point:
+
+				$ encfs /path/to/storage /path/to/mount
+
+
+			3.1) Using custom path for encfs6.xml file:
+				Use this for decrypting data if you have followed step #2C above:			
+					$ ENCFS6_CONFIG=/home/me/.encfs6.xml encfs /tmp/crypt-view /tmp/plain-view
+
+		4) BACKING UP ENCFS KEY FILE
+			By default, EncFS stores the key file on the encrypted directory /path/to/storage as
+			a hidden file named .encfs6.xml, without this file it'll not be possible to decrypt the
+			encrypted data anylonger.
+
+			If your data is too important, you always have the option to store this file elsewhere
+			and remove it from the default encrypted directory.
+
+			One way or another, always backup this file.
+
+
+	UMOUNTING ENCFS DIRECTORY
 		This is how to umount a fuse based device:
 			$ fusermount -u /path/to/mount/
 
-		KILLING ALL PROCESSES USING OR HOLDING DATA IN A DIRECTORY
+		KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
 			Killing processes that are holding on files might be necessary if umounting fails:
-				$ fuse --kill ~/path/to/mount/{*,.*}
+				$ fuser --kill ~/path/to/mount/{*,.*}
 
 ---------------
 ---------------
