@@ -979,6 +979,7 @@ USE LICENSE:
 
 ---SOME WINDOWS STUFF:
 	SOME WINDOWS UTILITIES
+	HOW TO KILL A FROZEN APPLICATION UNDER WINDOWS 11
 	INSTALLING WINDOWS WITHOUT A HOTMAIL OR MICROSOFT ACCOUNT
 		OLD METHOD OF BYPASSING INSTALLATION WITHOUT MICROSOFT ACCOUNT
 	RUNNING COMMAND AS ADMINISTRATOR ON WINDOWS
@@ -1114,6 +1115,11 @@ USE LICENSE:
 		HOW TO FIX USB DEVICE NOT DETECTED
 
 --MISCALENEOUS:
+	FILESYSTEM ENCRYPTION USING ENCFS
+		ADVANTAGES OF ENCFS
+		CREATING AN ENCRYPTED STORAGE
+		UMOUNTING ENCFS MOUNT POINT
+			KILLING ALL PROCESSES USING OR HOLDING DATA IN A DIRECTORY
 	CREATING OTP AUTHENTICATION FOR GDRIVE
 	MANAGING GPG KEYS
 		CREATING GPG KEYS
@@ -1398,8 +1404,9 @@ New Syntax(2023):
 ========================================S-CHANGELOG=================================================
 ====================================================================================================
 
-2025 - October:
-	--Day 25:
+-009
+		[*[FILESYSTEM ENCRYPTION USING ENCFS]*]
+		HOW TO KILL A FROZEN APPLICATION UNDER WINDOWS 11
 		CREATING OTP AUTHENTICATION FOR GDRIVE
 		MANAGING GPG KEYS -> Minor Update
 		USING A GPG KEY FOR ENCRYPTING A DAR ARCHIVE
@@ -1417,8 +1424,7 @@ New Syntax(2023):
 		FRAME INTERPOLATION | FRAME GENERATION
 		SETTING UP A VSFTP SERVER
 
-2025 - May/July:
-	--Day 30:
+-008
 		SOME THUNDERBIRD MAIL CLIENT STUFF
 		STARTING UP WESTON USING A REGULAR USER | INITIATING XDG_RUNTIME_DIR
 		MOUNTING .VHD AND .VHDX IMAGES
@@ -1429,42 +1435,33 @@ New Syntax(2023):
 		---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
 
 
-2025 - April:
-	--Day 21:
+-007
 		USING AND MANAGING DIFFERENT PROFILES ON MOZILLA
 		SYMLINKING/BIND MOUNT CACHE AND CONFIGURATION DATA TO FSCRYPTED FOLDER | LIST OF UNSAFE DIRECTORIES
 		BATCH CONVERSION OF MULTIPLE VIDEOS INTO COMPRESSED FORMAT
 		[INDEX: COMPRESSING AND UNCOMPRESSING FILES & DATA]
 
-2025 - March:
-	--Day 30:
+-006
 		CHANGING SYSTEM LOCALE FOR PROTON AND WINE
 
-	--Day 15:
+-005
 		USING MPV TO PLAY ANIMATED DESKTOP BACKGROUNDS VIDEOS ON X11
 
-2024 - December:
-	-- Day 22:
+-004
 		TROUBLESHOOTING AUDIO CRACKLING / AUDIO STUTTERS ON PIPEWIRE/WIREPLUMBER
 		TCP OFFLOAD AND WHAT IT IS || NETWORK OFFLOADING
 
 
-2024 - November:
-	-- Day 20:
+-003
 		REVERTING DOWNGRADING NVIDIA DRIVERS ON ARCHLINUX || NVIDIA DRIVERS || TROUBLESHOOTING XORG
-	-- Day 04:
+
+-002
 		NVIDIA OPENGL PERFORMANCE TWEAK
 		SUSPEND X HIBERNATE X HYBRID
 
-2024 - October:
-	-- Day 30:
+-001
 		FIREJAIL
-
-	-- Day 29:
 		ENABLING CARET MODE  IN FIREFOX
-
-2024 - September: 
-	-- Day 26:
 		--NEW BASH TUTORIAL 2020.2-T EDITION 1 - ---
 
 ====================================================================================================
@@ -32380,6 +32377,8 @@ VERY IMPORTANT:
 
 USEFUL LINKS TO CHECK:
 	https://sourceforge.net/projects/dar/				#DAR Archive Repository
+	https://github.com/Parchive/par2cmdline				#PAR2CMDLINE
+	https://www.gpg4win.org/					#OpenPGP for Windows
 	http://tinycorelinux.net/welcome.html				#Tiny Core Linux, 32bit only
 	https://ufile.io						#UPLOAD FILES WITH DATE/TIME EXPIRATION
 	https://genr8rs.com/Generator/Fun/LeetSpeakGenerator		#L33t language generator | Leet language generator
@@ -35209,6 +35208,17 @@ SOME BROOT FILE EXPLORER
 	
 		driverquery.exe			#Queries all currently installed drivers
 		whoami.exe			#Prints hostname and username
+
+	HOW TO KILL A FROZEN APPLICATION UNDER WINDOWS 11
+		If you can minimize the application, you can simply use 'system_key + d' then skip to step #3.
+	'ctrl + alt + del' might not work at all if the frozen program takes over the full screen,
+	on that case you'll have to follow instructions from step #1.
+
+		1) Press shift + tab
+		2) Move the frozen application to a new desktop
+		3) Now select the free desktop and press ctrl + alt + del
+			3.1) Click on 'Task Manager'
+			3.2) Right click the application inside the task manager and kill it
 
 	INSTALLING WINDOWS WITHOUT A HOTMAIL OR MICROSOFT ACCOUNT
 		NOTE: Since windows11 25H2 update, it's not possible to use none of the old methods anylonger,
@@ -46008,6 +46018,49 @@ SETTING UP A VSFTP SERVER
 		1.10 - (OPTIONAL) - WSL HYPER-V FIREWALL SETTINGS
 			Read more on:
 				LISTING HYPER-V FIREWALL SETTINGS
+---------------
+---------------
+---------------
+---------------
+---------------
+FILESYSTEM ENCRYPTION USING ENCFS
+	ENCFS REQUIREMENTS 
+		EncFS requires a 'Fuse' enabled kernel and also 'fuse' to be installed on the linux system.
+	
+	ADVANTAGES OF ENCFS
+		EncFS is a fuse based virtual encrypted layer. 
+		EncFS doesn't requires specific filesystem features and it doesn't requires the whole
+		block-device to be used, allowing directories within already partitioned filesystems to be used
+		for encryption, this means EncFS works on top of literally any 
+		known filesystem(BTRFS, Ext4, XFS, NFS, etc).
+
+		EncFS allows disk size to be shrinked or expanded on-the-fly as data is either added or removed 
+		without requiring any commands or extra tools.
+
+		Can be directly used on remote cloud storages, allowing the user to read the stored cloud data
+		without ever exposing the decrytped data to the cloud service when used alongside tools like 'rclone'.
+
+
+	CREATING AN ENCRYPTED STORAGE
+		Note: EncFS only accepts absolute paths, not relative ones; in other words, 
+		using characters like '~' or './' is not allowed.
+
+		Setting up EncFS for a given directory is as easy as this:
+			$ encfs /path/to/storage /path/to/mount
+
+
+		Note: /path/to/mount is only used as a pseudo directory for exposing the decrypted data to the user.
+		/path/to/storage is used as actual data storage where the data is encrypted and stored on-the-fly
+		as the user uses the data on /path/to/mount.
+
+	UMOUNTING ENCFS MOUNT POINT
+		This is how to umount a fuse based device:
+			$ fusermount -u /path/to/mount/
+
+		KILLING ALL PROCESSES USING OR HOLDING DATA IN A DIRECTORY
+			Killing processes that are holding on files might be necessary if umounting fails:
+				$ fuse --kill ~/path/to/mount/{*,.*}
+
 ---------------
 ---------------
 ---------------
