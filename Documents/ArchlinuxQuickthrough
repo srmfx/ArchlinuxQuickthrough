@@ -1123,6 +1123,7 @@ USE LICENSE:
 			CREATING AN ENCRYPTED ENCFS DIRECTORY
 				SETTING UP CUSTOM LOCAL STORAGE PATH FOR ENCFS KEYS
 			MOUNTING ENCRYPTED ENCFS DIRECTORY
+			CONFIRMING ENCFS DECRYPTED HAS BEEN PROPERLY MOUNTED
 			BACKING UP ENCFS KEY FILE
 		UMOUNTING ENCFS DIRECTORY
 			KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
@@ -46098,21 +46099,16 @@ FILESYSTEM ENCRYPTION USING ENCFS
 			2A) Note: /path/to/mount is only used as a pseudo directory for exposing the decrypted data 
 			to the user. /path/to/storage is used as actual data storage where the data is encrypted 
 			and stored on-the-fly as the user uses the data on /path/to/mount.
+			
+			2B) It's recommended to use 'Paranoia Mode' if you want strict security.
 
-			2B) Note: 'Block MAC headers' has to be enabled if bit-rot detection is desired.
-			This same option can also be disabled for performance when doing read and writes on data.
-			EncFS only offers error detection, but no way to fix it or repair it.
-			bit-rot detection is done by checksums.
-
-			2C) Note: Environment variable 'ENCFS6_CONFIG' can be set before setting up a new encrypted
-			directory, this allows the Key File to be used on encryption/decryption to be stored or read 
-			from a different directory other than the default directory /path/to/storage.
+			2C) Note: Environment variable 'ENCFS6_CONFIG' can NOT be set before setting up a new encrypted
+			directory; HOWEVER, it can be set for decrypting an already existing encrypted directory using 
+			.encfs6.xml file from a different directory than the default dir., thus this allows the Key File 
+			to be safely stored elsewhere.
 
 				Example 1 - Mounting an already encrypted storage on decryption mount-point - :
 					$ ENCFS6_CONFIG=/home/me/.encfs6.xml encfs /path/to/storage /path/to/mount
-
-				Example 2 - Setting up a new encryption using custom directory for .encfs6.xml:
-					$ ENCFS6_CONFIG=/home/me/.google-myaccount.xml encfs /path/to/storage /path/to/mount
 
 
 			2.1) SETTING UP CUSTOM LOCAL STORAGE PATH FOR ENCFS KEYS
@@ -46120,26 +46116,39 @@ FILESYSTEM ENCRYPTION USING ENCFS
 			and give it a different name. 
 
 				2.1.1) Create the new encfs directory:
-					# mkdir /etc/my_encfs_keys/
+					# mkdir /etc/encfs/
 
 				2.1.2) Give yourself access to the directory by setting up read/write/execute modes:
-					# setfacl -m u:${USER}:rwx /etc/my_encfs_keys/
+					# setfacl -m u:${USER}:rwx /etc/encfs/
 
 				2.1.3) Simplify the task by setting the path as an environment variables:
 				you can later use auto-completion features from zsh/bash:
 
 					[file: /etc/environment]
-						GOOGLEDRIVE_COUGAR="/etc/my_encfs_keys/.google-cougar.xml"
+						GDRIVE_COUGAR="/etc/my_encfs_keys/.google_cougar.xml"
 					[/file]
 
 					Note: you can load /etc/environment straight to your current shell session
 					using source command as follows:
 						$ source /etc/environment
 
-				2.1.4) Create the new encrypted directory:
-					$ ENCFS6_CONFIG=${GOOGLEDRIVE_COUGAR} encfs /path/to/storage /path/to/mount
+				2.1.4) Create the new encrypted directory on a trusted storage that belongs to you:
+					$ encfs /path/to/storage /path/to/mount
 
-				2.1.5) Now mount the encrypted data:
+					Note: The key file will always be created in the default dir. /path/to/storage.
+
+				2.1.5) Now Copy the Key file to the directory created on step #2.1.1
+					Note: Pay attention to Key Filename in order to not replace/overwrite
+					any existing keys, or you might permanently lose access to any other
+					encrypted data.
+
+					$ mv /path/to/storage/.encfs6.xml /etc/encfs/.google_cougar.xml
+
+				2.1.6)(OPTIONAL) Copy the encrypted directory to a CLOUD STORAGE service
+					If you have one set with 'rclone' you may simply copy it after mounting it:
+						$ mv /path/to/storage /path/to/google\ drive
+
+				2.1.7) Now mount the encrypted data:
 						$ ENCFS6_CONFIG=${GOOGLEDRIVE_COUGAR} encfs /path/to/storage /path/to/mount
 
 		3) MOUNTING ENCRYPTED ENCFS DIRECTORY
@@ -46152,6 +46161,12 @@ FILESYSTEM ENCRYPTION USING ENCFS
 			3.1) Using custom path for encfs6.xml file:
 				Use this for decrypting data if you have followed step #2C above:			
 					$ ENCFS6_CONFIG=/home/me/.encfs6.xml encfs /tmp/crypt-view /tmp/plain-view
+
+		5) CONFIRMING ENCFS DECRYPTED DATA HAS BEEN PROPERLY MOUNTED
+			You can make sure encfs has been mounted correctly,
+		this will show you how much disk space you have available, it should be the same as the 
+		cloud storage device or the hard disk you've decided to use.
+				$ df -h 
 
 		4) BACKING UP ENCFS KEY FILE
 			By default, EncFS stores the key file on the encrypted directory /path/to/storage as
