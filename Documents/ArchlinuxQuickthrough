@@ -46153,11 +46153,10 @@ FILESYSTEM ENCRYPTION USING ENCFS
 
 					2.1.6.2) If you have one set with 'rclone' you may simply copy it 
 					after mounting it:
-						$ cp -ar /path/to/storage /path/to/google\ drive/
+						$ mv /path/to/storage /path/to/google\ drive/
 
 					2.1.6.3) After copying to google drive, you can safely remove 
 					local storage created when using encfs:
-						$ rm -r /path/to/storage
 						$ rm -r /path/to/mount
 
 				2.1.7) Now mount the encrypted data now located on the cloud storage and using
