@@ -46147,14 +46147,21 @@ FILESYSTEM ENCRYPTION USING ENCFS
 					$ mv /path/to/storage/.encfs6.xml /etc/encfs/.google_cougar.xml
 
 				2.1.6)(OPTIONAL) Copy the encrypted directory to a CLOUD STORAGE service.
-					2.1.6.1) Umount first before moving files to the Cloud Directory:
+
+					2.1.6.1) Umount first before deleting local files:
 						$ fusermount -u /path/to/mount
 
 					2.1.6.2) If you have one set with 'rclone' you may simply copy it 
 					after mounting it:
-						$ mv /path/to/storage /path/to/google\ drive
+						$ cp -ar /path/to/storage /path/to/google\ drive/
 
-				2.1.7) Now mount the encrypted data:
+					2.1.6.3) After copying to google drive, you can safely remove 
+					local storage created when using encfs:
+						$ rm -r /path/to/storage
+						$ rm -r /path/to/mount
+
+				2.1.7) Now mount the encrypted data now located on the cloud storage and using
+				a local key file:
 						$ ENCFS6_CONFIG=${GOOGLEDRIVE_COUGAR} encfs /path/to/storage /path/to/mount
 
 		3) MOUNTING ENCRYPTED ENCFS DIRECTORY
