@@ -46151,12 +46151,12 @@ FILESYSTEM ENCRYPTION USING ENCFS
 					2.1.6.1) Umount first before deleting local files:
 						$ fusermount -u /path/to/mount
 
-					2.1.6.2) If you have one set with 'rclone' you may simply copy it 
-					after mounting it:
+					2.1.6.2) If you have cloud storage set with 'rclone' you may simply copy into it 
+					after mounting it with 'rclone':
 						$ mv /path/to/storage /path/to/google\ drive/
 
 					2.1.6.3) After copying to google drive, you can safely remove 
-					local storage created when using encfs:
+					local mount folder created when setting up encfs:
 						$ rm -r /path/to/mount
 
 				2.1.7) Now mount the encrypted data now located on the cloud storage and using
