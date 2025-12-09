@@ -1127,6 +1127,13 @@ USE LICENSE:
 			BACKING UP ENCFS KEY FILE
 		UMOUNTING ENCFS DIRECTORY
 			KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
+	RCLONE TUTORIAL
+		ADDING A NEW REMOTE CLOUD DEVICE
+		MOUNTING WITH RCLONE 
+		SETTING UP RCLONE FOR PCLOUD STORAGE
+		SETTING UP RCLONE FOR GOOGLE DRIVE AND HOTMAIL
+		SETTING UP RCLONE FOR PROTON DRIVE
+		UMOUNTING RCLONE STORAGE DEVICE
 	CREATING OTP AUTHENTICATION FOR GDRIVE
 	MANAGING GPG KEYS
 		CREATING GPG KEYS
@@ -1412,6 +1419,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -009
+		[*[RCLONE TUTORIAL]*]
 		[*[FILESYSTEM ENCRYPTION USING ENCFS]*]
 		HOW TO KILL A FROZEN APPLICATION UNDER WINDOWS 11
 		CREATING OTP AUTHENTICATION FOR GDRIVE
@@ -46195,10 +46203,85 @@ FILESYSTEM ENCRYPTION USING ENCFS
 		This is how to umount a fuse based device:
 			$ fusermount -u /path/to/mount/
 
+		Or Umounting by fuse device name:
+			$ fusermount -u <Name of the FUSE Device>
+
+			ex:
+				$ fusermount -u "Proton Drive"
+			 	Note: You can use auto-complete feature from bash-zsh by pressing <tab-key>
+
+		Or Lazy Umounting for a forced umount:
+			$ fusermount -uz /path/to/mount
+				or
+			$ fusermount -uz "Proton Drive"
+
 		KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
 			Killing processes that are holding on files might be necessary if umounting fails:
 				$ fuser --kill ~/path/to/mount/{*,.*}
 
+---------------
+---------------
+---------------
+---------------
+---------------
+RCLONE TUTORIAL
+	ADDING A NEW REMOTE CLOUD DEVICE
+		$ rclone config
+
+	MOUNTING WITH RCLONE 
+		$ rclone mount --daemon --vfs-cache-mode full Remote_Name: ./Pseudo-Directory
+
+
+		A) Note: ./Pseudo-Directory must exist, so make sure you create it first.
+		B) Note: Remote_Name is the name you used to setup the storage device when
+		setting it up with 'rclone config'
+		C) Note: '--vfs-cache-mode full' should cover most setups for free cloud storage drives.
+		D) Note: '--daemon' will allow rclone to run as a service(in the background) as opposed to running
+		it as a foreground process.
+
+	SETTING UP RCLONE FOR PCLOUD STORAGE
+		source: https://rclone.org/pcloud/
+
+		Input the email you have used on pcloud register as the username and then input the password to rclone.
+		Let everything else set to defaut options.
+
+	SETTING UP RCLONE FOR GOOGLE DRIVE AND HOTMAIL
+		source: https://rclone.org/onedrive/
+			https://rclone.org/drive/
+		
+		DO NOT enter your username and password, then it'll ask you to login via browser to give it
+		OAUTH permission. Let everything else set to defaut options.
+
+	SETTING UP RCLONE FOR PROTON DRIVE
+		source: https://rclone.org/protondrive/#configurations
+
+		Give your email as username and password. Confirm default settings for everything else.
+		Type 'rclone config' and edit the newly added remote and then add the MAILBOX PASSWORD.
+
+		NOTE: The Proton Drive encryption keys need to have been already generated after a regular login 
+		via the browser, otherwise attempting to use the credentials in rclone will fail.
+
+		Proton Drive support is considered to be in beta test, so might not work with all accounts.
+
+	UMOUNTING RCLONE STORAGE DEVICE
+		This is how to umount a fuse based device:
+			$ fusermount -u /path/to/mount/
+
+		Or Umounting by fuse device name:
+			$ fusermount -u <Name of the FUSE Device>
+
+			ex:
+				$ fusermount -u "Proton Drive"
+			 	Note: You can use auto-complete feature from bash-zsh by pressing <tab-key>
+
+		Or Lazy Umounting for a forced umount:
+			$ fusermount -uz /path/to/mount
+				or
+			$ fusermount -uz "Proton Drive"
+
+		KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
+			Killing processes that are holding on files might be necessary if umounting fails:
+				$ fuser --kill ~/path/to/mount/{*,.*}
 ---------------
 ---------------
 ---------------
