@@ -46138,14 +46138,20 @@ FILESYSTEM ENCRYPTION USING ENCFS
 					Note: The key file will always be created in the default dir. /path/to/storage.
 
 				2.1.5) Now Copy the Key file to the directory created on step #2.1.1
+				Using the filename specified in step #2.1.3.
+
 					Note: Pay attention to Key Filename in order to not replace/overwrite
 					any existing keys, or you might permanently lose access to any other
 					encrypted data.
 
 					$ mv /path/to/storage/.encfs6.xml /etc/encfs/.google_cougar.xml
 
-				2.1.6)(OPTIONAL) Copy the encrypted directory to a CLOUD STORAGE service
-					If you have one set with 'rclone' you may simply copy it after mounting it:
+				2.1.6)(OPTIONAL) Copy the encrypted directory to a CLOUD STORAGE service.
+					2.1.6.1) Umount first before moving files to the Cloud Directory:
+						$ fusermount -u /path/to/mount
+
+					2.1.6.2) If you have one set with 'rclone' you may simply copy it 
+					after mounting it:
 						$ mv /path/to/storage /path/to/google\ drive
 
 				2.1.7) Now mount the encrypted data:
@@ -46158,7 +46164,7 @@ FILESYSTEM ENCRYPTION USING ENCFS
 				$ encfs /path/to/storage /path/to/mount
 
 
-			3.1) Using custom path for encfs6.xml file:
+			3.1)(ALTERNATE OPTION - OPTIONAL) Using custom path for encfs6.xml file:
 				Use this for decrypting data if you have followed step #2C above:			
 					$ ENCFS6_CONFIG=/home/me/.encfs6.xml encfs /tmp/crypt-view /tmp/plain-view
 
