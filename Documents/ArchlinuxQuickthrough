@@ -1130,8 +1130,10 @@ USE LICENSE:
 	RCLONE TUTORIAL
 		ADDING A NEW REMOTE CLOUD DEVICE
 		MOUNTING WITH RCLONE 
+		SETTING UP RCLONE FOR MEGA UPLOAD
 		SETTING UP RCLONE FOR PCLOUD STORAGE
-		SETTING UP RCLONE FOR GOOGLE DRIVE AND HOTMAIL
+		SETTING UP RCLONE FOR ONE DRIVE
+		SETTING UP RCLONE FOR GOOGLE DRIVE
 		SETTING UP RCLONE FOR PROTON DRIVE
 		UMOUNTING RCLONE STORAGE DEVICE
 	CREATING OTP AUTHENTICATION FOR GDRIVE
@@ -46239,24 +46241,45 @@ RCLONE TUTORIAL
 		D) Note: '--daemon' will allow rclone to run as a service(in the background) as opposed to running
 		it as a foreground process.
 
+	SETTING UP RCLONE FOR MEGA UPLOAD
+		Normally use your email as username and input your password when asked.
+
 	SETTING UP RCLONE FOR PCLOUD STORAGE
 		source: https://rclone.org/pcloud/
 
-		Input the email you have used on pcloud register as the username and then input the password to rclone.
-		Let everything else set to defaut options.
+		Leave Client ID and Client Secret empty, Let everything else set to defaut options.
+		When asked to for browser access, say 'yes' and authorize yourself via browser.
 
-	SETTING UP RCLONE FOR GOOGLE DRIVE AND HOTMAIL
+	SETTING UP RCLONE FOR ONE DRIVE
 		source: https://rclone.org/onedrive/
+
+		When asked for CLIENT ID and CLIENT SECRET, do not enter any input, simply skip it.
+		Choose 'GLOBAL' when asked for 'national cloud region' for OneDrive.
+		Leave everything else to default option.
+
+		Access the generate URL for OAUTH Authentication.
+		Let anything else set to defaut options.
+
+
+	SETTING UP RCLONE FOR GOOGLE DRIVE
+		source:
 			https://rclone.org/drive/
 		
-		DO NOT enter your username and password, then it'll ask you to login via browser to give it
-		OAUTH permission. Let everything else set to defaut options.
+		When asked for CLIENT ID and CLIENT SECRET, do not give it any input, simply skip it.
+		Select 'Full access all files, excluding Application Data Folder' when asked.
+		Leave everything else to default option.
+
+		Access the generate URL for OAUTH Authentication.
+		Let anything else set to defaut options.
+
+
 
 	SETTING UP RCLONE FOR PROTON DRIVE
 		source: https://rclone.org/protondrive/#configurations
 
-		Give your email as username and password. Confirm default settings for everything else.
-		Type 'rclone config' and edit the newly added remote and then add the MAILBOX PASSWORD.
+		Give your email as username and then input your password. Confirm default settings for everything else.
+		When asked for 'Advanced Configuration', say 'yes' then input your MAILBOX PASSWORD when asked for it,
+		leave everything else to default options.
 
 		NOTE: The Proton Drive encryption keys need to have been already generated after a regular login 
 		via the browser, otherwise attempting to use the credentials in rclone will fail.
