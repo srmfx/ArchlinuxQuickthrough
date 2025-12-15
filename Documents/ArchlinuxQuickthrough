@@ -1000,6 +1000,7 @@ USE LICENSE:
 		CHANGING USER PASSWORDS ON WINDOWS
 		MAKING FOLDER OR FILES USER EXCLUSIVE | DIRECTORY AND FILES PERMISSIONS UNDER WINDOWS
 			HIDING FOLDER OR FILE FROM OTHER USERS IN WINDOWS
+		ALLOWING CERTAIN PROGRAMS TO ONLY BE EXECUTED BY ADMIN PERMISSION
 		WINDOWS REMOTE ACCOUNTS
 		LOCAL WINDOWS ACCOUNTS
 		CONVERTING REMOTE USER ACCOUNT INTO LOCAL USER ACCOUNT
@@ -1115,6 +1116,13 @@ USE LICENSE:
 		HOW TO FIX USB DEVICE NOT DETECTED
 
 --MISCALENEOUS:
+	FILESYSTEM ENCRYPTION USING GOCRYPTFS
+		REQUIREMENTS FOR USING GOCRYPTFS
+		ADVANTAGES OF GOCRYPTFS OVER ENCFS
+		INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
+		MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
+		CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
+
 	FILESYSTEM ENCRYPTION USING ENCFS
 		ENCFS REQUIREMENTS
 		ADVANTAGES OF ENCFS
@@ -1127,6 +1135,7 @@ USE LICENSE:
 			BACKING UP ENCFS KEY FILE
 		UMOUNTING ENCFS DIRECTORY
 			KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
+		CHANGING ENCFS PASSWORD
 	RCLONE TUTORIAL
 		ADDING A NEW REMOTE CLOUD DEVICE
 		MOUNTING WITH RCLONE 
@@ -1421,6 +1430,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -009
+		[*[FILESYSTEM ENCRYPTION USING GOCRYPTFS]*]
 		[*[RCLONE TUTORIAL]*]
 		[*[FILESYSTEM ENCRYPTION USING ENCFS]*]
 		HOW TO KILL A FROZEN APPLICATION UNDER WINDOWS 11
@@ -35688,6 +35698,10 @@ SOME BROOT FILE EXPLORER
 					HIDING FOLDER OR FILE FROM OTHER USERS IN WINDOWS
 						Simply remove permission for 'Everyone' by deleting it.
 
+		ALLOWING CERTAIN PROGRAMS TO ONLY BE EXECUTED BY ADMIN PERMISSION
+			Some binary executables can benefit from being executed only by administrators,
+		for doing this, 'right-click' the binary file, click on 'property', then click on 'Compatibility' Tab,
+		click on 'execute this program as administrator'. Optionally you can check this option for all users.
 
 		WINDOWS REMOTE ACCOUNTS
 			Windows remote accounts can only be be accessed with an internet connection;
@@ -46036,6 +46050,76 @@ SETTING UP A VSFTP SERVER
 		1.10 - (OPTIONAL) - WSL HYPER-V FIREWALL SETTINGS
 			Read more on:
 				LISTING HYPER-V FIREWALL SETTINGS
+
+---------------
+---------------
+---------------
+---------------
+---------------
+FILESYSTEM ENCRYPTION USING GOCRYPTFS
+	REQUIREMENTS FOR USING GOCRYPTFS
+		GOCRYPTFS requires a 'Fuse' enabled kernel and also 'fuse' to be installed on the linux system.
+		Here's a small list of packages required on archlinux:
+
+			1 - fuse2
+				Older fuse version, allows for backwards compatibility.
+
+			2 - fuse3
+				Newer version of fuse.
+
+			3 - psmisc
+				Allows 'fuser' to be used for killing/shutting down processes that have kept
+				a hold on files/data even tho they have been closed. On archlinux, 'psmisc' is installed
+				alongside the 'base' package.
+
+	ADVANTAGES OF GOCRYPTFS OVER ENCFS
+
+		A) 'Encfs' isn't maintained nor supported anylonger.
+		B) 'Gocryptfs' is 'encfs' spiritual successor.
+		C) Just like 'encfs' it can be used on any filesystem, including remote storages filesystems.
+		D) unlike 'encfs', 'gocryptfs' allows specifying configuration key file from the moment it's created.
+		E) unlike 'encfs', 'gocryptfs' has multi-threading support.
+
+	INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
+		1) First create a directory meant for storage:
+			$ mkdir ~/Encrypted.storage
+
+			1A) Note: When creating directories on a remote storage, make sure that DIRECTORY CREATION
+			and INITIALIZATION is done directly in the remote storage.
+
+		2) Initialize the encrypting directory: 
+			$ gocrypfs --config "/etc/gocryptfs/gdrive_cougar_A.conf" --init ~/Encryted.storage
+				or
+			$ gocrypfs --config --deterministic-names "/etc/gocryptfs/gdrive_cougar_A.conf" --init ~/Encryted.storage
+
+			2A) Note: when not specifying '--config', a .conf file will be created at the encrypted.storage
+			directory.
+
+			2B) Note: An extra .diriv file will be created at encrypted.storage directory,
+			this file can not be stored elsewhere and it's related to hiding directory name and file names by
+			obfuscating them behind completely random names.
+
+			2C) Note: Cloud storage might have issues with files that are accessed/read too many times
+			as is the case with .diriv file, make sure to enable cached mode '--vfs-cache-mode full' 
+			when using a tool like 'rclone'. If this is a problem for you, .diriv file can be disabled 
+			with the --deterministic-names option upon creation and mount.
+			
+			2D) Note: Backup both .conf and .diriv, the .diriv file needs to be backed up from time to 
+			time as new files are added or renamed.
+		
+	MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
+		$ gocryptfs --config "/etc/gocryptfs/gdrive_cougar_A.conf" ~/Encrypted.storage ~/Mount.point
+			or
+		$ gocryptfs --deterministic-names --config "/etc/gocryptfs/gdrive_cougar_A.conf" ~/Encrypted.storage ~/Mount.point
+
+		A) Note: Only specify --deterministic-names for mounting if you have initialized/created a 'gocryptfs' 
+		with it.
+
+	CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
+		$ gocryptfs --passwd ~/Encrypted.storage
+			or
+		$ gocryptfs --config "/etc/gocryptfs/gdrive_cougar_A.conf" --passwd ~/Encrypted.storage
+
 ---------------
 ---------------
 ---------------
@@ -46220,6 +46304,11 @@ FILESYSTEM ENCRYPTION USING ENCFS
 		KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
 			Killing processes that are holding on files might be necessary if umounting fails:
 				$ fuser --kill ~/path/to/mount/{*,.*}
+
+	CHANGING ENCFS PASSWORD
+		$ encfsctl passwd /path/to/storage
+			or
+		$ ENCFS6_CONFIG="/etc/encfs/.gdrive_cougar.conf"  /path/to/storage
 
 ---------------
 ---------------
