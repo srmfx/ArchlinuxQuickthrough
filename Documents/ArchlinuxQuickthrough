@@ -46079,6 +46079,7 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 		C) Just like 'encfs' it can be used on any filesystem, including remote storages filesystems.
 		D) unlike 'encfs', 'gocryptfs' allows specifying configuration key file from the moment it's created.
 		E) unlike 'encfs', 'gocryptfs' has multi-threading support.
+		F) unlike 'encfs', 'gocryptfs' can use both relative and absolute paths when decrypting/encrypting.
 
 	INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
 		1) First create a directory meant for storage:
