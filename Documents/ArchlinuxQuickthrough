@@ -1122,6 +1122,7 @@ USE LICENSE:
 		INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
 		MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
 		CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
+		SOME LINKS ON GOCRYPTFS
 
 	FILESYSTEM ENCRYPTION USING ENCFS
 		ENCFS REQUIREMENTS
@@ -1136,15 +1137,21 @@ USE LICENSE:
 		UMOUNTING ENCFS DIRECTORY
 			KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
 		CHANGING ENCFS PASSWORD
+
 	RCLONE TUTORIAL
 		ADDING A NEW REMOTE CLOUD DEVICE
 		MOUNTING WITH RCLONE 
+			RCLONE MOUNT CACHE MODES EXPLAINED
 		SETTING UP RCLONE FOR MEGA UPLOAD
 		SETTING UP RCLONE FOR PCLOUD STORAGE
 		SETTING UP RCLONE FOR ONE DRIVE
 		SETTING UP RCLONE FOR GOOGLE DRIVE
 		SETTING UP RCLONE FOR PROTON DRIVE
 		UMOUNTING RCLONE STORAGE DEVICE
+		CREATING A SHAREABLE LINK TO A FILE OR DIRECTORY CLOUD STORAGE SERVICE USING RCLONE
+		LISTING NON-CACHED STORED DATA ON REMOTE USING RCLONE
+		MAKING SURE DATA IS SYNCED TO REMOTE STORAGE USING RCLONE
+
 	CREATING OTP AUTHENTICATION FOR GDRIVE
 	MANAGING GPG KEYS
 		CREATING GPG KEYS
@@ -46121,6 +46128,9 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 			or
 		$ gocryptfs --config "/etc/gocryptfs/gdrive_cougar_A.conf" --passwd ~/Encrypted.storage
 
+	SOME LINKS ON GOCRYPTFS
+		https://nuetzlich.net/gocryptfs/comparison/#performance		## Some Benchmark in relation 
+										   to other tools
 ---------------
 ---------------
 ---------------
@@ -46331,6 +46341,65 @@ RCLONE TUTORIAL
 		D) Note: '--daemon' will allow rclone to run as a service(in the background) as opposed to running
 		it as a foreground process.
 
+		
+		RCLONE MOUNT CACHE MODES EXPLAINED
+			--vfs-cache-mode <mode> can be set before mounting a device,
+			these are the modes available.
+
+			the below information has been partially extracted from rclone man page:
+
+			1) FULL
+				A) In this mode all reads and writes are buffered to and from disk.  When data is read 
+				from the remote this is buffered to disk as well.
+
+				In  this  mode  the files in the cache will be sparse files and rclone will keep track 
+				of which bits of the files it has downloaded. 
+
+				The cache is by default located on ~/.cache/rclone/ directory. Filesystem needs 
+				to support sparse files.
+
+				if an application only reads the starts of each file, then rclone will only buffer 
+				the start of the file.   These files will appear to be their full size in the cache,
+				but they will be sparse files with only the data that has been downloaded present in them.
+
+				
+				B) When reading a file rclone will read --buffer-size plus --vfs-read-ahead bytes 
+				ahead.  The --buffer-size is buffered in memory whereas the --vfs-read-ahead 
+				is buffered on disk.
+
+				When  using this mode it is recommended that --buffer-size IS NOT SET TOO LARGE
+				and --vfs-read-ahead IS SET LARGE IF REQUIRED.
+
+				IMPORTANT not all file systems support sparse files.  In particular FAT/exFAT 
+				do not.  Rclone will perform very badly if the cache directory is on a
+				filesystem which doesn't support sparse files and it will log an ERROR 
+				message if one is detected.
+
+
+			2) WRITES
+				A) In this mode files opened for read-only are still read directly from the remote,
+				write-only and read/write files are buffered to disk first. This mode should support
+				all normal file system operations. If an upload fails it will be retried at 
+				exponentially increasing intervals up to 1 minute.
+
+			3) MINIMAL
+				A) This is very similar to "off" except that files opened for read AND write will 
+				be buffered to disk.  This means that files opened for write will be a lot more 
+				compatible, but uses the minimal disk space.
+
+				B) Files opened as write-only can not be seeked.
+
+			4) OFF
+				A) In this mode (THE DEFAULT) the cache will read directly from the remote and write 
+				directly  to  the  remote  without caching anything on disk.
+
+				B) Files opened for write can not be seeked.
+
+				C) If an upload fails it can't be retried;
+
+				D) Files can't be opened for both read AND write
+
+			
 	SETTING UP RCLONE FOR MEGA UPLOAD
 		Normally use your email as username and input your password when asked.
 
@@ -46363,7 +46432,6 @@ RCLONE TUTORIAL
 		Let anything else set to defaut options.
 
 
-
 	SETTING UP RCLONE FOR PROTON DRIVE
 		source: https://rclone.org/protondrive/#configurations
 
@@ -46374,7 +46442,8 @@ RCLONE TUTORIAL
 		NOTE: The Proton Drive encryption keys need to have been already generated after a regular login 
 		via the browser, otherwise attempting to use the credentials in rclone will fail.
 
-		Proton Drive support is considered to be in beta test, so might not work with all accounts.
+		VERY IMPORTANT:
+			Proton Drive support is considered to be in beta test, so MIGHT NOT WORK WELL with all accounts.
 
 	UMOUNTING RCLONE STORAGE DEVICE
 		This is how to umount a fuse based device:
@@ -46395,6 +46464,51 @@ RCLONE TUTORIAL
 		KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
 			Killing processes that are holding on files might be necessary if umounting fails:
 				$ fuser --kill ~/path/to/mount/{*,.*}
+	
+	CREATING A SHAREABLE LINK TO A FILE OR DIRECTORY CLOUD STORAGE SERVICE USING RCLONE
+		This will only works when supported by cloud storage service.
+
+		1) Create a shareable link to some date stored on the cloud:
+			$ rclone link <remote_name>:<path_to_data>
+
+		2) Making the data unshereable again:
+			$ rclone unlink <remote_name>:<path_to_data>
+
+			
+	LISTING NON-CACHED STORED DATA ON REMOTE USING RCLONE
+		$ rclone lsd <remote_name>:
+			or
+		$ rclone lsl <remote_name>:
+
+		Note: 'lsl' will list files and directories with timestamp.
+
+	MAKING SURE DATA IS SYNCED TO REMOTE STORAGE USING RCLONE
+		You can list data differences between remote and local storage.
+			$ rclone check <remote_name>: <local_storage>
+
+		note: using 'stat <file/folder>' will also reveal the inode number, which
+		will indicate to which device the file/folder belongs to.
+
+		$ rclone sync --dry-run <remote_name>: /path/to/proton.storage/backup
+			or
+		$ rclone sync --dry-run /path/to/mount <remote_name>: 
+
+		Important: 
+			Only remove --dry-run after running it first and making sure those 
+			are the changes you want. --progress or -P can also be used to show the progress.
+
+		Example 1 - Will Sync data from proton drive to hard disk - :
+			You can use this example for backing up cloud data to a different storage.
+				$ rclone --dry-run sync Proton\ Drive\ -\ cougar: ~/protondrive\ backup
+				
+		Example 2 - Will Sync data hard disk to proton drive - :
+			You can use this example to help syncing cached data with the cloud storage.
+				$ rclone sync --dry-run /path/to/mount Proton\ Drive\ -\ cougar: 
+
+		Note: Sometimes rclone might not sync cached data immediatly, which would result in data
+		not being uploaded/updated to the cloud storage. 
+
+
 ---------------
 ---------------
 ---------------
