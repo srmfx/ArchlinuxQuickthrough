@@ -990,6 +990,7 @@ USE LICENSE:
 		DISM TOOL SUMMARY
 		RUNNING FILESYSTEM CHECK ON A WSL DISTRO
 			FILESYSTEM CHECK FOR LINUX DISTROS | EXT4 ONLY
+		SHRINKING A MICROSOFT .VDHX VIRTUAL DISK IMAGE
 	SOME WINDOWS 11 HOTKEYS
 	BASICS ON HYPERV
 		CHECKING IF HYPER-V IS ENABLED ON WINDOWS
@@ -1437,6 +1438,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -009
+		SHRINKING A MICROSOFT .VHDX VIRTUAL DISK IMAGE
 		[*[FILESYSTEM ENCRYPTION USING GOCRYPTFS]*]
 		[*[RCLONE TUTORIAL]*]
 		[*[FILESYSTEM ENCRYPTION USING ENCFS]*]
@@ -35470,6 +35472,77 @@ SOME BROOT FILE EXPLORER
 			read the following topic for more information:
 				BARE MOUNTING DEVICES
 
+		SHRINKING A MICROSOFT .VHDX VIRTUAL DISK IMAGE
+			Note: A .VHDX Virtual Disk is used by default for WSL2 Distros.
+		Since A .VHDX Virtual Disk can expand in size dynamically, but it lacks the ability to shrink in
+		size as files are removed within the Virtual Disk, WSL2 users will have to rely on manually 
+		shrinking the size of .VHDX.
+
+		To do this, a few steps will have to be followed:
+
+			1) HOW TO TELL IF YOU NEED TO SHRINK YOUR VIRTUAL DISK
+				1.1 - GO TO FILE EXPLORER AND CHECK DISK SIZE FOR YOUR .VHDX IMAGE:
+					"C:\Users\Your_Username\AppData\Local\wsl\{9143-dbb1aeb6b89c}\ext4.vhdx"
+
+				1.2 - RUN YOUR .VHDX IN WSL2 AND CHECK DISK USAGE QUOTA BY TYPING IN YOUR LINUX DISTRO:
+					$ df -h
+
+				1.3 - COMPARE BOTH SIZES IN #1.2 AND #1.1:
+
+					1.3.1 - If size in #1.1 is larger than #1.2, then you may have to
+					shrink your .vhdx image.
+
+					Note that WSL2 pre-allocates some disk-space in the name of performance,
+					on my case it's always +10GB that never becomes shrinkable.
+					
+					In other words, you may only have to shrink if the difference between the 
+					found sizes in #1.1 and #1.2 is MORE than 10GB.
+
+
+			2)(OPTIONAL) - BACKUP YOUR .VHDX FILE ELSEWHERE:
+				The reason to backup your Virtual Disk is because the shrinking procedure CAN TAKE UP 
+				A VERY LONG TIME - It took me 1h long just for a small 135GB virtual disk - 
+				so just backup the virtual disk somewhere, since data corruption can occur in case of 
+				unexpected power blackouts and system crashes. 
+
+				Virtual Disks created by WSL are located in this directory:
+					C:\Users\<username>\AppData\Local\wsl\<WSL_DISTRO_ID>\
+
+					example: 
+						"C:\Users\Your_Username\AppData\Local\wsl\{9143-dbb1aeb6b89c}\ext4.vhdx"
+
+			3) SHUTDOWN WSL
+				Virtual Disk needs to be umounted and unattached:
+				Launch a windows power shell session and type
+					$ wsl --shutdown
+
+			4) AS ADMIN, LAUNCH A WINDOWS POWER SHELL SESSION AND TYPE:
+				# diskpart
+
+				4.1) SELECT VDISK FILE FROM WITHIN DISKPART:
+					Type:
+						select vdisk file="C:\Users\username\AppData\Local\wsl\{9143-dbb1aeb6b89c}\ext4.vhdx"
+
+				4.2) COMPACT DISK AFTER SELECTION:
+					Note: If you haven't backed up your .vhdx image yet, make sure to do now.
+					Shrinking can take up to 1h minimum and longer time at maximum, power blackouts
+					or system crashes can occur leaving you with a permanent damaged Virtual Disk.
+
+					Note2: progress percentage may get stuck, but you must leave the diskpart running
+					until it finishes.
+
+					Type:
+						compact disk
+
+				4.3) WAIT FOR IT TO FINISH THEN CLOSE DISKPART:
+					Type:
+						exit
+
+			5) FINAL NOTES AND CONSIDERATIONS:
+				Hyper-V Manager may offer a different easier approach for compacting/shrinking the disk,
+				But I haven't tested it out myself.
+
+--------------------------
 				
 	SOME WINDOWS 11 HOTKEYS
 		alt + tab_key				#Cycles to next open program(Task View)
