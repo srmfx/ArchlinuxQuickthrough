@@ -1117,6 +1117,7 @@ USE LICENSE:
 		HOW TO FIX USB DEVICE NOT DETECTED
 
 --MISCALENEOUS:
+	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 	FILESYSTEM ENCRYPTION USING GOCRYPTFS
 		REQUIREMENTS FOR USING GOCRYPTFS
 		ADVANTAGES OF GOCRYPTFS OVER ENCFS
@@ -1436,6 +1437,9 @@ New Syntax(2023):
 ====================================================================================================
 ========================================S-CHANGELOG=================================================
 ====================================================================================================
+
+-010
+		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
 -009
 		SHRINKING A MICROSOFT .VHDX VIRTUAL DISK IMAGE
@@ -46581,6 +46585,33 @@ RCLONE TUTORIAL
 		Note: Sometimes rclone might not sync cached data immediatly, which would result in data
 		not being uploaded/updated to the cloud storage. 
 
+
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
+	By default, 'man' uses 'less' to display man pages on the terminal.
+When reading man pages for 'less' you can find information on 'LESS_TERMCAP_xx' environment variable,
+which allows us to apply different colors using Control Escape Sequences.
+
+1) Add this to your /etc/environment file:
+
+	[file: /etc/environment ]
+		man(){
+			export LESS_TERMCAP_mb=$'\e[01;31m'
+			export LESS_TERMCAP_md=$'\e[01;31m'
+			export LESS_TERMCAP_me=$'\e[0m'
+			export LESS_TERMCAP_se=$'\e[0m'
+			export LESS_TERMCAP_so=$'\e[43;93m'
+			export LESS_TERMCAP_ue=$'\e[0m'
+			export LESS_TERMCAP_us=$'\e[4;93m'
+			export GROFF_NO_SGR=1              	# mandatory for groff versions
+
+			command man "$@"
+		}
+	[/file]
 
 ---------------
 ---------------
