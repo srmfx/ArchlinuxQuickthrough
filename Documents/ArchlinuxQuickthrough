@@ -8046,7 +8046,7 @@ Mount a directory to another directory:
 	mount --bind path/to/old_dir path/to/new_dir
 	use 'lsblk' to list all bind mounts on the system.
 
-CREATING RAW IMAGE:
+CREATING RAW IMAGE USING QEMU-IMG:
 	qemu-img create -f raw ./archlinux-install.raw 5G
 
 	^VERY IMPORTANT: This is 200x times faster than using dd to create an empty zeroed file!!!
