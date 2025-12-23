@@ -1276,6 +1276,7 @@ USE LICENSE:
 			HOW TO IGNORE FILES FROM BEING TRACKED/UNTRACKED
 			FIXING UNTRACKED FILES
 		CREATING GIT ALIASES
+		DOING PARTIAL HUNK GIT COMMITS
 		ADVANCED GIT
 		GIT OAUTH TOKEN | VERY IMPORTANT 2023
 		GIT GPG - SIGNING GITHUB COMMIT LOCALLY AND REMOTELY | VERY IMPORTANT(2024):
@@ -1448,6 +1449,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -010
+		DOING PARTIAL HUNK GIT COMMITS
 		CREATING AND MOUNTING LOOP DEVICES -> Minor Update
 			USING TRUNCATE FOR CREATING A LOOP DEVICE FILE
 			TELLING THE DIFFERENCE BETWEEN ALLOCATED SIZE AND APPARENT SIZE | PHYSICAL DATA SIZE VS LOGICAL DATA SIZE
@@ -46700,6 +46702,31 @@ which allows us to apply different colors using Control Escape Sequences.
 		}
 	[/file]
 
+---------------
+---------------
+---------------
+---------------
+---------------
+DOING PARTIAL HUNK GIT COMMITS
+	1) ADDING HUNKS TO STAGING AREA
+		$ git add -p
+	
+		A) Note: type 'y' for adding hunk to staging or 'n' for removing it.
+		you can also type 's' for splitting a hunk into different hunks.
+		
+		B) Note: type '?' for listing other options.
+
+		C) Stagged hunks will be commited after following step #2,
+		non-stagged hunks can be commited after step #4.
+
+	2) CHECKING DIFFERENCE ON THE STAGING AREA
+		$ git diff --staged
+
+	3) COMMITING THE STAGGING AREA
+		$ git commit -m "commit message"
+	
+	4) COMPLETED
+		You can now either add new hunks or commit the rest of the changes using 'git commit -a -m <message>'.
 ---------------
 ---------------
 ---------------
