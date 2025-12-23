@@ -653,7 +653,16 @@ USE LICENSE:
 			IPTABLES
 				REVOKING INTERNET PERMISSION FROM AN EXISTING GROUP
 		CREATING AND MOUNTING LOOP DEVICES
-			CREATING RAW IMAGES
+			CREATE A FILE TO BE USED AS LOOP-DEVICE, SIZE 1GB (A) | USING DD TO CREATE A LOOP DEVICE FILE
+			USING TRUNCATE FOR CREATING A LOOP DEVICE FILE
+			TELLING THE DIFFERENCE BETWEEN ALLOCATED SIZE AND APPARENT SIZE | PHYSICAL DATA SIZE VS LOGICAL DATA SIZE
+				APPARENT SIZE | LOGICAL DATA SIZE
+				REAL ALLOCATED SIZE | PHYSICAL DATA SIZE
+				DISPLAYING BOTH ALLOCATED SIZE AND APPARENT SIZE
+			LISTING MOUNTED DEVICES
+			LISTING ATTACHED LOOP DEVICES
+			FURHTER NOTES ON SHRINKING / EXTENDING(OR EXPANDING)
+			CREATING RAW IMAGE USING QEMU-IMG
 			RESIZING EXISTING RAW IMAGES | RESIZING LOOP DEVICES
 			RESIZING EXISTING QCOW IMAGES
 				ABOUT SPARSE FILES
@@ -1439,6 +1448,15 @@ New Syntax(2023):
 ====================================================================================================
 
 -010
+		CREATING AND MOUNTING LOOP DEVICES -> Minor Update
+			USING TRUNCATE FOR CREATING A LOOP DEVICE FILE
+			TELLING THE DIFFERENCE BETWEEN ALLOCATED SIZE AND APPARENT SIZE | PHYSICAL DATA SIZE VS LOGICAL DATA SIZE
+				APPARENT SIZE | LOGICAL DATA SIZE
+				REAL ALLOCATED SIZE | PHYSICAL DATA SIZE
+				DISPLAYING BOTH ALLOCATED SIZE AND APPARENT SIZE
+			LISTING MOUNTED DEVICES
+			LISTING ATTACHED LOOP DEVICES
+			FURHTER NOTES ON SHRINKING / EXTENDING(OR EXPANDING)
 		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
 -009
@@ -19370,10 +19388,73 @@ CREATING AND MOUNTING LOOP DEVICES
 --
 0. note: the letter '(A)' describes the easy way to create a loop-device.
 
-1. Create a file to be used as loop-device, size 1GB (A)
-	$ dd if=/dev/zero of=<filename> bs=1G count=5
-		or
-	$ dd if=/dev/zero of=<filename> bs=250k count=2
+1. CREATE A FILE TO BE USED AS LOOP-DEVICE, SIZE 1GB (A) | USING DD TO CREATE A LOOP DEVICE FILE
+		$ dd if=/dev/zero of=<filename> bs=1G count=5
+			or
+		$ dd if=/dev/zero of=<filename> bs=250k count=2
+
+	1.1(BETTER ALTERNATE OPTION) - USING TRUNCATE FOR CREATING A LOOP DEVICE FILE
+		You can use truncate to create a file without allocating disk space resources
+		until it's actually used:
+			Truncate can also be used for shrinking or extending the file size:
+				$ truncate <filename> -s 10G
+
+				Note: this allows creating loop devices as big as 1000GB without using the entire
+				free disk space.
+			
+		IMPORTANT NOTE 1: For shrinking or extending an already existing loop device, make sure that
+		any mounted filesystems are umounted and that the file attached as loop device has been dettached first.
+
+		IMPORTANT NOTE 2: Since 'truncate' creates sparse files, filesystems containning this image
+		will have to support sparse files; when copying this file to another storage device,
+		the program used for copying will have to support sparse files or else sparse disk space will be converted to
+		raw disk space; make sure to use some backup tool like 'rsync' for copying sparse files. 'cp' also supports sparse
+		files using '--sparse=always'.
+
+		1.1.1 - TELLING THE DIFFERENCE BETWEEN ALLOCATED SIZE AND APPARENT SIZE | PHYSICAL DATA SIZE VS LOGICAL DATA SIZE
+			1.1.1.1 - APPARENT SIZE | LOGICAL DATA SIZE
+				$ du --apparent-size -h <filename>
+					or
+				$ ls -lh <filename>
+
+				Note: if <filename> has been created as per instruction, then apparent size will be 5GB,
+				however when using 'df -h' for checking free disk space, those 5GB will never show up
+				as being consumed from disk because those 5GB have not been allocated yet for any data.
+
+			1.1.1.2 - REAL ALLOCATED SIZE | PHYSICAL DATA SIZE
+				$ du -h <filename>
+					or
+				$ ls -sh <filename>
+			
+				Note: only the real allocated size will be displayed here.
+
+			1.1.1.3 - DISPLAYING BOTH ALLOCATED SIZE AND APPARENT SIZE
+				$ ls -lhs
+
+		1.1.1 - LISTING MOUNTED DEVICES
+			$ df -ha
+			  or
+			$ df -h
+			
+			Note: use 'umount' for umounting. use 'fuser -k' for killing any process holding on files.
+
+		1.1.2 - LISTING ATTACHED LOOP DEVICES
+			$ losetup -a
+
+			Note: use 'losetup -d /dev/loop0p01' for dettaching a specific loop device
+			or 'losetup -D' for dettaching all loop devices.
+
+		1.1.3 - FURHTER NOTES ON SHRINKING / EXTENDING(OR EXPANDING)
+			When extending, you still have to allocate free space to a given partition using 'fdisk' or 'gparted';
+			When shrinking, you'll have to make sure you're not shrinking below the used disk space, or else
+			you'll lose data; before shrinking with 'truncate' make sure to trim and shrink the choosen partition first,
+			by using 'fdisk' or 'gparted' as well as deleting files you don't need before doing that.
+
+			In case you have more than one partition, pay attention that 'truncate' always shrink end-of-files and
+			doesn't really care about free space remainning between one partition and another.
+
+			If you encounter yourself in the later case AND you still want to shrink, you'll have to copy all your data
+			to a new loop device(or disk), since full format would be the only easy option.
 
 2. Attach the file to loop device (A - optional for files larger than 500k?)
 	# losetup -f <filename>
@@ -19390,7 +19471,9 @@ CREATING AND MOUNTING LOOP DEVICES
 			or
 		# fdisk <filename>
 	
-	^ both options requires going through step #2.
+	IMPORTANT NOTE: you can straight use 'fdisk' without attaching <filename> as a 
+	loop-device on step #2. Then you can just attach it like this:
+		# losetup --show --partscan --find <filename>
 	
 5. (Optional) Force kernel to re-scan for existing partition tables:
 	# losetup --partscan
