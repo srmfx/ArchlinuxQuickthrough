@@ -19485,8 +19485,12 @@ CREATING AND MOUNTING LOOP DEVICES
 
 7. Format Filesystems: (A) 
 	7.0 - EFI Partition:
-		# mkfs.fat -F 32 -t vfat /dev/<efi_loop_partition>
+		# mkfs.fat -F 32 /dev/<efi_loop_partition>
 		^ Only meant for bootable devices
+
+		Old Argument:
+			# mkfs.fat -F 32 -t vfat /dev/<efi_loop_partition>
+
 
 	7.1 - EXT4 Partition: (A)
 		# mkfs.ext4 /dev/<ext4_loop_partition>
