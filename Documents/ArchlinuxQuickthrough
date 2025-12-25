@@ -25229,19 +25229,43 @@ Summary:
 	source: https://wiki.archlinux.org/title/sparse_file
 
 Creating sparse files:
-	$dd if=/dev/zero of=file.img bs=1 count=0 seek=512M
+	$ truncate <filename> -s 10G
 		or
-	$truncate -s 512M file.img
+	$ dd if=/dev/zero of=<filename> bs=1 count=0 seek=10G
+		or
+	$ dd if=/dev/zero of=<filename> bs=10G count=1 conv=sparse
 
-These two commands are going to display different file size if file.img is a sparse file(same file):
-	$du -h --apparent-size file.img
-	$du -h file.img
+	Example:
+		$ dd if=/dev/zero of=file.img bs=1 count=0 seek=512M
+			or
+		$ truncate -s 512M file.img
+
+These commands will display Logical Data Size and Physical Data Size:
+	DISPLAYING BOTH
+		$ ls -lhs <filename>
+
+	LOGICAL DATA SIZE
+		$ du --apparent-size -h <filename>
+			or
+		$ ls -lh <filename>
+
+		Note: if <filename> has been created as per instruction, then apparent size will be 5GB,
+		however when using 'df -h' for checking free disk space, those 5GB will never show up
+		as being consumed from disk because those 5GB have not been allocated yet for any data.
+
+	PHYSICAL DATA SIZE
+		$ du -h <filename>
+			or
+		$ ls -sh <filename>
+	
+		Note: only the real allocated size will be displayed here.
+
 
 Converting non-sparse files to sparse:
-	$fallocate -d copy.img
+	$ fallocate -d copy.img
 
 Converting existing sparse files to non-sparse:
-	$cp file.img copy.img --sparse=never
+	$ cp file.img copy.img --sparse=never
 
 Then new_file.img will be sparse. However, cp does have a --sparse=when option. This is especially useful if a sparse file has somehow become non sparse (i.e. the empty blocks have been written out to disk in full). DISK SPACE CAN BE RECOVERED BY:
 
