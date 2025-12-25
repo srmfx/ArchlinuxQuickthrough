@@ -46785,8 +46785,8 @@ USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 		Note: this will not concatenate or append new content to sparse.file, it will instead
 		overwrite content in the sparse file, which means previously written content can be overriden.
 
-		Note: 'dd' is only capable of concatenating/appending to end-of-file using the option of=append,
-		it can not insert new data at the beginning of a file.
+		Note: 'dd' is only capable of concatenating to end-of-file using the option of=append,
+		it can not append new data at the beginning of a file nor at some specific offset.
 
 	3) Extracting the content from the sparse file:
 		This requires knowing the offset used to store the dummy.file when using 'seek' attribute,
