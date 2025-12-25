@@ -1126,6 +1126,7 @@ USE LICENSE:
 		HOW TO FIX USB DEVICE NOT DETECTED
 
 --MISCALENEOUS:
+	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 	FILESYSTEM ENCRYPTION USING GOCRYPTFS
 		REQUIREMENTS FOR USING GOCRYPTFS
@@ -1449,6 +1450,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -010
+		USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 		DOING PARTIAL HUNK GIT COMMITS
 		CREATING AND MOUNTING LOOP DEVICES -> Minor Update
 			USING TRUNCATE FOR CREATING A LOOP DEVICE FILE
@@ -46727,6 +46729,68 @@ DOING PARTIAL HUNK GIT COMMITS
 	
 	4) COMPLETED
 		You can now either add new hunks or commit the rest of the changes using 'git commit -a -m <message>'.
+---------------
+---------------
+---------------
+---------------
+---------------
+USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
+	1)(Optional) Creating a dummy file:
+		The dummy file will be used as example, but you can replace it with anything you want.
+		$ touch ~/dummy.file
+		
+		1.1) Edit the dummy.file with a text editor and add the following content:
+			[file: ~/dummy.file ]
+				This is a dummy file
+			[/file]
+
+	1) Create the sparse file:
+		$ truncate -s 1M /tmp/sparse.file
+			or
+		$ dd if=/dev/zero of=/tmp/sparse.file bs=1 count=0 seek=1M
+			or
+		$ dd if=/dev/zero of=/tmp/sparse.file bs=1M count=1 conv=sparse
+	
+	2) Copy the dummy file into the created sparse file:
+		$ dd if=/home/username/dummy.file of=/tmp/sparse.file seek=250B conv=notrunc
+		
+		Note: this will not concatenate or append new content to sparse.file, it will instead
+		overwrite content in the sparse file, which means previously written content can be overriden.
+
+		Note: 'dd' is only capable of concatenating/appending to end-of-file using the option of=append,
+		it can not insert new data at the beginning of a file.
+
+	3) Extracting the content from the sparse file:
+		This requires knowing the offset used to store the dummy.file when using 'seek' attribute,
+		and it also requires knowing the size of the stored dummy.file.
+
+		Since we know it's 21 bytes(20 letters and end-of-file character).
+
+		$ dd if=/tmp/sparse.file of=/home/username/2nd_dummy.file skip=250B bs=21B count=1
+			or
+		$ dd if=/tmp/sparse.file of=/home/username/2nd_dummy.file skip=250B bs=$(stat -c "%s" ~/"dummy.file")B count=1
+
+		Note: using 'stat' only works if you have the original file hanging around somewhere.
+		It's also possible to use 'grep' for finding offset and size from some other file if you have them noted down,
+		in a similar way that has been done here with 'stat', however using 'grep' instead.
+
+	4)(Optional) You can check file differences using 'diff' for ensuring no differences exist:
+		$ diff -rqd ~/dummy.file ~/2nd_dummy_file
+	
+	5) Final considerations:
+		If you intend to obfuscate and hide data this way, it's recommended to instead use known and well-supported
+		archiving tools like 'dar' or 'tar' that also support well known and well supported cryptographic algorithms.
+
+		Othwerise you'd have to write your own methods and scripts for retrieving and encrypting data.
+
+		'dd' can also be used for splitting a single file into different files in the same fashioned way.
+		again, tools like 'dar' already exist for this purpose.
+
+		A more advanced 'dd' tool called 'dcfldd' exists. A poweful data recovery and protection tool based on
+		'dd' also exists and is called 'dd_rescue'.
+
+		'dd' is also carismatically called 'Disk Destroyer' since human errors can occur when feeding inputs 
+		which can lead to full destruction of your hard disk. You've been warned use with care.
 ---------------
 ---------------
 ---------------
