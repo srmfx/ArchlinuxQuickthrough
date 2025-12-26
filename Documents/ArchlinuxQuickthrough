@@ -1128,6 +1128,31 @@ USE LICENSE:
 --MISCALENEOUS:
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
+
+	SETTING UP A BTRFS FILESYSTEM
+		BTRFS FILESYSTEM MANAGEMENT
+			SCANNING FOR BTRFS STORAGE DEVICES
+			ENABLING BTRFS QUOTAS AND DISPLAYING THEM
+			BTRFS DEVICE USAGE STATS
+			DISPLAYING BTRFS DEVICE ERRORS
+			EXECUTING BTRFS FILESYSTEM CHECKS
+			USING BTRFS SCRUB TOOL
+				CANCELING OR PAUSING SCRUB ON A BTRFS VOLUME/DEVICE
+				RESUMING A CANCELED SCRUB TASK ON A BTRFS VOLUME/DEVICE
+				DISPLAYING BTRFS STATUS FOR RUNNING SCRUB
+			CREATING BTRFS SUB-VOLUMES 
+			DELETING BTRFS SUB-VOLUMES
+			LISTING BTRFS SUB-VOLUMES
+			FETCHING AND REPLACING DEFAULT SUB-VOLUME
+			DISPLAYING BTRFS SUB-VOLUME INFORMATION
+			DEFRAGMENTING BTRFS VOLUME
+			BALANCING BTRFS DISKS
+			ADDING DEVICE TO BTRFS VOLUME
+			DELETING DEVICE FROM BTRFS VOLUME
+			CREATING BTRFS SUB-VOLUME SNAPSHOTS
+			VIEWING BTRFS SHARED EXTENTS FOR A GIVEN FILE
+			CREATING BTRFS SUB-VOLUMES 
+
 	FILESYSTEM ENCRYPTION USING GOCRYPTFS
 		REQUIREMENTS FOR USING GOCRYPTFS
 		ADVANTAGES OF GOCRYPTFS OVER ENCFS
@@ -19490,6 +19515,13 @@ CREATING AND MOUNTING LOOP DEVICES
 
 6. (Optional) Lists all block devices partition tables:
 	$ lsblk
+	   or
+	$ fdisk -l <loop_device>
+
+	ex:
+		# fdisk -l /dev/loop0
+
+		Note: a filename can be used, but it will not retrieve a mountable loop device.
 
 7. Format Filesystems: (A) 
 	7.0 - EFI Partition:
@@ -45740,6 +45772,9 @@ SOME BROOT FILE EXPLORER
 				or
 			$ wsl --terminate <distribution>
 
+			note: if you use --terminate you'll have to terminate every single running distribution by hand.
+			--shutdown will terminate every running distribution automatically.
+
 		14 - Now you can finally use any distribution you want with your new custom compiled kernel:
 			$ wsl -d archlinux
 
@@ -46819,6 +46854,267 @@ USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 
 		'dd' is also carismatically called 'Disk Destroyer' since human errors can occur when feeding inputs 
 		which can lead to full destruction of your hard disk. You've been warned use with care.
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP A BTRFS FILESYSTEM
+	1)(OPTIONAL) If you don't intend to use BTRFS on an actual disk or partition,
+	you can create a loop device, read more on:
+		CREATING AND MOUNTING LOOP DEVICES
+
+	2) Create a gpt partition table and then create a linux filesystem partition partition:
+		# fdisk /dev/<block_device>
+
+	3) Format the filesystem as btrfs:
+		# mkfs.btrfs -O block-group-tree /dev/<block_device>
+			or
+		# mkfs.btrfs -f -O block-group-tree /dev/<block_device>
+		
+		A) Note: It's possible to create RAID and NON-RAID like profiles here. 
+		read more on mkfs.btrfs man pages, default btrfs profile is 'DUP':
+			$ man mkfs.btrfs
+
+		B) Note: 'block-group-tree' is a filesystem feature that allows for faster mounting,
+		however, as of current date it's only available as safe-to-use on kernel 6.6 and above.
+
+		you can type '-O list-all' for a full list of the filesystem features.
+		check man pages as well for other details:
+			$ man mkfs.btrfs
+
+		C) Note: for standard default btrfs DUP profile:
+			VERY IMPORTANT: 
+				A device that starts to misbehave and repairs from the DUP copy, 
+				should be replaced immediatly! DUP is not backup!
+
+	4) Mount the filesystem:
+		# mount --mkdir --options discard -t btrfs /dev/<block_device> /mnt/
+
+		Note: the 'discard' mount option is meant as optimization for SSD Devices and Sparse Loop-Devices.
+	
+		4.1(Optional) - If mounting doesn't work, check your kernel has support for BTRFS:
+			$ cat /proc/filesystems | less
+				or
+			$ cat /proc/filesystems | grep -i -P "btrfs"
+		
+		4.2) Checking estabilished mount options post-mount:
+			$ mount -l | grep -i -P btrfs
+
+	5) Completed!
+		All there's left to do is setup and manage btrfs sub-volumes.
+	
+	BTRFS DATA ENCRYPTION
+		If you need to encrypt your data, you'll have to use a 3rd party data encryption methods,
+		read more on:
+			FILESYSTEM ENCRYPTION USING GOCRYPTFS
+				or
+			FILESYSTEM ENCRYPTION USING ENCFS
+
+
+	BTRFS FILESYSTEM MANAGEMENT
+		All examples here suppose you have mounted the filesystem under /mnt/btrfs_data/ .
+		
+		SCANNING FOR BTRFS STORAGE DEVICES
+			$ btrfs device scan --all-devices
+
+		ENABLING BTRFS QUOTAS AND DISPLAYING THEM
+			Quotas help limitting resource usage by Sub-Volumes, Users and Snapshots.
+
+				# btrfs quota enable <path>
+			
+			Ex:
+				# btrfs quota enable /mnt/btrfs_data
+
+			DISPLAYING BTRFS QUOTAS
+				# btrfs qgroup show /mnt/data
+			
+		BTRFS DEVICE USAGE STATS
+			This will display usage information, including metadata disk space being stored:
+				# btrfs device usage <path>
+					
+			This can also be used:
+				# btrfs filesystem usage
+
+			And this:
+				# btrfs filesystem show <path>
+
+			Checking free disk space:
+				# btrfs filesystem df <path>
+
+		DISPLAYING BTRFS DEVICE ERRORS
+			This will display btrfs filesystem related errors and how many times they've occurred:
+				# btrfs device stats <dev|path>
+
+		EXECUTING BTRFS FILESYSTEM CHECKS
+			This is similar to 'fsck' tool for finding and fixing errors:
+				$ btrfs check <device>
+
+			C) Note: It's recommended to umount the device first, although this can be bypassed with --force.
+			B) Note: It's not recommended to use --repair, it's a very dangerous option.
+
+		USING BTRFS SCRUB TOOL
+			Scrub is not a filesystem checker (fsck, btrfs-check(8) <>). 
+			It can  only  detect  filesystem  damage  using  the checksum validation, 
+			and it can only repair filesystem damage by copying from other known good replicas:
+				$ btrfs scrub start <path|device>
+
+			CANCELING OR PAUSING SCRUB ON A BTRFS VOLUME/DEVICE
+				$ btrfs scrub cancel <path|device>
+
+			RESUMING A CANCELED SCRUB TASK ON A BTRFS VOLUME/DEVICE
+				$ btrfs scrub resume <path|device>
+
+			DISPLAYING BTRFS STATUS FOR RUNNING SCRUB
+				$ btrfs scrub status <path|device>
+
+				Note: if no scrub is running, this will display the previous status
+				of the last scrub session.
+
+
+		CREATING BTRFS SUB-VOLUMES 
+			Creates sub-volume called 'documents':
+				# btrfs subvolume create /mnt/btrfs_data/documents
+
+		DELETING BTRFS SUB-VOLUMES
+			This will delete the previously created sub-volume along with all stored data:
+				# btrfs subvolume delete /mnt/btrfs_data/documents
+
+		LISTING BTRFS SUB-VOLUMES
+			Listing all created sub-volumes:
+				# btrfs subvolume list /mnt/btrfs_data
+
+		FETCHING AND REPLACING DEFAULT SUB-VOLUME
+			If a sub-volume has too much important data, it doesn't needs to be exposed
+			when mounting.
+
+			You can also easily repair damaged or lost sub-volumes this way:
+
+			1) Make sure of which sub-volumes exist first:
+				# btrfs subvolume list /mnt/btrfs_data
+
+			2) Fetch default sub-volume:
+				$ btrfs subvolume get-default /mnt/btrfs_data
+
+			3) Change default sub-volume:
+				# btrfs subvolume set-default <new_id> <path_to_change>
+
+				Ex - Changing default id from 5 to 256 on <path_to_change>:
+					# btrfs subvolume set-default 256 /mnt/btrfs_data
+
+			4) Mount and Remount device:
+				4.1) Umount device: 
+					# umount /mnt/btrfs_data
+
+				4.2) Remount device:
+					# mount -t btrfs -o discard /dev/<device_storage> /mnt/btrfs_data
+				
+			5) You can now notice that <path_to_change>(mnt/btrfs_data) has now
+			the contents of the ID 256 Sub-volume instead of ID 5 Sub-volume.
+
+
+		DISPLAYING BTRFS SUB-VOLUME INFORMATION
+			Displaying sub-volume information:
+				# btrfs subvolume show /mnt/btrfs_data/documents
+
+		DEFRAGMENTING BTRFS VOLUME
+			Defragment has to be done individually for sub-volumes and mount points,
+			by default it will not descend symlinks:
+
+				# btrfs filesystem defragment -r -c -t 0B <sub-volume/mount-point>
+
+			A) Note: '-t 0B' ensures that extents greater than '0 Bytes' aren't defragmented,
+			or shared extents will be lost.
+
+			B) Note: '-r' Adds recursion to defragmentation.
+			C) Note: '-c' compress file contents using 'lzo' while defragmenting.
+			'zstd' can be passed as an option.
+			currently it's not possible to select 'no compression'.
+
+
+		BALANCING BTRFS DISKS
+			Disk Balancing evenly distributes data throughout all disks in-use to ensure that all disks 
+			are effectively utilized.
+			
+			Disk Balancing isn't necessary if you're only using BTRFS as a single block-device.
+
+			Read about BALANCE and PROFILES:
+				$ man btrfs-balance
+				$ man 8 mkfs.btrfs
+
+
+			DUP is a form of raid, By default, btrfs uses DUP profile.
+
+			DUP is it protects against data-corruption and other failures, 
+			but does not provide any guarantees if the entire device fails. 
+
+			VERY IMPORTANT: 
+				A device that starts to misbehave and repairs from the DUP copy, 
+				should be replaced immediatly! DUP is not backup!
+
+
+		ADDING DEVICE TO BTRFS VOLUME
+			As seen on 'BALANCING BTRFS DISKS', a different BTRFS Disk can be added
+			using the following command:
+				# btrfs device add <device> <path>
+
+			Example:
+				# btrfs device add /dev/<block_device> /mnt/my_btrfs/
+
+
+			A) Note: Adding a new device can also be used for expanding overall disk size.
+			allowing to use 2 different disks as 1 single logical storage device.
+
+		
+		DELETING DEVICE FROM BTRFS VOLUME
+			# btrfs device del <device> <path>
+
+			Example:
+			# btrfs device add /dev/<block_device> /mnt/my_btrfs/<path>
+
+
+		CREATING BTRFS SUB-VOLUME SNAPSHOTS
+			Creating sub-volume snapshots:
+				# btrfs subvolume snapshot <source_sub-volume> <dest_dir/sub-volume/non-existing>
+					
+				Example: 
+				# btrfs subvolume snapshot /mnt/btrfs_data/documents /mnt/btrfs_data/documents/snapshots
+
+			A) Note: This creates a new sub-volume when destination dir/sub-volume doesn't exists.
+			B) Note: If a directory is given as destination, snapshooting will create a new sub-volume 
+			under the same name as the source.
+			C) Note: source always needs to be a sub-volume or it'll fail.
+
+			If you want to test sub-volume snapshotting feature, you can simply create multiple files
+			before snapshotting:
+				
+				cd <source_sub-volume> && touch ./file{1..10} && btrfs subvolume snapshot ./ ./new_snapshot
+				
+				Example:
+				sudo bash -c "cd /mnt/btrfs_data/documents && touch ./file{1..10} && btrfs subvolume snapshot ./ ./new_snapshot"
+
+			D) Note: Nested sub-volumes aren't snapshotted, only the contents(directories and files)  
+			that belongs to the sub-volume are snapshotted.
+
+		VIEWING BTRFS SHARED EXTENTS FOR A GIVEN FILE
+			One of btrfs filesystem features is the shared extents, which allows files that have 
+			similar data to 'share extents' with another file in order to save disk space.
+
+			There's one way to visualize shared file extents:
+				$ btrfs fi du -s <path_to_file>
+					or
+				$ find <dirname> -type f -exec filefrag {} \;
+
+			Notes: Shared Extents differ from hardlinked files, because changing the content of a hardlinked
+			file will also change the contents of the other files that have been hardlinked.
+
+			A file that has 'shared extents' with another file can have different contents until they have 
+			nothing else in common with one another.
+
+			Some tools can copy files with shared extents on, although this will only work under filesystems
+			that support shared extents:
+				$ cp --reflink=always <source> <dest>
+
 ---------------
 ---------------
 ---------------
