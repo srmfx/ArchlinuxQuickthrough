@@ -47043,9 +47043,9 @@ SETTING UP A BTRFS FILESYSTEM
 			Defragment has to be done individually for sub-volumes and mount points,
 			by default it will not descend symlinks:
 
-				# btrfs filesystem defragment -r -c -t 0B <sub-volume/mount-point>
+				# btrfs filesystem defragment -r -c -t 0 <sub-volume/mount-point>
 
-			A) Note: '-t 0B' ensures that extents greater than '0 Bytes' aren't defragmented,
+			A) Note: '-t 0' ensures that extents greater than '0 Bytes' aren't defragmented,
 			or shared extents will be lost.
 
 			B) Note: '-r' Adds recursion to defragmentation.
