@@ -1129,6 +1129,23 @@ USE LICENSE:
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
+
+	SETTING UP A XFS FILESYSTEM
+		INTRODUCTION TO XFS FILESYSTEM
+		HOW TO SETUP XFS FILESYSTEM
+
+	SETTING UP AN EXFAT FILESYSTEM
+		INTRODUCTION TO EXFAT FILESYSTEM
+		DISADVANTAGES OF EXFAT FILESYSTEM
+		ADVANTAGES OF EXFAT FILESYSTEM
+		WHEN TO USE EXFAT FILESYSTEM
+		HOW TO SETUP EXFAT FILESYSTEM
+	
+	SETTING UP A NTFS FILESYSTEM
+		INTRODUCTION TO NTFS FILESYSTEM
+		WHY AND WHEN TO USE NTFS FILESYSTEM
+		HOW TO SETUP NTFS FILESYSTEM
+
 	SETTING UP A BTRFS FILESYSTEM
 		BTRFS FILESYSTEM MANAGEMENT
 			SCANNING FOR BTRFS STORAGE DEVICES
@@ -1475,6 +1492,11 @@ New Syntax(2023):
 ====================================================================================================
 
 -010
+
+		[*[SETTING UP A NTFS FILESYSTEM]*]
+		[*[SETTING UP AN EXFAT FILESYSTEM]*]
+		[*[SETTING UP A XFS FILESYSTEM]*]
+		[*[SETTING UP A BTRFS FILESYSTEM]*]
 		USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 		DOING PARTIAL HUNK GIT COMMITS
 		CREATING AND MOUNTING LOOP DEVICES -> Minor Update
@@ -47115,6 +47137,168 @@ SETTING UP A BTRFS FILESYSTEM
 			that support shared extents:
 				$ cp --reflink=always <source> <dest>
 
+
+
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP A XFS FILESYSTEM
+ 	INTRODUCTION TO XFS FILESYSTEM
+		Currently, XFS underperforms in comparison to other well known filesystems like exFat, ext4 and btrfs
+	when handling small files. XFS is only performant when handling very huge data.
+
+	You can follow the same instructions for creating a BTRFS Filesystem just by replacing the mkfs command
+	there with this one:
+		# mkfs.xfs /dev/<device_storage>
+
+	HOW TO SETUP XFS FILESYSTEM
+		Since instructions are the same, read more on the following topic: 
+			SETTING UP A BTRFS FILESYSTEM
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP AN EXFAT FILESYSTEM
+	INTRODUCTION TO EXFAT FILESYSTEM
+		ExFat filesystem is ideal for USB Storage Devices that have to be carried over and used into
+	different computers running different operating systems due to it's high cross-compatibility
+	with other systems. It can also be used on MicroSD storage devices for the very same reason, it can be read
+	on most devices including photo/video cameras, TVs and other OSes.
+
+	DISADVANTAGES OF EXFAT FILESYSTEM
+		The main disadvantage is that ExFat doesn't has a journaling feature, so any data loss and corruption 
+		will be irreversible. This can be circumvented by tools like par2cmdline and by doing actual backups
+		in other trusted storage devices.
+
+	ADVANTAGES OF EXFAT FILESYSTEM
+		ExFAT is optimized for USB Storage Devices and SD Cards since it was designed in mind with lower
+		filesystem overhead when doing cluster allocations.
+
+		It has wide spread support on modern Photo/Video Camera, Smart TVs, Smartphones, Laptops and both portable
+		and non-portable media players.
+	
+	WHEN TO USE EXFAT FILESYSTEM
+		Both USB Storage Devices and SD Cards can have a very short life span which will carry over as costs since
+		new storage devices will be required once the old ones are broken.
+
+		ExFat should be used as a filesystem whenever longevity and endurance of the storage device are 
+		more important than it's stored data integrity.
+
+		For example, SD Cards used on MP3 Players/Smartphones can be easily backed up on actual hard disks
+		using tools like 'rsync' and be backed up on Cloud Storages Service using 'rclone', making "data loss"
+		on EXFAT filesystem meaningless.
+
+		Data that never gets edited/changed/updated that must be carried on a small SD Card or USB Device
+		into other places are a perfect target for ExFat filesystem, since backup in trusted storage devices
+		is only done once for file. Ex.: Songs, Videos, Books.
+
+
+	HOW TO SETUP EXFAT FILESYSTEM
+		There are two important options meant for optimizing ExFAT filesystem during creation at the current
+		date(information here was extracted from mkfs.exfat's man page):
+
+			1)  --pack-bitmap
+				This option strictly violates SD Card Specification Standard, but will improve performance
+				and endurance on SD Cards and other flash media not designed for use with exFAT
+				filesystem in mind.
+				
+			2)  --boundary-align=<alignment>
+				The alignment VALUE SHOULD BE SET TO HALF of the card's native 'boundary unit size'.
+				If the card's native boundary  unit  size  is not known, this alignment value can be set
+				with k/K or m/M for size in kibibytes or mebibytes. This option always defaults to '1M'
+				when not specified by the user, which may not be optimal.
+
+				Refer to the following table of boundary unit sizes recommended by the SD Card Association:
+
+				Card Capacity Range        Cluster Size     Boundary Unit
+				  ──────────────────────────────────────────────────────
+					      ≤8 MiB           8 KiB          8 KiB
+				    >8 MiB   ≤64 MiB          16 KiB         16 KiB
+				   >64 MiB  ≤256 MiB          16 KiB         32 KiB
+				  >256 MiB    ≤1 GiB          16 KiB         64 KiB
+				    >1 GiB    ≤2 GiB          32 KiB         64 KiB
+				    >2 GiB   ≤32 GiB          32 KiB          4 MiB
+				   >32 GiB  ≤128 GiB         128 KiB         16 MiB
+				  >128 GiB  ≤512 GiB         256 KiB         32 MiB
+				  >512 GiB    ≤2 TiB         512 KiB         64 MiB
+
+
+
+		You can follow the same instructions for creating a BTRFS Filesystem just by replacing the mkfs command
+		there with this one:
+
+			Practical Example - Creating a EXFAT for a 2GB SD Card - :
+				# mkfs.exfat --boundary-align=32k --pack-bitmap /dev/<storage_device>
+				
+			Note: For greater cross-compatibility you may remove --pack-bitmap option.
+
+		You can use 'tune.exfat' for tuning or changing other settings after formatting it:
+			# tune.exfat <storage_device>
+
+		Since instructions for creating an ExFAT filesystem are the same, read more on the following topic: 
+			SETTING UP A BTRFS FILESYSTEM
+
+
+			VERY IMPORTANT: Just for ExFAT you'll need to specify something different during 'fdisk':
+				code 11 - "Microsoft basic data": GPT GUID = EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
+				This is the same GPT GUID for NTFS, however formatting will be done by 'mkfs.exfat'
+				according to instructions.
+
+				Important: Code Number may change depending on the available list of supported filesystems 
+				that can be managed by the kernel.
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP A NTFS FILESYSTEM
+	INTRODUCTION TO NTFS FILESYSTEM
+		NTFS is the default filesystem for windows since version NT 3.1.
+
+	WHY AND WHEN TO USE NTFS FILESYSTEM
+		Aside from the fact that one should use NTFS as filesystem on external or internal hard disks
+		(or USB Storage devices) that are going to be used on a Windows Operating System, 
+		once could also use it for storing data to be carried over onto Smart TVs, since most modern
+		Smart TVs are compatible with NTFS.
+
+		As opposed to ExFAT Filesystem, NTFS should be used whenever Data is deemed somewhat important
+		and when data loss and corruption can not be an option.
+
+		Work, School and University Projects and files that are shared between teammate students and co-workers
+		that are also using a Windows operating system.
+
+		Specially when working with data that will be modified on a daily or even hourly basis,
+		and making hourly/daily backups can be a hasle, using a filesystem that contains a filesystem journaling
+		feature and is compatible with your Operating System at work and home is deemed very important.
+
+		Even for linux users who might have linux Operating System at home and at work, they'll also likely have
+		to use NTFS Partition - using a portable storage device like SD Card or USB Device - if they intend to
+		share files and data with co-workers who don't use linux.
+		
+
+	HOW TO SETUP NTFS FILESYSTEM
+		# mkfs.ntfs --enable-compression --fast /dev/<storage_device>
+
+		A) Note: --fast option allows for a quick formatting, it will skip both zeroing of the volume and 
+		bad sector checking. This option allows NTFS data recovery tools to scan for deleted files and
+		recover them.
+
+		B) Note: --enable-compression enables compression feature on the volume.
+
+
+		Since instructions for creating an NTFS filesystem are the same, read more on the following topic: 
+			SETTING UP A BTRFS FILESYSTEM
+
+			VERY IMPORTANT: Just for NTFS you'll need to specify something different during 'fdisk':
+				code 11 - "Microsoft basic data": GPT GUID = EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
+				This is the same GPT GUID for EXFAT, however formatting will be done by 'mkfs.ntfs'
+				according to instructions.
+
+				Important: Code Number may change depending on the available list of supported filesystems 
+				that can be managed by the kernel.
 ---------------
 ---------------
 ---------------
