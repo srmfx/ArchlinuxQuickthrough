@@ -1493,6 +1493,7 @@ New Syntax(2023):
 
 -010
 		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
+		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME -> minor update
 		[*[SETTING UP A NTFS FILESYSTEM]*]
 		[*[SETTING UP AN EXFAT FILESYSTEM]*]
 		[*[SETTING UP A XFS FILESYSTEM]*]
@@ -1508,7 +1509,6 @@ New Syntax(2023):
 			LISTING MOUNTED DEVICES
 			LISTING ATTACHED LOOP DEVICES
 			FURHTER NOTES ON SHRINKING / EXTENDING(OR EXPANDING)
-		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
 -009
 		SHRINKING A MICROSOFT .VHDX VIRTUAL DISK IMAGE
@@ -46774,10 +46774,30 @@ SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 When reading man pages for 'less' you can find information on 'LESS_TERMCAP_xx' environment variable,
 which allows us to apply different colors using Control Escape Sequences.
 
-1) Add this to your /etc/environment file:
+	A) Note: use /etc/zsh/zshrc if you're under a zsh shell, 
+	or use /etc/bash.bashrc if you're under the default linux shell.
 
-	[file: /etc/environment ]
-		man(){
+	B) Note: Don't use /etc/profile.d/ since scripts only run once per login
+	and will not be available when launching a terminal emulator or programs.
+
+	C) For more information, Read more on:
+		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
+
+1) Create a bash script file with the following content in the following file:
+
+	[file: /etc/zsh/zshrc ]
+		function man {
+			# Saves current settings in environment variables
+			PR_LESS_TERMCAP_mb=${LESS_TERMPCAP_mb}
+			PR_LESS_TERMCAP_md=${LESS_TERMPCAP_md}
+			PR_LESS_TERMCAP_me=${LESS_TERMPCAP_me}
+			PR_LESS_TERMCAP_se=${LESS_TERMPCAP_se}
+			PR_LESS_TERMCAP_so=${LESS_TERMPCAP_so}
+			PR_LESS_TERMCAP_ue=${LESS_TERMPCAP_ue}
+			PR_LESS_TERMCAP_us=${LESS_TERMPCAP_us}
+			PR_GROFF_NO_SGR=${GROFF_NO_SGR}
+			
+			# Set new colors before running man pages
 			export LESS_TERMCAP_mb=$'\e[01;31m'
 			export LESS_TERMCAP_md=$'\e[01;31m'
 			export LESS_TERMCAP_me=$'\e[0m'
@@ -46785,9 +46805,30 @@ which allows us to apply different colors using Control Escape Sequences.
 			export LESS_TERMCAP_so=$'\e[43;93m'
 			export LESS_TERMCAP_ue=$'\e[0m'
 			export LESS_TERMCAP_us=$'\e[4;93m'
-			export GROFF_NO_SGR=1              	# mandatory for groff versions
+			GROFF_NO_SGR=1              	# mandatory for some modern groff versions
 
+			# Running man pages
 			command man "$@"
+
+			# Restoring previous values if there were any
+			LESS_TERMCAP_mb=${PR_LESS_TERMPCAP_mb}
+			LESS_TERMCAP_md=${PR_LESS_TERMPCAP_md}
+			LESS_TERMCAP_me=${PR_LESS_TERMPCAP_me}
+			LESS_TERMCAP_se=${PR_LESS_TERMPCAP_se}
+			LESS_TERMCAP_so=${PR_LESS_TERMPCAP_so}
+			LESS_TERMCAP_ue=${PR_LESS_TERMPCAP_ue}
+			LESS_TERMCAP_us=${PR_LESS_TERMPCAP_us}
+			GROFF_NO_SGR=${PR_GROFF_NO_SGR}
+
+			# Unsetting variables used for saving and restoring the previous settings
+			unset -v PR_LESS_TERMCAP_mb
+			unset -v PR_LESS_TERMCAP_md
+			unset -v PR_LESS_TERMCAP_me
+			unset -v PR_LESS_TERMCAP_se
+			unset -v PR_LESS_TERMCAP_so
+			unset -v PR_LESS_TERMCAP_ue
+			unset -v PR_LESS_TERMCAP_us
+			unset -v PR_GROFF_NO_SGR
 		}
 	[/file]
 
