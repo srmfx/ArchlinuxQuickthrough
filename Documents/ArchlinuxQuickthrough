@@ -1126,9 +1126,9 @@ USE LICENSE:
 		HOW TO FIX USB DEVICE NOT DETECTED
 
 --MISCALENEOUS:
+	SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
-
 
 	SETTING UP A XFS FILESYSTEM
 		INTRODUCTION TO XFS FILESYSTEM
@@ -1492,7 +1492,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -010
-
+		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
 		[*[SETTING UP A NTFS FILESYSTEM]*]
 		[*[SETTING UP AN EXFAT FILESYSTEM]*]
 		[*[SETTING UP A XFS FILESYSTEM]*]
@@ -47301,6 +47301,44 @@ SETTING UP A NTFS FILESYSTEM
 
 				Important: Code Number may change depending on the available list of supported filesystems 
 				that can be managed by the kernel.
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
+	A) System wide scripts that run only once per login can be created on these locations,
+	the scripts in these locations will not run when launching a terminal emulator and launching other 
+	shell programs, thus making script invisible for them:
+		1) /etc/profile.d/
+			Scripts created here will need to have their own scripting file.
+			Shebangs must be created for each scripting file.
+
+		2) /etc/zsh/zprofile
+			Scripts added in this file will run only once as described, 
+			but only for users under zsh shell.
+
+		3) /etc/bash.bash_profile
+			Scripts added in this file will run only once as described,
+			but only for users under bash shell.
+			
+	
+	B) System wide scripts that need to run with every instance of shell or with other shell programs 
+	can be added to these files depending on which shell you're using:
+		1) For zsh shell:
+			/etc/zsh/zshrc
+
+		2) For bash shell:
+			/etc/bash.bashrc
+
+
+	C) Local user scripts/functions can be set on these files depending on which shell you're using:
+		1) ~/.zshrc 
+		2) ~/.bashrc
+
+	For an example of system wide bash function, read more on:
+		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
+
 ---------------
 ---------------
 ---------------
