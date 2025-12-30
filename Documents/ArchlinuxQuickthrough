@@ -1146,6 +1146,15 @@ USE LICENSE:
 		WHY AND WHEN TO USE NTFS FILESYSTEM
 		HOW TO SETUP NTFS FILESYSTEM
 
+
+	SETTING UP AN EXT4 FILESYSTEM
+		INTRODUCTION TO EXT4 FILESYSTEM
+		HOW TO SETUP EXT4 FILESYSTEM
+			EXT4 EXTENDED FILESYSTEM OPTIONS
+			EXT4 FILESYSTEM FEATURES
+			AVAILABLE EXT4 FILESYSTEM MOUNT OPTIONS
+			CREATING BTRFS SUB-VOLUME SNAPSHOTS
+
 	SETTING UP A BTRFS FILESYSTEM
 		BTRFS FILESYSTEM MANAGEMENT
 			SCANNING FOR BTRFS STORAGE DEVICES
@@ -1494,6 +1503,7 @@ New Syntax(2023):
 -010
 		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
 		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME -> minor update
+		[*[SETTING UP AN EXT4 FILESYSTEM]*]
 		[*[SETTING UP A NTFS FILESYSTEM]*]
 		[*[SETTING UP AN EXFAT FILESYSTEM]*]
 		[*[SETTING UP A XFS FILESYSTEM]*]
@@ -19412,7 +19422,7 @@ however, this may render some devices unusable!(not advisible)
 		# lsmod | awk 'nf==3{print $1}'
 
 	2.2 - Make sure it hasn't been loaded and unloaded before at boot: 
-		#journalctl -b-0 | grep -P "udev"
+		# journalctl -b-0 | grep -P "udev"
 
 	2.3 - Rebuild initramfs: 
 		# mkinitcpio -P
@@ -19503,15 +19513,27 @@ CREATING AND MOUNTING LOOP DEVICES
 
 		1.1.3 - FURHTER NOTES ON SHRINKING / EXTENDING(OR EXPANDING)
 			When extending, you still have to allocate free space to a given partition using 'fdisk' or 'gparted';
-			When shrinking, you'll have to make sure you're not shrinking below the used disk space, or else
-			you'll lose data; before shrinking with 'truncate' make sure to trim and shrink the choosen partition first,
-			by using 'fdisk' or 'gparted' as well as deleting files you don't need before doing that.
+			When shrinking, you'll have to make sure you're not shrinking below the actual used disk space, or else
+			you'll lose data; before shrinking with 'truncate' tool to make sure to trim and shrink the choosen partition
+			first, by using 'fdisk' or 'gparted' as well as deleting files you don't need before doing that.
 
 			In case you have more than one partition, pay attention that 'truncate' always shrink end-of-files and
 			doesn't really care about free space remainning between one partition and another.
 
 			If you encounter yourself in the later case AND you still want to shrink, you'll have to copy all your data
 			to a new loop device(or disk), since full format would be the only easy option.
+
+			A) NOTE: When shrinking a loop-device under Linux on a mounted filesystem with the discard option enabled,
+			for a sparsed loop-device, running 'fstrim -v /dev/<storage_device>' automatically made free space 
+			available to the host operating linux system. As opposed to linux, On WSL I had to use DISKPART from 
+			windows to compact/shrink .VHDX image.
+
+				TODO:
+					Methods for expanding/shrinking raw and sparse devices will also be different.
+					The above method of using 'truncate' tool and 'fdisk' or 'gparted' will work for expanding
+					partition size. Shrinking can be done using 'A) NOTE'.
+					Will write more stuff at some point later.
+
 
 2. Attach the file to loop device (A - optional for files larger than 500k?)
 	# losetup -f <filename>
@@ -46965,6 +46987,12 @@ SETTING UP A BTRFS FILESYSTEM
 		
 		4.2) Checking estabilished mount options post-mount:
 			$ mount -l | grep -i -P btrfs
+				or
+			$ mount -l | grep -i -P ext4
+
+
+			NOTE: for EXT4 Filesystem you can use 'dumpe2fs' for checking internal filesystem features and options:
+				$ dumpe2fs /dev/<storage_device>
 
 	5) Completed!
 		All there's left to do is setup and manage btrfs sub-volumes.
@@ -47342,6 +47370,309 @@ SETTING UP A NTFS FILESYSTEM
 
 				Important: Code Number may change depending on the available list of supported filesystems 
 				that can be managed by the kernel.
+
+
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP AN EXT4 FILESYSTEM
+	INTRODUCTION TO EXT4 FILESYSTEM
+		EXT4 is the default linux filesystem for most linux distributions, with some minor distributions supporting
+		BTRFS and XFS Filesystems.
+
+		It is by far one of the most reliable and well supported filesystems.
+	
+	HOW TO SETUP EXT4 FILESYSTEM
+
+		Since instructions for creating an NTFS filesystem are the same, read more on the following topic: 
+			SETTING UP A BTRFS FILESYSTEM
+
+
+		1) '-E' specifies extended-options for the filesystem
+			Read more on the following sections.
+
+		2) '-O' specifies filesystem features 
+			Some features are set by default, but they can be set off  like this:
+				# mkfs.ext4 -O ^has_journal /dev/<storage_device>
+
+				Note: this will disable filesystem journal.
+
+			More can be read at man page:
+				$ man 5 ext4
+
+			Read more on the following sections.
+
+		3) '-I' this option allows changing the default inode size, which is 128 bits.
+		this option is also ONLY AVAILABLE BY USING 'TUNE2FS' for changing post-formated EXT4 filesystems.
+
+		File systems with an inode size of 128 bytes DO NOT SUPPORT TIMESTAMPS beyond January 19, 2038.  
+		Inodes which are  256  bytes  or  larger will support extended timestamps,
+		project id's, and the ability to store some extended attributes in the inode table for 
+		improved performance.
+
+			IMPORTANT: This may take a long time to finish, so make sure
+			you backup all your important data somewhere.
+
+
+		4) '-o' allows the name of the creator operating system to be changed.
+		The creator field is set by default to the name of the OS the mke2fs executable
+		was compiled for.
+
+		5) The following file contains default options that are used when creating 
+		EXT2/EXT3/EXT4 filesystems:
+			$ cat /etc/mke2fs.conf | less
+
+		6) '-t' is used to specify one of the filesystems: EXT2/EXT3/EXT4
+		this option is set by default either when running 'mkfs.ext4', 'mkfs.ext3' or 'mkfs.ext2';
+		or it's picken through the defaul configuration file /etc/mke2fs.conf.
+
+		7) '-T' usage type allow profiles to be used for optimizing how the filesystem is created
+		according to the total available disk size: floppy, small, bug, huge. 
+		default options will be fetch from /etc/mke2fs.conf when this option isn't specified.
+			
+			A) floppy
+				Less than 3MB.
+			B) small
+				in-between 3MB and 512MB.
+			C) big
+				in-between 4TB and 16TB.
+			D) huge
+				greater than 16TB.
+
+		8) '-U' allows to define how UUID is going to be created: time, random, clear.
+			A) time: creates the UUID based on current time
+			B) random: generates the UUID using random number genrator.
+			C) clear: clears the filesystem UUID.
+		
+
+
+
+		EXT4 EXTENDED FILESYSTEM OPTIONS
+			By passing '-E' as an argument to mkfs.ext4, it's possible to use the following options:
+
+			Here's a small list of extended options, read man page for more info:
+				$ man mkfs.ext4
+
+			1) lazy_journal_init=<0|1>
+				Allows journal to be initialized without being fully zeroed.
+				Note that having '0' as option is the default behavior, however it carries the risk
+				that you'll end up with a corrupted filesystem if the journaling has not been fully
+				written to it's full size on Power Crashes or System Freezes.
+				
+				Safer option is to set it to '1' instead.
+				
+			2) num_backup_sb=<0|1|2>
+				Number of Superblock Backups, which can be 0, 1 or 2.
+				It's a general good idea to set it to 2.
+
+			3) discard
+				Discard option meant for SSD devices and Sparse files.
+
+			4) force_fsck
+				This flag indicates that the disk has errors and will force fsck 
+				to run at the next mount. It can be used to force fsck to run at system boot/reboot,
+				even if the disk has no apparent problems.
+
+				This flag can also be set using 'tune2fs' for already formatted and partitioned
+				filesystems.
+
+			5) mount_opts=<mount_option_string>
+				Default mount options for the filesystem.
+				Unlike the  bitmask-based  default  mount  options  which can be specified with
+				the -o option, mount_op‐ tion_string is an arbitrary string with a maximum length of 63
+				bytes, which is stored in the  su‐ perblock.
+
+				The  ext4  file  system driver will first apply the -o bitmask-based default options,
+				and then parse the mount_option_string, before parsing the mount options passed from 
+				the mount program.
+
+
+			6) mmp_update_interval=<interval_in_seconds>
+				This default interval is 0 seconds. This is a Mount Protection that prevents
+				the same filesystem from being mounted multiple times either by system request or
+				accidentaly, which can cause major disk corruption.
+
+				Maximum Allowed value is 300 seconds.
+
+				It's advisory to leave this at it's default when mounting the filesystem for use with
+				operating systems or to store important data.
+
+				Even stupid system requests for remounting the disk while it's still in use might
+				cause a huge damage. Again, when the stored data isn't important, then this isn't
+				a problem.
+
+
+			4) packed_meta_blocks=<0|1>
+				Set to '0' by default. When set, it optimizes the filesystem for Shingled Storage Devices
+				and/or SLC Flash Storage Devices(Flash Storage Devices can be SLC, MLC, TLC, QLC, PLC from
+				better to worse in the respective order).
+
+			5) test_fs
+				Set a flag in the file system superblock indicating that it may  be  mounted  using
+				experimental kernel code, such as the ext4dev file system.
+
+			6) ^test_fs
+				Clear  the test_fs flag, indicating the file system should only be mounted using
+				production-level file system code.
+
+
+		EXT4 FILESYSTEM FEATURES
+			A) Note: Features can be disbaled with '^' character as in  "^has_journal".
+
+			B) Note: Enabling certain file system features may prevent the file system from being mounted 
+			by kernels  which  do  not support  those  features.
+
+			C) Note: Read man pages for more features and details:
+				$ man 5 ext4
+				$ man mkfs.ext4
+
+			1) has_journal
+				Enables journaling. This is a default option.
+
+			2) extent
+				The use of the extent tree decreases metadata block overhead, improves file
+				system performance, and decreases the needed to run e2fsck(8)  on  the file  system.
+
+			3) 64bit
+				Enable the file system to be larger than 2^32 blocks.
+
+			4) extra_isize
+				Enable the extended inode fields used by ext4.
+
+			5) uninit_bg
+				The first  e2fsck(fsck.ext4)  run  after  enabling this feature will take full time 
+				to finish, but subsequent e2fsck runs will take only a fraction of the original time,
+				depending on how full the file system is.
+
+			6) read-only
+				Forces the kernel to mount the filesystem as read-only. This feature can be set 
+				using 'tune2fs' after the filesystem has been created and written to it.
+
+			7) dir_index
+				Speeds up name lookup in large directories.
+
+			8) encrypt
+				Enable  support  for  file system level encryption. 
+				Currently, only 'tune2fs' supports setting this feature post-creation of the filesystem.
+
+				This feature is required for encrypting tools like 'fscrypt' to work.
+
+			9) verity 
+				Enable  support  for  verity  protected files. At current date, only tune2fs can
+				set this option. Verity allows to create files that are only written to it one time,
+				and then become read-only for the remained lifetime of it's existence.
+
+			10) project
+				Enable project ID tracking.  This is used for project quota tracking.
+
+			11) orphan_file
+				Store  the  list of orphan inodes in multiple blocks instead of a single linked-list
+				to avoid po‐ tential scalability bottlenecks for workloads that perform a large number
+				of file truncations  or extensions in parallel.
+
+			12) mmp
+				Enable or disable multiple mount protection (MMP) feature.
+				This will disable 'mmp_update_interval' extended option completely.
+
+				Disabling not recommended as already stated.
+
+			13) metadata_csum
+				Store a checksum to protect the contents in each metadata block.
+
+			14) metadata_csum_seed
+				Allow the file system to store the metadata checksum seed in the superblock,
+				enabling the  administrator to change the UUID of a file system using the
+				metadata_csum feature while it is mounted.
+
+			15) large_file
+				Filesystem can contain files larger than 2GB.
+
+			16) huge_file
+				Supports files larger than 2TB.
+
+			17) large_dir
+				Increase the limit on the number of files per directory.  Currently, only 'tune2fs' 
+				supports this feature post-creation of the filesystem.
+
+			18) fast_commit
+				Enable fast commit journaling feature to improve fsync latency.
+
+		
+		AVAILABLE EXT4 FILESYSTEM MOUNT OPTIONS
+			source: information extracted from 'tune2fs' man page
+
+			The following mount options can be set or cleared using tune2fs:
+
+				debug
+					Enable debugging code for this file system.
+
+				bsdgroups
+					Emulate  BSD  behavior  when  creating new files: they will take the group-id
+					of the directory in which they were created.  The standard System V behavior
+					is  the  default,  where  newly  created files  take  on the fsgid of the current
+					process, unless the directory has the setgid bit set, in which case it takes the
+					gid from the parent directory, and also gets the setgid bit set if it  is a
+					directory itself.
+
+				user_xattr
+					Enable user-specified extended attributes.
+
+				acl
+					Enable Posix Access Control Lists.
+
+				uid16
+					Disables  32-bit UIDs and GIDs.  This is for interoperability with older
+					kernels which only store and expect 16-bit values.
+
+				journal_data
+					When the file system is mounted with journaling enabled, all data
+					(not just metadata) is  commit‐ ted into the journal prior to being written
+					into the main file system.
+
+				journal_data_ordered
+					When  the  file system is mounted with journaling enabled, all data is forced
+					directly out to the main file system prior to its metadata being committed to
+					the journal.
+
+				journal_data_writeback
+					When the file system is mounted with journaling enabled, data may be written
+					into the main  file system  after its metadata has been committed to the journal.
+					This may increase throughput, how‐ ever, it may allow old data to appear in files
+					after a crash and journal recovery.
+	
+
+				nobarrier
+					The file system will be mounted with barrier operations in the journal disabled.
+					(This option is currently only supported by the ext4 file system driver
+					in 2.6.35+ kernels.)
+
+				block_validity
+					The file system will be mounted with the block_validity option enabled, which
+					causes extra checks to be performed after reading or writing from the file
+					system.  This prevents corrupted  metadata blocks from causing file system
+					damage by overwriting parts of the inode table or block group de‐ scriptors.
+					This  comes  at the cost of increased memory and CPU overhead, so it is enabled
+					only for debugging purposes.  (This option is currently only supported by the ext4
+					file system  driver in 2.6.35+ kernels.)
+
+				discard
+					The  file  system will be mounted with the discard mount option.
+					This will cause the file system driver to attempt to use the trim/discard
+					feature of some storage  devices  (such  as  SSD's  and thin-provisioned drives
+					available in some enterprise storage arrays) to inform the storage device that
+					blocks  belonging  to deleted files can be reused for other purposes.
+					(This option is cur‐ rently only supported by the ext4 file system driver
+					in 2.6.35+ kernels.)
+
+				nodelalloc
+					The file system will be mounted with the nodelalloc mount option.
+					This will disable the  delayed allocation  feature.
+					(This option is currently only supported by the ext4 file system driver
+					in 2.6.35+ kernels.)
+
+
 ---------------
 ---------------
 ---------------
