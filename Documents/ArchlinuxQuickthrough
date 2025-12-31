@@ -1130,6 +1130,30 @@ USE LICENSE:
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
+	SETTING UP A LVM STORAGE MANAGEMENT LAYER
+		INTRODUCTION TO LVM
+		SETTING UP A LVM STORAGE DEVICE
+			CREATING A LOOP DEVICE
+				ATTACHING THE LOOP DEVICE
+				LISTING LOOP DEVICE PARTITIONS
+			SETTING UP A LVM VOLUME
+				CREATING A LVM PHYSICAL-VOLUME
+				LISTING DETAILS ON ALL EXISTING LVM PHYSICAL-VOLUMES
+				CREATING A LVM VOLUME-GROUP
+				LISTING DETAILS ON ALL LVM VOLUME-GROUPS
+				CREATING A LVM LOGICAL-VOLUME
+				LISTING DETAILS ON ALL LOGICAL-VOLUMES
+				LISTING DETAILS ON A SINGLE LVM LOGICAL-VOLUME
+				CREATING A FILESYSTEM FOR A LVM LOGICAL VOLUME | FORMATTING A FILESYSTEM FOR A LVM LOGICAL-VOLUME
+					CREATING THE EXT4 FILESYSTEM
+					SETTING UP DEFAULT MOUNT OPTIONS FOR EXT4 FILESYSTEM
+		EXPANDING / EXTENDING AVAILABLE DISK SPACE FOR A LOGICAL-VOLUME
+			EXPANDING AVAILABLE DISK SIZE FOR EXT4 FILESYSTEM
+		SHRINKING AVAILABLE DISK SPACE FOR A LOGICAL VOLUME
+			SHRINKING AVAILABLE DISK SIZE FOR EXT4 FILESYSTEM
+		EXPANDING / EXTENDING AVAILABLE DISK SPACE FOR A LOGICAL-GROUP
+		SHRINKING AVAILABLE DISK SPACE FOR A LOGICAL-GROUP
+
 	SETTING UP A XFS FILESYSTEM
 		INTRODUCTION TO XFS FILESYSTEM
 		HOW TO SETUP XFS FILESYSTEM
@@ -1501,6 +1525,8 @@ New Syntax(2023):
 ====================================================================================================
 
 -010
+
+		[*[SETTING UP A LVM STORAGE MANAGEMENT LAYER]*]
 		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
 		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME -> minor update
 		[*[SETTING UP AN EXT4 FILESYSTEM]*]
@@ -19534,6 +19560,10 @@ CREATING AND MOUNTING LOOP DEVICES
 					partition size. Shrinking can be done using 'A) NOTE'.
 					Will write more stuff at some point later.
 
+					Some filesystems have their own tools for disk resizing like 'resize2fs' for EXT4 filesystems
+					'xfs_growfs' for XFS Filesystem.
+
+
 
 2. Attach the file to loop device (A - optional for files larger than 500k?)
 	# losetup -f <filename>
@@ -19550,10 +19580,23 @@ CREATING AND MOUNTING LOOP DEVICES
 			or
 		# fdisk <filename>
 	
-	IMPORTANT NOTE: you can straight use 'fdisk' without attaching <filename> as a 
-	loop-device on step #2. Then you can just attach it like this:
-		# losetup --show --partscan --find <filename>
+	A) IMPORTANT NOTE: 
+		you can use 'fdisk' without attaching <filename> as a 
+		loop-device on step #2. Then you can just attach it like this afterwards:
+			# losetup --show --partscan --find <filename>
 	
+	B) IMPORTANT NOTE:
+		While creating a partition table isn't mandatory, some filesystems might not be able to
+		resize(grow/shrink in size) without actual data loss. Some operating systems and devices might
+		also be unable to read the filesystem without a partition table.
+
+		While you can skip fdisk part and use 'mkfs' for directly formatting the filesystem straight on
+		a storage device or loop-device file, then mind that this isn't a recommended thing.
+
+		Some data recovery tools or disk error fixing tools might expect a partition table to exist
+		and will not work properly without one existing.
+
+		
 5. (Optional) Force kernel to re-scan for existing partition tables:
 	# losetup --partscan
 		or
@@ -46992,7 +47035,7 @@ SETTING UP A BTRFS FILESYSTEM
 
 
 			NOTE: for EXT4 Filesystem you can use 'dumpe2fs' for checking internal filesystem features and options:
-				$ dumpe2fs /dev/<storage_device>
+				$ dumpe2fs -h /dev/<storage_device>
 
 	5) Completed!
 		All there's left to do is setup and manage btrfs sub-volumes.
@@ -47215,6 +47258,170 @@ SETTING UP A BTRFS FILESYSTEM
 ---------------
 ---------------
 ---------------
+SETTING UP A LVM STORAGE MANAGEMENT LAYER
+	LVMs make storage management easier, it allows setting up different filesystems on a single storage device
+	and easily set different disk usage quotas/restrictions and resize volumes on a single storage device.
+	LVM can also attach differen storage devices into an unified volume group.
+
+	SETTING UP A LVM STORAGE DEVICE
+		CREATING A LOOP DEVICE
+			Just for creating a loop-device, i'd recommend read it here, since it already covers all the steps:
+				CREATING AND MOUNTING LOOP DEVICES
+
+				A) NOTE: Just for 'fdisk' section, create a GPT Partition Table, followed by a LVM Filesystem
+				Partition, GPT GUID for LVM Filesystem: 6D6D379-F507-44C2-A23C-238F2A3DF928
+
+				B) NOTE: 'fdisk' Code number might change depending on supported filesystems on your Operating System.
+				which is the reason you should use the GPT GUID as reference instead.
+
+				C) NOTE: you can use the same instructions for setting up LVM on a real Storage Device.
+	
+			ATTACHING THE LOOP DEVICE
+				The command below will attach and return the loop device to which the file has been attached to:
+					# losetup --find --partscan --show <loop-device-filename>
+			
+			LISTING LOOP DEVICE PARTITIONS
+				The command below will return a list of all existing partitions on a storage device:
+					# fdisk -l /dev/<loop-device>
+				
+				example:
+					# fdisk -l /dev/loop0
+
+					note: on our setup, this will return /dev/loop0p1
+
+			SETTING UP A LVM VOLUME
+				When using LVMs, it'll be introduced three key concepts:
+					1 - PHYSICAL VOLUME
+						A Physical Volume can contain one or more Volume-Groups.
+
+					2 - VOLUME GROUPS
+						A Volume group can contain one or more Logical-Volumes.
+
+					3 - LOGICAL VOLUMES
+						A Logical Volume should contain a single filesystem.
+
+				CREATING A LVM PHYSICAL-VOLUME
+					# pvcreate /dev/loop0p1
+
+				LISTING DETAILS ON ALL EXISTING LVM PHYSICAL-VOLUMES
+					# pvdisplay
+
+				CREATING A LVM VOLUME-GROUP
+					# vgcreate <volume_group_name> /dev/loop0p1
+					
+					Example:
+						# vgcreate volume-group1 /dev/loop0p1
+
+				LISTING DETAILS ON ALL LVM VOLUME-GROUPS
+					# vgs
+
+				CREATING A LVM LOGICAL-VOLUME
+					This will create a logical-volume called 'ext-data' inside the
+					volume-group called 'volume-group1':
+						# lvcreate --name ext-data -l 100%FREE volume-group1
+
+				LISTING DETAILS ON ALL LOGICAL-VOLUMES
+					# lvs
+
+				LISTING DETAILS ON A SINGLE LVM LOGICAL-VOLUME
+					# lvdisplay /dev/volume-group1/ext-data
+
+				CREATING A FILESYSTEM FOR A LVM LOGICAL VOLUME | FORMATTING A FILESYSTEM FOR A LVM LOGICAL-VOLUME
+					Note: if desired you can create a partition table first, althought not necessary,
+					since LVM already does all volume management.
+
+					1) CREATING THE EXT4 FILESYSTEM
+						# mfks.ext4 -E discard -O extent /dev/volume-group1/ext-data
+
+					2) SETTING UP DEFAULT MOUNT OPTIONS FOR EXT4 FILESYSTEM
+						# tune2fs -o discard /dev/volume-group1/ext-data
+						
+						NOTE: Set 'discard' as default mount option for SSDs and/or
+						sparsed loop-devices.
+
+					Refer to man pages for more options:
+						$ man tune2fs
+						$ man mkfs.ext4
+
+				MOUNTING A LOGICAL-VOLUME AFTER IT HAS BEEN FORMATTED
+					# mount --mkdir -t ext4 /dev/volume-group1/ext-data /mnt/ext_data
+						or
+					# mount --mkdir -o discard -t ext4 /dev/volume-group1/ext-data /mnt/ext_data
+
+					Note: Use 'discard' as mount option for SSDs and/or sparsed loop-devices.
+
+					LISTING ALL EXT4 FILESYSTEM SETTINGS
+						This part is 100% OPTIONAL. You can skip.
+
+						you can list all default mount options
+						and features for EXT4 Filesystem:
+							# dumpe2fs -h /dev/volume-group1/ext-data
+						
+						This will only work on mounted device:
+							$ mount -l | grep -i -P ext4
+								or
+							$ mount -l | grep -i -P /dev/volume-group1/ext-data
+
+						Can also use this:
+							$ df -hT
+
+	EXPANDING / EXTENDING AVAILABLE DISK SPACE FOR A LOGICAL-GROUP
+		TODO:
+
+	SHRINKING AVAILABLE DISK SPACE FOR A LOGICAL GROUP
+		TODO:
+
+	EXPANDING / EXTENDING AVAILABLE DISK SPACE FOR A LOGICAL-VOLUME
+		# lvextend -l +10%FREE /dev/volume-group1/ext4-data
+			or
+		# lvextend -L +16G /dev/volume-group1/ext4-data
+
+		Note: After expanding the available disk size using LVM, you'll have to
+		resize the filesystem with it's available resizing tool.
+		
+		EXPANDING AVAILABLE DISK SIZE FOR EXT4 FILESYSTEM
+			# resize2fs -p /dev/volume-group1/logical-volume-dat
+
+	SHRINKING AVAILABLE DISK SPACE FOR A LOGICAL VOLUME
+		SHRINKING AVAILABLE DISK SIZE FOR EXT4 FILESYSTEM
+			1) First umount the filesystem, in case it's mounted:
+				1.1) Run fstrim one time before umounting:
+					# fstrim -v -a
+					
+					Note: due to the nature of LVM, you can fstrim at any point.
+
+				1.2) Umount:
+					# umount /mnt/ext_data
+
+			1) You'll have to shrink using available tools for your filesystem:
+				1.1) First run fsck:
+					# fsck.ext4 -Dfy /dev/volume-group1/logical-volume-data
+
+				1.2) Resize to it's minimum size:
+					# resize2fs -pM /dev/volume-group1/logical-volume-data
+				
+					Note: On EXT4 Filesystem, this will shrink to it's minimum size.
+
+		2) Finally reduce the available size:
+			# lvreduce -L 10G /dev/volume-group1/logical-volume-data
+				or
+			# lvreduce -L -10G /dev/volume-group1/logical-volume-data
+
+			Note: first option will set maximum size of the Logical Volume to be 10GB.
+
+		3)(Optional) Confirm Resize of Volume-Groups and Logical-Volumes:
+			# vgs
+			# lvs
+
+		4) Resize EXT4 Filesystem to the newest maximumsize:
+			# resize2fs -p 
+
+
+---------------
+---------------
+---------------
+---------------
+---------------
 SETTING UP A XFS FILESYSTEM
  	INTRODUCTION TO XFS FILESYSTEM
 		Currently, XFS underperforms in comparison to other well known filesystems like exFat, ext4 and btrfs
@@ -47390,6 +47597,21 @@ SETTING UP AN EXT4 FILESYSTEM
 			SETTING UP A BTRFS FILESYSTEM
 
 
+		VERY IMPORTANT: When using SSD or Sparse Loop-Devices, it's important to use 'tune2fs' and set
+		EXT4's auto-mount option for discard AFTER the filesystem has been created with 'mkfs.ext4':
+			# tune2fs -o discard /dev/<storage-device>
+
+			Note: This ensures that 'fstrim' will work correctly and discard any unused block,
+			for SSDs this means that the firmware can re-use the already used blocks,
+			for loop devices, this means that the host operating system can re-use the blocks as free disk space.
+			
+			If 'tune2fs' isn't used, then you'll have to mount it with discard option manually using this
+			every single time:
+				# mount --mkdir -o discard -t ext4 /dev/<storage-device> /mnt/ext_data
+
+				Note: A 3rd option is to use /etc/fstab and set the default options there.
+
+
 		1) '-E' specifies extended-options for the filesystem
 			Read more on the following sections.
 
@@ -47446,7 +47668,6 @@ SETTING UP AN EXT4 FILESYSTEM
 			B) random: generates the UUID using random number genrator.
 			C) clear: clears the filesystem UUID.
 		
-
 
 
 		EXT4 EXTENDED FILESYSTEM OPTIONS
@@ -47528,75 +47749,80 @@ SETTING UP AN EXT4 FILESYSTEM
 				$ man 5 ext4
 				$ man mkfs.ext4
 
-			1) has_journal
+			1) resize_inode
+				Allows filesystem to be resized online(without umounting) by 'resize2fs'.
+				This is set by default and can only be disabled by 'tune2fs' post-creation of the
+				filesystem.
+
+			2) has_journal
 				Enables journaling. This is a default option.
 
-			2) extent
+			3) extent
 				The use of the extent tree decreases metadata block overhead, improves file
 				system performance, and decreases the needed to run e2fsck(8)  on  the file  system.
 
-			3) 64bit
+			4) 64bit
 				Enable the file system to be larger than 2^32 blocks.
 
-			4) extra_isize
+			5) extra_isize
 				Enable the extended inode fields used by ext4.
 
-			5) uninit_bg
+			6) uninit_bg
 				The first  e2fsck(fsck.ext4)  run  after  enabling this feature will take full time 
 				to finish, but subsequent e2fsck runs will take only a fraction of the original time,
 				depending on how full the file system is.
 
-			6) read-only
+			7) read-only
 				Forces the kernel to mount the filesystem as read-only. This feature can be set 
 				using 'tune2fs' after the filesystem has been created and written to it.
 
-			7) dir_index
+			8) dir_index
 				Speeds up name lookup in large directories.
 
-			8) encrypt
+			9) encrypt
 				Enable  support  for  file system level encryption. 
 				Currently, only 'tune2fs' supports setting this feature post-creation of the filesystem.
 
 				This feature is required for encrypting tools like 'fscrypt' to work.
 
-			9) verity 
+			10) verity 
 				Enable  support  for  verity  protected files. At current date, only tune2fs can
 				set this option. Verity allows to create files that are only written to it one time,
 				and then become read-only for the remained lifetime of it's existence.
 
-			10) project
+			11) project
 				Enable project ID tracking.  This is used for project quota tracking.
 
-			11) orphan_file
+			12) orphan_file
 				Store  the  list of orphan inodes in multiple blocks instead of a single linked-list
 				to avoid po‐ tential scalability bottlenecks for workloads that perform a large number
 				of file truncations  or extensions in parallel.
 
-			12) mmp
+			13) mmp
 				Enable or disable multiple mount protection (MMP) feature.
 				This will disable 'mmp_update_interval' extended option completely.
 
 				Disabling not recommended as already stated.
 
-			13) metadata_csum
+			14) metadata_csum
 				Store a checksum to protect the contents in each metadata block.
 
-			14) metadata_csum_seed
+			15) metadata_csum_seed
 				Allow the file system to store the metadata checksum seed in the superblock,
 				enabling the  administrator to change the UUID of a file system using the
 				metadata_csum feature while it is mounted.
 
-			15) large_file
+			16) large_file
 				Filesystem can contain files larger than 2GB.
 
-			16) huge_file
+			17) huge_file
 				Supports files larger than 2TB.
 
-			17) large_dir
+			18) large_dir
 				Increase the limit on the number of files per directory.  Currently, only 'tune2fs' 
 				supports this feature post-creation of the filesystem.
 
-			18) fast_commit
+			19) fast_commit
 				Enable fast commit journaling feature to improve fsync latency.
 
 		
