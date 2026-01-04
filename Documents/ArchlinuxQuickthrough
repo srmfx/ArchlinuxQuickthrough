@@ -1024,7 +1024,8 @@ USE LICENSE:
 		ENABLE DIRECT PLAY
 		DISABLE HYPER-V
 		DISABLE CORTANA AND CO-PILOT
-		DISABLING PAGE FILE
+		DISABLING PAGE FILE ON WINDOWS
+		DISABLING WINDOWS HIBERNATION | DISABLING HIBERNATION PAGE ON WINDOWS
 	SOME NVIDIA PERFORMANCE IMPROVEMENT
 	SOME LIFE QUALITY IMPROVEMENTS ON WINDOWS
 		ENABLING HDR(HIGH DYNAMIC RANGE) ON WINDOWS
@@ -1124,6 +1125,7 @@ USE LICENSE:
 
 	---TROUBLESHOOTING WINDOWS
 		HOW TO FIX USB DEVICE NOT DETECTED
+		RE-ENABLING WINDOWS AUTO-UPDATE
 
 --MISCALENEOUS:
 	SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
@@ -36091,12 +36093,19 @@ SOME BROOT FILE EXPLORER
 		DISABLE CORTANA AND CO-PILOT
 			No instructions.
 
-		DISABLING PAGE FILE
+		DISABLING PAGE FILE ON WINDOWS
 			Only disable the Page File / Disk Swap Cache if you have more than enough Physical RAM, otherwise 
 			you'll get BSODs often:
 				run 'SystemPropertiesAdvanced.exe' as administrator by typing on search box and right-clicking for to 
 				launch it with admin rights >> Go to "Advanced" tab >> go to "Performance" and click on "Settings" >> 
 				... >> Click on "Advanced" >> Disable by choosing 'No Page File' and then apply it.
+
+		DISABLING WINDOWS HIBERNATION | DISABLING HIBERNATION PAGE ON WINDOWS
+			Disabling Hibernation will also disable hibernation page file
+		which can save some considerable disk space:
+			# powercfg.exe /hibernate off
+				or
+			# powercfg -h off
 
 	SOME NVIDIA PERFORMANCE IMPROVEMENT
 		1 - Go to Nvidia Settings >> 3D Settings >> Managing 3D Settings >> Global 3D Settings:
@@ -45977,6 +45986,21 @@ SOME BROOT FILE EXPLORER
 
 			Hint: you can rollback steps #1 and #2 if your device still doesn't shows up.
 
+		RE-ENABLING WINDOWS AUTO-UPDATE
+			Only use this as troubleshooting method if you have used 'Winaero Tweaker' tool for disabling
+			windows updates AND you want to enable it back again.
+
+			This is only useful if your windows has been blocked by System Policies from doing system updates.
+
+			1) Press 'system-key + r'
+			2) Type in:
+				gpedit.msc
+
+			3) Go to:
+				Administrative Models > Windows Components > Windows Update > End User Final Experience Manager
+			4) Set this:
+				Enable: Remove access to the "Pause updates" feature.				
+				Disable: Remove access to all Windows Update features.
 ----------------------------------
 ----------------------------------
 ----------------------------------
