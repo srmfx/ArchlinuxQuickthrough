@@ -35638,8 +35638,8 @@ SOME BROOT FILE EXPLORER
 
 			SFC can introduce even more system file corruption if the 'component store' is not 100% healthy.
 
-			VERY IMPORTANT: It's very important to execute DISM from time to time to ensure the component store is
-			healthy so that 'sfc' can fix windows system files when problem arises.
+			VERY IMPORTANT: It's very important to execute DISM from time to time to ensure the component
+			store is healthy so that 'sfc' can fix windows system files when problem arises.
 
 			1) sfc /scannow
 				Scans the integrity of all protected system files and repairs files with problems when possible.
@@ -35695,14 +35695,20 @@ SOME BROOT FILE EXPLORER
 				Restores recovery image using a .wim image. It limits windows auto-update.
 
 			Note 1: After a system checkup (Using instruction 1 or 2 above), DISM will let you know when the
-			'component store' is corrupt after finishing the scan.
+			'component store' is corrupt after finishing the scan. 
 
 			Note 2: When reapiring the 'component store' DISM may get stuck, however it's possible to track down
 			the reason why it's stuck by typing on the terminal:
 				notepad.exe C:\WINDOWS\Logs\DISM\dism.log
 
-			It's highly suggested to wait until it's finished, since DISM can download huge files using windows update 
-			tool.
+			VERY IMPORTANT: 
+				It's suggestable to use #2 for a full-scan and then use #3 for repairing the Windows
+				Component Store using 'DISM'. Using 'sfc' for repairing windows is only possible
+				if Windows Component Store is not corrupt.
+
+
+			It's highly suggested to wait until it's finished, since DISM can download huge files 
+			using windows update tool.
 
 			These are some known states for DISM downloaded files:
 				A) DISM_INSTALL_STATE_INSTALLED meaning that the file was completely missing and replaced.
