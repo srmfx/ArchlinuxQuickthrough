@@ -1126,6 +1126,7 @@ USE LICENSE:
 	---TROUBLESHOOTING WINDOWS
 		HOW TO FIX USB DEVICE NOT DETECTED
 		RE-ENABLING WINDOWS AUTO-UPDATE
+		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS:
 	SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
@@ -1527,6 +1528,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -010
+		ENABLING VOICE RECOGNITION ON WINDOWS
 		RE-ENABLING WINDOWS AUTO-UPDATE
 		DISABLING WINDOWS HIBERNATION | DISABLING HIBERNATION PAGE ON WINDOWS
 		[*[SETTING UP A LVM STORAGE MANAGEMENT LAYER]*]
@@ -46008,6 +46010,29 @@ SOME BROOT FILE EXPLORER
 			4) Set this:
 				Enable: Remove access to the "Pause updates" feature.				
 				Disable: Remove access to all Windows Update features.
+
+		ENABLING VOICE RECOGNITION ON WINDOWS
+			Voice recognition software installation and update relies on Windows Update features;
+		Windows Group Policy may also interfere, so make sure you have it enabled:
+			
+			1) Press 'system-key + r'
+			2) Type in:
+				gpedit.msc
+
+			3) Go to:
+				Administrative Models > Windows Components > Windows Update > Voice Control.
+
+				3.1) Set this:
+					Enable: Allow Auto Update of Data Voice.
+
+			5) Press 'system + i' > Choose 'Date and Language' > 'Language and Region' > Add chosen Language >
+			click on '...' and click on 'more options' > Install speech recognition modules.
+
+			6) Press 'ctrl + system_key + s' and then enable speech recognition.
+
+			NOTE: If this doesn't work, make sure to use a 'windows remote account' instead of a
+			'local account', since modern windows updates might not work with 'local accounts'.
+
 ----------------------------------
 ----------------------------------
 ----------------------------------
