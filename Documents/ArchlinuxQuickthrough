@@ -1150,6 +1150,22 @@ USE LICENSE:
 				CREATING A FILESYSTEM FOR A LVM LOGICAL VOLUME | FORMATTING A FILESYSTEM FOR A LVM LOGICAL-VOLUME
 					CREATING THE EXT4 FILESYSTEM
 					SETTING UP DEFAULT MOUNT OPTIONS FOR EXT4 FILESYSTEM
+		MOUNTING AND UMOUNTING LVM DEVICE
+			MOUNTING LVM DEVICE
+			UMOUNTING LVM DEVICE
+		SCANNING FOR PHYSICAL VOLUMES, GROUP VOLUMES AND LOGICAL VOLUMES
+			SCANNING FOR PHYSICAL VOLUMES
+			SCANNING FOR GROUP VOLUMES
+			SCANNING FOR LOGICAL VOLUMES
+		ACTIVATING AND DISABLING VOLUME GROUPS
+			ACTIVATING EXISTING VOLUME GROUPS
+			DISABLING EXISTING VOLUME GROUPS
+		CHECKING FOR DISK INCONSISTENCIES | DISK CHECK FOR LVM STORAGE DEVICES
+			CREATING AUTOMATIC METADATA BACKUP
+			RESTORING METADATA FROM AUTOMATIC METADATA BACKUPS
+				LISTING AVAILABLE METADATA BACKUPS
+			CHECKING PHYSICAL VOLUME FOR ERRORS
+			CHECKING VOLUME-GROUP FOR ERRORS
 		EXPANDING / EXTENDING AVAILABLE DISK SPACE FOR A LOGICAL-VOLUME
 			EXPANDING AVAILABLE DISK SIZE FOR EXT4 FILESYSTEM
 		SHRINKING AVAILABLE DISK SPACE FOR A LOGICAL VOLUME
@@ -47325,7 +47341,7 @@ SETTING UP A LVM STORAGE MANAGEMENT LAYER
 				CREATING AND MOUNTING LOOP DEVICES
 
 				A) NOTE: Just for 'fdisk' section, create a GPT Partition Table, followed by a LVM Filesystem
-				Partition, GPT GUID for LVM Filesystem: 6D6D379-F507-44C2-A23C-238F2A3DF928
+				Partition, GPT GUID for LVM Filesystem: E6D6D379-F507-44C2-A23C-238F2A3DF928
 
 				B) NOTE: 'fdisk' Code number might change depending on supported filesystems on your Operating System.
 				which is the reason you should use the GPT GUID as reference instead.
@@ -47357,12 +47373,16 @@ SETTING UP A LVM STORAGE MANAGEMENT LAYER
 						A Logical Volume should contain a single filesystem.
 
 				CREATING A LVM PHYSICAL-VOLUME
+					Creates a physical volume for storing volume-groups.
+
 					# pvcreate /dev/loop0p1
 
 				LISTING DETAILS ON ALL EXISTING LVM PHYSICAL-VOLUMES
 					# pvdisplay
 
 				CREATING A LVM VOLUME-GROUP
+					Creates a volume group for storing logical volumes.
+
 					# vgcreate <volume_group_name> /dev/loop0p1
 					
 					Example:
@@ -47372,6 +47392,9 @@ SETTING UP A LVM STORAGE MANAGEMENT LAYER
 					# vgs
 
 				CREATING A LVM LOGICAL-VOLUME
+					Creates a logical volume that can contain partitions, filesystem
+					and other schemes alike.
+
 					This will create a logical-volume called 'ext-data' inside the
 					volume-group called 'volume-group1':
 						# lvcreate --name ext-data -l 100%FREE volume-group1
@@ -47420,6 +47443,126 @@ SETTING UP A LVM STORAGE MANAGEMENT LAYER
 
 						Can also use this:
 							$ df -hT
+
+
+	MOUNTING AND UMOUNTING LVM DEVICE
+		By default, LVM Devices are mounted after being created for the first time,
+		except for actual filesystems belonging to logical volumes.
+
+		MOUNTING LVM DEVICE
+			1) attach the loop device:
+				1.1) Attach loop device in a single command:
+					# losetup --find --partscan --show ~/disk.lvm
+
+				1.2)(Alternate-Option) Use kpartx for scanning partitions instead of --partscan:
+					# losetup -f ~/disk.lvm
+					# kpartx -a /dev/loop0
+
+					Note: when using kpartx, device will be mapped to /dev/mapper/ as new loop device.
+
+			2) scan physical volume
+				# pvscan
+
+			3) scan volume groups
+				# vgscan
+
+			4) scan logical volumes
+				# lvscan
+
+			5) Mounting logical volume
+				# mount --mkdir -t ext4 /dev/volume-group1/ext-data /mnt/ext_data
+					or
+				# mount --mkdir -o discard -t ext4 /dev/volume-group1/ext-data /mnt/ext_data
+
+				Note: Use 'discard' as mount option for SSDs and/or sparsed loop-devices.
+
+
+		UMOUNTING LVM DEVICE
+			1) Umount existing mounted filesystems:
+				# umount <mounted_storage>
+
+				Example:
+					# umount /mnt/ext-data
+
+			2) Deactivate all volume groups:
+				# vgchange -an
+
+			3)(optional) only use this if you used step #1.2 for attaching when MOUNTING:
+				3.1) Listing dms:
+					# ls -l /sys/block/loop0/holders
+						or
+					# ls -l /dev/mapper/
+
+				3.2) Removing dm:
+					# dmsetup remove /dev/dm-0
+
+			4) dettach loop device:
+				# losetup -D
+
+
+	SCANNING FOR PHYSICAL VOLUMES, GROUP VOLUMES AND LOGICAL VOLUMES
+		Scans for existing physical volumes, group volumes and logical volumes,
+		useful after mounting device.
+
+			SCANNING FOR PHYSICAL VOLUMES
+				# pvscan
+
+			SCANNING FOR GROUP VOLUMES
+				# vgscan
+
+			SCANNING FOR LOGICAL VOLUMES
+				# lvscan
+
+
+	ACTIVATING AND DISABLING VOLUME GROUPS
+		When creating a volume-group for the first time, it'll be activated by default.
+		It should be disabled before umounting and manually activated each time
+		after 'pvscan'/'vgscan':
+
+			ACTIVATING EXISTING VOLUME GROUPS
+				$ vgchange -ay 
+
+			DISABLING EXISTING VOLUME GROUPS
+				$ vgchange -an
+
+
+	CHECKING FOR DISK INCONSISTENCIES | DISK CHECK FOR LVM STORAGE DEVICES
+		Fixing an LVM storage device requires using metadata backup,
+	VOLUME-GROUP meta is stored in '/etc/lvm/backup':
+
+		CREATING AUTOMATIC METADATA BACKUP
+			Backup metadata for all Volume Groups:
+				# vgcfgbackup 
+
+		RESTORING METADATA FROM AUTOMATIC METADATA BACKUPS
+			source: 'vgcfgrestore' man page.
+
+			'vgcfgrestore'  restores  the  metadata  of  a VG from a text back up file produced by vgcfgbackup.
+			This writes VG metadata onto the devices specified in back up file.
+
+			LISTING AVAILABLE METADATA BACKUPS
+				$ vgcfgrestore --list <volume_group_name>
+
+		CHECKING PHYSICAL VOLUME FOR ERRORS
+			# pvck <storage_device>
+
+			Example:
+				# pvck /dev/loop0p1
+
+
+			Note: when scanning a LVM contained within a partition table, you'll have to scan
+			the inner logical table belonging to LVM.
+
+		CHECKING VOLUME-GROUP FOR ERRORS
+			$ vgck
+			# vgck <device>
+				or
+			# vgck --devices /dev/<storage_device>
+
+			Example:
+				# vgck /dev/volume-group1
+					or
+				# vgck  --devices /dev/loop0p1
 
 	EXPANDING / EXTENDING AVAILABLE DISK SPACE FOR A LOGICAL-GROUP
 		TODO:
@@ -48312,3 +48455,6 @@ Temporary 3:
 Custom Modeline 70hz:
 "1280x768_70n" 73.685 1280 1288 1320 1360 768 780 788 794 +HSync -VSync
 ----
+MAJOR AND MINOR NUMBER
+	ls -l /dev/
+	https://www.kernel.org/doc/Documentation/admin-guide/devices.txt
