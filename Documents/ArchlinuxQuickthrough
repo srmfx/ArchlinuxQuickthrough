@@ -47361,8 +47361,8 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 
 			Note: this is the exact case with WSL2 .VHDX based linux distributions under windows,
 			While both the kernel and the filesystem(ext4) support trimming, it's disabled by default
-			when mounting .VHDX images on WSL; because of this, internal loop-devices will only free space
-			internally but never to the host's physical storage device; because of this, diskpart has to be
+			when mounting .VHDX images on WSL2; because of this, internal loop-devices will only free space
+			internally but never to the host's physical storage device; due to this, diskpart has to be
 			used as an external tool for shrinking and reclaimming free space.
 
 		D) LVM trim/discard option can be enabled in the following configuration file:
