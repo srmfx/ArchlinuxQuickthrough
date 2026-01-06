@@ -1133,6 +1133,9 @@ USE LICENSE:
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
+	SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
+		ENABLING DISCARDS ON OPENNING A LUKS DEVICE
+
 	SETTING UP A LVM STORAGE MANAGEMENT LAYER
 		INTRODUCTION TO LVM
 		SETTING UP A LVM STORAGE DEVICE
@@ -1542,6 +1545,10 @@ New Syntax(2023):
 ====================================================================================================
 ========================================S-CHANGELOG=================================================
 ====================================================================================================
+
+-011
+		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*]
+		TODO: LVM ALSO HAS TRIMMING/DISCARD RELATED OPTIONS, MAKE SURE TO ADD THEM
 
 -010
 		ENABLING VOICE RECOGNITION ON WINDOWS
@@ -47324,7 +47331,53 @@ SETTING UP A BTRFS FILESYSTEM
 				$ cp --reflink=always <source> <dest>
 
 
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
+	ENABLING DISCARDS ON OPENNING A LUKS DEVICE
+		VERY IMPORTANT: Just for LUKS, Before enabling TRIM support, make sure the device actually supports
+		TRIM commands or data loss can occur.
+			source: https://wiki.archlinux.org/title/Dm-crypt/Specialties#Discard/TRIM_support_for_solid_state_drives_(SSD)
+		---
+		A) NOTE: Trimming/Discard is a feature that should be enabled for SSD Storage Devices and
+		Sparse Loop-Devices. The inner filesystem on a LUKS must also have trim/discard enabled.
 
+		For sparse Loop-Devices trimming/discard allows the kernel to reclaim space from deleted
+		data back to the host's storage device.
+
+		B) NOTE: You'll also need to enable LVM Discard/Trim options for LVM Storage Devices. 
+
+		C) NOTE:  TRIM/DISCARD commands must pass through all layers so that the actual physical storage device
+		can reclaim space:
+			PHYSICAL STORAGE DEVICE <- LVM <- ENCRYPTION <- FILESYSTEM 
+
+		Example:
+			If TRIM/DISCARD is only enabled by 'ENCRYPTION' and 'FILESYSTEM' layers, then free space will only
+			be reported to LVM, but not to the actual 'PHYSICAL STORAGE DEVICE', requiring other tools
+			to shrink and reclaim space from the LVM layer for the 'PHYSICAL STORAGE' device.
+
+			Note: this is the exact case with WSL2 .VHDX based linux distributions under windows,
+			While both the kernel and the filesystem(ext4) support trimming, it's disabled by default
+			when mounting .VHDX images on WSL; because of this, internal loop-devices will only free space
+			internally but never to the host's physical storage device; because of this, diskpart has to be
+			used as an external tool for shrinking and reclaimming free space.
+
+		D) LVM trim/discard option can be enabled in the following configuration file:
+			[file: /etc/lvm/lvm.conf]
+				issue_discards=1
+			[/file]
+
+			Note: this option defaults to '0', so enabling it with '1' will be necessary for LUKS.
+
+		E) Filesystem, Encryption, and Volume Managers that have TRIM/DISCARD enabled can not be mounted
+		on Operating Systems with Kernel(s) that doesn't support TRIM/DISCARD.
+		---
+
+		For a LUKS2 device, TRIM support can be enabled by using the following when openning the device:
+			# cryptsetup --allow-discards --persistent open /dev/sdaX root
 ---------------
 ---------------
 ---------------
