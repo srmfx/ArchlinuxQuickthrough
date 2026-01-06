@@ -47372,8 +47372,8 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 
 			Note: this option defaults to '0', so enabling it with '1' will be necessary for LUKS.
 
-		E) Filesystem, Encryption, and Volume Managers that have TRIM/DISCARD enabled can not be mounted
-		on Operating Systems with Kernel(s) that doesn't support TRIM/DISCARD.
+		E) Filesystem, Encryption Layers, and Volume Managers that have TRIM/DISCARD enabled can not be
+		mounted(or used) on Operating Systems with Kernel(s) that doesn't support TRIM/DISCARD.
 		---
 
 		For a LUKS2 device, TRIM support can be enabled by using the following when openning the device:
