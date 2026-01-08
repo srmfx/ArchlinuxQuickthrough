@@ -1134,7 +1134,13 @@ USE LICENSE:
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
 	SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
-		ENABLING DISCARDS ON OPENNING A LUKS DEVICE
+		CREATING A LUKS ENCRYPTED DEVICE
+		UMOUNTING AND CLOSING A LUKS DEVICE
+		DUMPING INFORMATION FROM LUKS DEVICE
+		BACKING UP A LUKS DEVICE HEADER 
+		RESTORING A LUKS DEVICE BY USING A HEADER
+		ENABLING DISCARDS WHEN OPENNING A LUKS DEVICE
+			SMALL NOTE ON SPARSE FILES
 
 	SETTING UP A LVM STORAGE MANAGEMENT LAYER
 		INTRODUCTION TO LVM
@@ -1547,6 +1553,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -011
+		SMALL NOTE ON SPARSE FILES
 		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*]
 		TODO: LVM ALSO HAS TRIMMING/DISCARD RELATED OPTIONS, MAKE SURE TO ADD THEM
 
@@ -47337,11 +47344,131 @@ SETTING UP A BTRFS FILESYSTEM
 ---------------
 ---------------
 SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
-	ENABLING DISCARDS ON OPENNING A LUKS DEVICE
+
+	CREATING A LUKS ENCRYPTED DEVICE
+		LUKS Encrypted device need to be created before a filesystem is actually formatted onto the device.
+		'cryptsetup' does allows to encrypt already existing filesystems with 'plain text mode encryption',
+		not 'luks'.
+
+			1) Create a sparse LOOP DEVICE:
+				$ dd if=/dev/zero of=disk.luks bs=1 count=0 seek=100G
+
+				FOR MORE INFO, READ MORE ON:
+					'CREATING AND MOUNTING LOOP DEVICES'
+
+					You can also read this for a practical example:
+						SETTING UP A BTRFS FILESYSTEM
+
+					A) VERY IMPORTANT:
+						Never use tools like 'fsck', 'e2fsck', 'resize2fs' on an
+						encrypted device, or you'll cause permanent data loss and corruption!
+						ALWAYS decrypt the LUKS device first!
+
+			2) Attach the loop device:
+				# losetup --find --show --partscan ./disk.luks
+
+			3) Setup LUKS:
+				# cryptsetup luksFormat --type luks2 /dev/loop0
+
+			4) Open/Decrypt the device with DISCARD/TRIM Features enabled:
+				# cryptsetup --allow-discards --persistent open /dev/<storge_device> <device_alias>
+					or
+				# cryptsetup open /dev/<storge_device> <device_alias>
+
+				A) Note: <device_alias> can be any name, a device under /dev/mapper/ will be created
+				using the same name.
+
+				VERY IMPORTANT:
+					Read 'SMALL NOTE ON SPARSE FILES' for more understanding on how
+					sparse works on LUKS device.
+
+
+					# cryptsetup --allow-discards --persistent open /dev/<storge_device> <device_alias>
+
+			5) After LUKS device is open, Format the filesystem under /dev/mapper/:
+				EXAMPLE:
+
+					# fdisk /dev/mapper/<device_alias>
+					# mfks.ext4 -E discard -O extent /dev/mapper/<device_alias>
+					# fsck.ext4 -Dfy /dev/mapper/<device_alias>
+					# tune2fs -o discard /dev/mapper/<device_alias>
+					
+					Note: running 'fsck' is needed for setting auto-mount options using
+					      'tune2fs'.
+
+				RECOMMENDED READINGS:
+					CREATING AND MOUNTING LOOP DEVICES
+					SETTING UP AN EXT4 FILESYSTEM
+
+
+	UMOUNTING AND CLOSING A LUKS DEVICE
+		1) Umount any mounted filesystem first:
+			# umount /mnt/<luks_mounted_filesystem>
+
+		2) Close LUKS Device:
+			# cryptsetup close <device_alias>
+
+		3)(Optional) Dettach Loop Device:
+			Only use this if using a loop device:
+				# losetup -d /dev/<loop_device>
+
+	DUMPING INFORMATION FROM LUKS DEVICE
+		# cryptsetup luksDump /dev/<storage_device>
+			or
+		# cryptsetup luksDump <loop-device-name>
+
+
+	BACKING UP A LUKS DEVICE HEADER 
+		A LUKS device header backup can be used in case it gets corrupted:
+			# cryptsetup luksHeaderBackup /dev/<storage_device> --header-backup-file <header_filename>
+
+			A) Note: <storage_device> is either a loop-device or an actual block device at which
+			LUKS was created.
+
+			B) Note: <header_filename> is the header backup, if you've made one.
+
+	RESTORING A LUKS DEVICE BY USING A HEADER
+		RESTORING A LUKS HEADER allows for fixing a broken LUKS Storage Device using it's backup header.
+			# cryptsetup luksHeaderRestore /dev/<storage_device> --header-backup-file <header_filename>
+
+		Note: since header restore can permanently break a luks device when the expected header file passed
+		in --header-backup-file isn't actually the header or it's a corrupted header, it is wise to
+		test it first using the following:
+
+			1) If you have create a LOOP DEVICE you'll need to attach the file first using 'losetup':
+				FOR MORE INFO, READ MORE ON:
+					CREATING AND MOUNTING LOOP DEVICES
+
+			2) Decrypt the luks device using the header image:
+				# cryptsetup -v --header /mnt/backup/<header_filename> open /dev/<storage_device> <device_alias>
+				
+				A) Note: <device_alias> can be any name, a device under /dev/mapper will be created
+				using the same name.
+
+				B) Note: <storage_device> is either a loop-device or an actual block device at which
+				LUKS was created.
+
+				C) Note: <header_filename> is the header backup, if you've made one.
+
+			3) Mount device:
+				# mount --mkdir /dev/mapper/<device_alias> /mnt/<mount_dir>
+
+			4) List Contents: 
+				$ ls /mnt/<mount_dir>
+
+			5) Umount and Close LUKS Encrypted Device:
+				# umount /mnt/test 
+				# cryptsetup close test 
+
+		
+			6) If all these steps succeed and you can normally list the contents, then the header is
+			ok to use on restore.
+
+	ENABLING DISCARDS WHEN OPENNING A LUKS DEVICE
 		VERY IMPORTANT: Just for LUKS, Before enabling TRIM support, make sure the device actually supports
 		TRIM commands or data loss can occur.
 			source: https://wiki.archlinux.org/title/Dm-crypt/Specialties#Discard/TRIM_support_for_solid_state_drives_(SSD)
-		---
+		--- SMALL NOTE ON SPARSE FILES --
 		A) NOTE: Trimming/Discard is a feature that should be enabled for SSD Storage Devices and
 		Sparse Loop-Devices. The inner filesystem on a LUKS must also have trim/discard enabled.
 
@@ -47377,7 +47504,47 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 		---
 
 		For a LUKS2 device, TRIM support can be enabled by using the following when openning the device:
-			# cryptsetup --allow-discards --persistent open /dev/sdaX root
+			# cryptsetup --allow-discards --persistent open /dev/<storge_device> <device_alias>
+
+			A) Note: <device_alias> can be any name, a device under /dev/mapper/ will be created
+			using the same name.
+
+			B) Note: <storage_device> is either a loop-device or an actual block device at which
+			LUKS was created.
+		---
+
+	RESIZING A LUKS DEVICE
+		Since 'LUKS' encryption works similarly to a storage container, you'll need to use this
+		specific tool for resizing it:
+
+			1) Disable LUKS device before allocating space using available tools:
+				# cryptsetup close <device_alias>
+
+			2)(OPTIONAL) If you're using a loop device, make sure to detach it first:
+				# losetup -d /dev/loop0
+					or
+				# losetup -D
+
+			3) Now either allocate or shrink space using available tools
+				
+			4) After space is allocated, attach the loop device:
+				# losetup --find --partscan --show <loop_device_filename>
+
+			5) decrypt the LUKS Device:
+				# cryptsetup open /dev/loop0 <device_alias>
+
+				A) Note: <device_alias> can be any name, a device under /dev/mapper/ will be created
+
+			6) Resize it using 'cryptsetup resize':
+				$ cryptsetup resize <device_alias>
+
+			7) (OPTIONAL - EXAMPLE) for an EXT4 Filesystem, this is how you would allocate more space:
+				# e2fsck -f /dev/mapper/<device_alias>
+				# resize2fs /dev/mapper/<device_alias>
+
+				Note: you can allocate space universally using 'gparted', just make sure to use 
+				/dev/mapper/ as device and not any of the other /dev/loopX for LUKS Encrypted Devices.
+
 ---------------
 ---------------
 ---------------
