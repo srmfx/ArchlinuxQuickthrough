@@ -1553,6 +1553,8 @@ New Syntax(2023):
 ====================================================================================================
 
 -011
+
+		COMPILING WSL KERNEL -> Minor Content Update regarding Kernel Modules
 		SMALL NOTE ON SPARSE FILES
 		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*]
 		TODO: LVM ALSO HAS TRIMMING/DISCARD RELATED OPTIONS, MAKE SURE TO ADD THEM
@@ -37693,8 +37695,8 @@ SOME BROOT FILE EXPLORER
 
 			9.3(Optional) - This is just a reference for my 'menuconfig' configuration file for building 
 			kernel 6.6.87.2:
-				Note: search for 'end-of-file' to skip reading this:
 
+				Note: search for 'end-of-file' to skip reading this:
 				[start-of-file: ~/WSL2-Linux-Kernel/Microsoft/config-wsl ]
 					#
 					# Automatically generated file; DO NOT EDIT.
@@ -45885,16 +45887,35 @@ SOME BROOT FILE EXPLORER
 
 		11 - Once it's finished, Copy the compiled kernel to your windows directory located in /mnt/c/ on WSL:
 			11.1) First create a new directory in your user directory:
-				$ mkdir -p /mnt/c/Users/<username>/.wsl-kernels/
+				$ mkdir -p /mnt/c/Users/<username>/.wsl-kernel/
 
 			11.2) Copy the compiled kernel to the newly created directory:
-				$ cp arch/x86/boot/bzImage /mnt/c/Users/<username>/.wsl-kernels/bzImage_new
+				$ cp ./arch/x86/boot/bzImage /mnt/c/Users/<username>/.wsl-kernel/bzImage_new
 			
 			NOTE 1: Becareful not to re-write an existing kernel.
 			NOTE 2: Make sure to copy existing kernel to a safe place, just in case.
 			NOTE 3: Replace <username> with an existing username.
 
-		12 - Create the file '.wslconfig' in your user directory:
+		12(OPTIONAL) - Now you can copy the modules the same way:
+			
+			12.1 - After booting your linux distro using your new kernel
+			use this for fetching your <kernel_version>:
+				$ uname -r
+
+				Note: you can also fetch the new <kernel_version> simply by listing directories
+				on ./modules/lib/modules/:
+					$ ls -la ./modules/lib/modules/
+
+			12.2 - Copy Modules to your windows folder:
+				$ mkdir -P /mnt/Users/<username>/.wsl-kernel/modules/
+
+				$ cp -ar ./modules/lib/modules/<kernel_version> /mnt/Users/<username>/.wsl-kernel/modules/
+
+			
+			12.3 - Now run your linux distribution and Copy modules into your linux distro:
+				# cp -ar /mnt/Users/<username>/.wsl-kernel/modules/<kernel_version> /lib/modules/
+
+		13 - Create the file '.wslconfig' in your user directory:
 			At this point, if you wish to do so, you can rename the kernel name from 'bzImage' to anything you'd like.
 
 			[file: C:\Users\USER\<username>\.wslconfig ]
@@ -45904,7 +45925,7 @@ SOME BROOT FILE EXPLORER
 
 			NOTE: Replace <username> with an existing username.
 
-		13 - Now terminate/shutdown ALL running WSL distributions:
+		14 - Now terminate/shutdown ALL running WSL distributions:
 			$ wsl --shutdown
 				or
 			$ wsl --terminate <distribution>
@@ -45912,10 +45933,10 @@ SOME BROOT FILE EXPLORER
 			note: if you use --terminate you'll have to terminate every single running distribution by hand.
 			--shutdown will terminate every running distribution automatically.
 
-		14 - Now you can finally use any distribution you want with your new custom compiled kernel:
+		15 - Now you can finally use any distribution you want with your new custom compiled kernel:
 			$ wsl -d archlinux
 
-		15 - Verify Kernel version 
+		16 - Verify Kernel version 
 			$ uname -rv
 
 
@@ -47350,7 +47371,10 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 		'cryptsetup' does allows to encrypt already existing filesystems with 'plain text mode encryption',
 		not 'luks'.
 
-			1) Create a sparse LOOP DEVICE:
+			1) First load required module:
+				# modprobe dm_crypt
+
+			2) Create a sparse LOOP DEVICE:
 				$ dd if=/dev/zero of=disk.luks bs=1 count=0 seek=100G
 
 				FOR MORE INFO, READ MORE ON:
@@ -47364,16 +47388,25 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 						encrypted device, or you'll cause permanent data loss and corruption!
 						ALWAYS decrypt the LUKS device first!
 
-			2) Attach the loop device:
-				# losetup --find --show --partscan ./disk.luks
+			3)(OPTIONAL) Attach file to a loop device:
+				Technically speaking you don't have to attach file to a loop device,
+				since you can directly run cryptsetup straight into <loop-device-file>,
+				both for setting up and openning(decrypting) a luks device :
 
-			3) Setup LUKS:
+					# losetup --find --show --partscan ./disk.luks
+
+			4) Setup LUKS:
 				# cryptsetup luksFormat --type luks2 /dev/loop0
+					or
+				# cryptsetup luksFormat --type luks2 <loop-device-file>
 
-			4) Open/Decrypt the device with DISCARD/TRIM Features enabled:
+			5) Open/Decrypt the device with DISCARD/TRIM Features enabled:
 				# cryptsetup --allow-discards --persistent open /dev/<storge_device> <device_alias>
 					or
-				# cryptsetup open /dev/<storge_device> <device_alias>
+				# cryptsetup --allow-discards --persistent open <loop-device-filename> <device_alias>
+					
+				You can also use this if you don't desire DISCARD/TRIM option enabled:
+					# cryptsetup open /dev/<storge_device> <device_alias>
 
 				A) Note: <device_alias> can be any name, a device under /dev/mapper/ will be created
 				using the same name.
@@ -47385,7 +47418,7 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 
 					# cryptsetup --allow-discards --persistent open /dev/<storge_device> <device_alias>
 
-			5) After LUKS device is open, Format the filesystem under /dev/mapper/:
+			6) After LUKS device is open, Format the filesystem under /dev/mapper/:
 				EXAMPLE:
 
 					# fdisk /dev/mapper/<device_alias>
