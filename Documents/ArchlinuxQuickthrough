@@ -47401,14 +47401,22 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 				# cryptsetup luksFormat --type luks2 <loop-device-file>
 
 			5) Open/Decrypt the device with DISCARD/TRIM Features enabled:
-				# cryptsetup --allow-discards --persistent open /dev/<storge_device> <device_alias>
+				# cryptsetup --allow-discards --persistent open /dev/<storage_device> <device_alias>
 					or
 				# cryptsetup --allow-discards --persistent open <loop-device-filename> <device_alias>
 					
+
+				A) NOTE: using --persistent enables --allow-discard by default the next time
+				'cryptsetup open' is used without the need of using --allow-discard again.
+				read man page for 'cryptsetup open' for more information:
+					$ man cryptsetup-open
+						or
+					$ man 8 cryptsetup-open
+
 				You can also use this if you don't desire DISCARD/TRIM option enabled:
 					# cryptsetup open /dev/<storge_device> <device_alias>
 
-				A) Note: <device_alias> can be any name, a device under /dev/mapper/ will be created
+				B) NOTE: <device_alias> can be any name, a device under /dev/mapper/ will be created
 				using the same name.
 
 				VERY IMPORTANT:
