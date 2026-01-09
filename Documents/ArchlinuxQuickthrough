@@ -47423,9 +47423,6 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 					Read 'SMALL NOTE ON SPARSE FILES' for more understanding on how
 					sparse works on LUKS device.
 
-
-					# cryptsetup --allow-discards --persistent open /dev/<storge_device> <device_alias>
-
 			6) After LUKS device is open, Format the filesystem under /dev/mapper/:
 				EXAMPLE:
 
