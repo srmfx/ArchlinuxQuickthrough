@@ -47965,8 +47965,8 @@ SETTING UP A XFS FILESYSTEM
 SETTING UP AN EXFAT FILESYSTEM
 	INTRODUCTION TO EXFAT FILESYSTEM
 		ExFat filesystem is ideal for USB Storage Devices that have to be carried over and used into
-	different computers running different operating systems due to it's high cross-compatibility
-	with other systems. It can also be used on MicroSD storage devices for the very same reason, it can be read
+	different devices running different systems, due to it's high cross-compatibility.
+	It can also be used on MicroSD storage devices for the very same reason, it can be read
 	on most devices including photo/video cameras, TVs and other OSes.
 
 	DISADVANTAGES OF EXFAT FILESYSTEM
