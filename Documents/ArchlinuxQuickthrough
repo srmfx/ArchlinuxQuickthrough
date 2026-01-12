@@ -270,7 +270,6 @@ USE LICENSE:
 				ADDING/CREATING NEW FSCRYPT PROTECTOR | CHANGING FSCRYPT PASSWORD
 				CLEANING JOURNALCTL
 				MORE INFO ON FSCRYPT
-				FSCRYPT VS LUKS OR DM-CRYPT ON LOOP DEVICE
 			CREATING A LUKS ENCRYPTED LOOP DEVICE USING DM-CRYPT
 				RESIZING A LUKS ENCRYPTED LOOP-DEVICE USING DM-CRYPT
 				HOW TO KEEP CRYPTSETUP / LUKS / DM-CRYPT DEVICE SAFE
@@ -17020,10 +17019,11 @@ It is also highly recommended for the kernel version to be 5.4 or later, as this
 --INSTRUCTIONS & ENABLING FSCRYPT ENCRYPTION ON EXT4:
 For ext4, the file system on which encryption is to be used must have the encrypt feature flag enabled. To enable it, run:
 
-Step 1  - #tune2fs -O encrypt /dev/device
-		#tune2fs -O encrypt /dev/sdc1
+1) # tune2fs -O encrypt /dev/<storage-device>
+	Example:
+		# tune2fs -O encrypt /dev/sdc1
 			or
-		#tune2fs -O encrypt <loop_device_file>	
+		# tune2fs -O encrypt <loop_device_file>	
 
 The operation can be undone with debugfs -w -R "feature -encrypt" /dev/device. 
 Also run fsck before and after to ensure the integrity of the file system on both cases.
@@ -17156,15 +17156,6 @@ If SUDO is used, it will sudo lock or sudo unlock the given user in sudo -iu <us
 	Finally, you can copy the security-key to a removable disk like an USB Device,
 	and even the loop-devices containning the fscrypt data themselves.
 
-	FSCRYPT VS LUKS OR DM-CRYPT ON LOOP DEVICE
-		The advantages are many, 1st loop-devices don't work well when they're over 100GB,
-		they become super slow. Fscrypt runs using the underlaying filesystem encryption.
-
-		Performance wise, fscrypt is much faster since it uses the underlying filesystem instead of 
-		simulating stuff inside a loop device file. So it should be faster even when using a loop-device.
-
-		In terms of security, there's no password recovery/change on fscrypt, it's almost always assured
-		to be a permanent loss and likely no one can recover it in case you lose your data.
 
 --READ MORE ON SECTIONS:
 	ENCRYPTING FILES WITH GPG
