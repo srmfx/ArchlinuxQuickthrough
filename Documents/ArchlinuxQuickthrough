@@ -32701,10 +32701,10 @@ VERY IMPORTANT:
 
 USEFUL LINKS TO CHECK:
 	https://ntcore.com/4gb-patch/					#4GB Patcher for x86 programs
-									^ useful for programs 32bits software
-									that require lots of RAM and may end up crashing
-									when going above the 2GB Limit for 32bit apps.
-									Some very old games may benefit from this.
+									^ useful for 32bits software that require lots
+									of RAM and may end up crashing when going above
+									the 2GB Limit for 32bit apps.
+									Very old games may benefit from this.
 
 	https://sourceforge.net/projects/dar/				#DAR Archive Repository
 	https://github.com/Parchive/par2cmdline				#PAR2CMDLINE
