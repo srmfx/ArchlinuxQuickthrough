@@ -1560,6 +1560,7 @@ New Syntax(2023):
 -011
 
 		SETTING UP A F2FS FILESYSTEM
+		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*] -> Minor update
 		COMPILING WSL KERNEL -> Minor Content Update regarding Kernel Modules
 		SMALL NOTE ON SPARSE FILES
 		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*]
@@ -47371,7 +47372,6 @@ SETTING UP A BTRFS FILESYSTEM
 ---------------
 ---------------
 SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
-
 	CREATING A LUKS ENCRYPTED DEVICE
 		LUKS Encrypted device need to be created before a filesystem is actually formatted onto the device.
 		'cryptsetup' does allows to encrypt already existing filesystems with 'plain text mode encryption',
@@ -47395,11 +47395,22 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 						ALWAYS decrypt the LUKS device first!
 
 			3)(OPTIONAL) Attach file to a loop device:
-				Technically speaking you don't have to attach file to a loop device,
+				A) IMPORTANT: Technically speaking you don't have to attach file to a loop device,
 				since you can directly run cryptsetup straight into <loop-device-file>,
 				both for setting up and openning(decrypting) a luks device :
 
+				B) IMPORTANT: Skipping this step will create a LUKS Device without a partition
+				table. A Partition Table like GPT may prevent other operating systems from 
+				accidentally overwritting the LUKS Header. Some bootloaders like GRUB may not
+				recognizez a .luks device at all without a GPT Partition Table.
+
+				Just for this example, i'll be creating a LUKS device WITHOUT A PARTITION TABLE,
+				Check the recommended readings section below if you want to create a partition table:
+
 					# losetup --find --show --partscan ./disk.luks
+
+				RECOMMENDED READINGS:
+					CREATING AND MOUNTING LOOP DEVICES
 
 			4) Setup LUKS:
 				# cryptsetup luksFormat --type luks2 /dev/loop0
@@ -47430,7 +47441,10 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 					sparse works on LUKS device.
 
 			6) After LUKS device is open, Format the filesystem under /dev/mapper/:
-				EXAMPLE:
+				Note: At this point you may want to create a partition table,
+				checkout the RECOMMENDED READINGS section below.
+
+				EXAMPLE - formatting EXT4 on LUKS Storage WITHOUT A PARTITION TABLE -:
 
 					# fdisk /dev/mapper/<device_alias>
 					# mfks.ext4 -E discard -O extent /dev/mapper/<device_alias>
