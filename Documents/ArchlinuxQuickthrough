@@ -1142,6 +1142,11 @@ USE LICENSE:
 		ENABLING DISCARDS WHEN OPENNING A LUKS DEVICE
 			SMALL NOTE ON SPARSE FILES
 
+	SETTING UP A F2FS FILESYSTEM
+		INTRODUCTION TO F2FS
+		DISADVANTAGES OF F2FS
+		F2FS FEATURES
+
 	SETTING UP A LVM STORAGE MANAGEMENT LAYER
 		INTRODUCTION TO LVM
 		SETTING UP A LVM STORAGE DEVICE
@@ -1554,6 +1559,7 @@ New Syntax(2023):
 
 -011
 
+		SETTING UP A F2FS FILESYSTEM
 		COMPILING WSL KERNEL -> Minor Content Update regarding Kernel Modules
 		SMALL NOTE ON SPARSE FILES
 		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*]
@@ -47583,6 +47589,52 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 				Note: you can allocate space universally using 'gparted', just make sure to use 
 				/dev/mapper/ as device and not any of the other /dev/loopX for LUKS Encrypted Devices.
 
+---------------
+---------------
+---------------
+---------------
+---------------
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING UP A F2FS FILESYSTEM
+	INTRODUCTION TO F2FS
+		F2FS is a linux system only. 
+
+		You can expect some sort of compatibility with some more modern Smart TVs, Smartphones
+		or even some more modern MP3 Players, but it's not 100% assured F2FS will work on all devices.
+
+		It also lacks compatibility with MacOS and Windows.
+
+		F2FS is optimized for NAND-based Flash Memory that have built-in support for
+		FTL(Flash-transition layer) to handle write distributions.
+
+		Note that some Raw NAND Flash storage devices and SmartMediaCards might not have support for FTL.
+		FTL is 100% found in all flash memory storage devices with a SCSI/SATA/PCIe/NVMe interface.
+
+
+	DISADVANTAGES OF F2FS
+		According to Archlinux Wikipedia, Data contained in a F2FS partition can become unusable when
+		trying to mount the storage device using an older kernel version than the one it was created with.
+		
+		This has been extracted directly from archlinux wikipedia:
+			source: https://wiki.archlinux.org/title/F2FS
+
+			"The data contained on F2FS partitions can become unusable if the kernel version 
+			on the running machine is older than the kernel version used to create the partition. 
+			For example, this limitation can manifest if the F2FS partition was created on a mainline
+			kernel provided by linux yet the system has a need to downgrade to an older series of 
+			kernels provided by linux-lts."
+
+		As of current date, F2FS also has a weak filesystem check(fsck) tool for finding and fixing errors,
+		so it's not reliable and trustable for use under Power Loss situations, since you may end up
+		with a complete and corrupt data.
+	
+	F2FS FEATURES
+		It has support for dm_crypt, verity, data compression and it works out-of-box by using 
+		multiple different storage devices to work as a single storage device.
 ---------------
 ---------------
 ---------------
