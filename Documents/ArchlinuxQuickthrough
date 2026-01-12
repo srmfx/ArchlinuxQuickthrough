@@ -1134,6 +1134,8 @@ USE LICENSE:
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
 	SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
+		LUKS VS FSCRYPT VS GOCRYPTFS
+			DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 		CREATING A LUKS ENCRYPTED DEVICE
 		UMOUNTING AND CLOSING A LUKS DEVICE
 		DUMPING INFORMATION FROM LUKS DEVICE
@@ -1559,8 +1561,10 @@ New Syntax(2023):
 
 -011
 
-		SETTING UP A F2FS FILESYSTEM
+
 		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*] -> Minor update
+			LUKS VS FSCRYPT VS GOCRYPTFS -> New content
+		SETTING UP A F2FS FILESYSTEM
 		COMPILING WSL KERNEL -> Minor Content Update regarding Kernel Modules
 		SMALL NOTE ON SPARSE FILES
 		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*]
@@ -47378,6 +47382,50 @@ SETTING UP A BTRFS FILESYSTEM
 ---------------
 ---------------
 SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
+	LUKS VS FSCRYPT VS GOCRYPTFS
+			LUKS Requires the entire block device to be encrypted; in the other hand, fscrypt
+		and gocryptfs can encrypt directories individually.
+
+		The benefits are straightforward, fscrypt and gocryptfs can be set for multiple user sharing
+		a single filesystem, each user having their own different password; LUKS in the other hand would
+		require either multiple physical disks or virtual loop-devices for each user. In the case 
+		of loop-devices, LUKS would directly impact performance for those users due to input/output speeds
+		on loop-devices.
+
+		LUKS would also share the same problem when a user wants to create a secondary encrypted directory 
+		with a different password. The LUKS user would either have to set a different physical disk or virtual
+		disk(using loop-devices), thus propagating the performance issue when using a loop-device.
+
+			When booting a hard disk with LUKS, the block-device will also have to be fully decrypted at
+		boot time before the system is actually fully loaded. With 'fscrypt' and 'gocryptfs' only one or
+		few directories would have to be decrypted, while optional encrypted directories wouldn't have to be
+		decrypted.
+
+		The larger the encrypted disk(or data) size is, the more time will be spent on decrypting it.
+
+			Another problem with LUKS is that it's container based; and just like a GPT Partition Table
+		can become corrupt, a LUKS Container can also be damaged and become corrupt, which will render
+		the encrypted data inside the LUKS permanently innacessible.
+
+		in the other hand, both fscrypt and gocryptfs allow 'fsck'(filesystem check) tools to normally run
+		and fix filesystem errors without requiring data to be decrypted at all.
+		
+			DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
+				'Gocryptfs' is cross-platform while 'fscrypt' is linux-only.
+			On linux, 'gocryptfs' is a FUSE-based filesystem while 'fscrypt' is not,
+			this means 'fscrypt' will perform better.
+
+			When compared to LUKS, Both 'gocryptfs' and 'fscrypt' allow any system user to encrypt and
+			decrypt their own data. LUKS in the other hand can only be used by root administrator
+			and authorized system users.
+
+			'Gocryptfs' also works atop any known filesystem, while 'fscrypt' only work atop known linux
+			filesystems like xfs, ext4 and btrfs.
+
+			Due to 'gocryptfs' cross-platform and filesystem wide compatibility, it can be used over
+			remote cloud storages.
+
+
 	CREATING A LUKS ENCRYPTED DEVICE
 		LUKS Encrypted device need to be created before a filesystem is actually formatted onto the device.
 		'cryptsetup' does allows to encrypt already existing filesystems with 'plain text mode encryption',
