@@ -47405,20 +47405,25 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 		with a different password. The LUKS user would either have to set a different physical disk or virtual
 		disk(using loop-devices), thus propagating the performance issue when using a loop-device.
 
-			When booting a hard disk with LUKS, the block-device will also have to be fully decrypted at
-		boot time before the system is actually fully loaded. With 'fscrypt' and 'gocryptfs' only one or
-		few directories would have to be decrypted, while optional encrypted directories wouldn't have to be
-		decrypted.
+			When booting a hard disk with LUKS, the block-device will also have to be decrypted at
+		boot time before the system(kernel, initramfs, modules, etc) is actually fully loaded.
+		However, with 'fscrypt' and 'gocryptfs' only one or few directories would have to be decrypted at boot,
+		while optional encrypted directories can be decrypted later post system boot.
 
-		The larger the encrypted disk(or data) size is, the more time will be spent on decrypting it.
+		As time passes, the disk will become old and might become slower, requiring bigger access time for reading
+		data, which when added on top of LUKS, would make it boot slower due to how files need to be decrypted
+		on a per-read basis(when read is demanded). This will render system boot times to become bigger
+		over the time. A solution, again, is to either use a secondary hard drive just for LUKS or a loop-device.
 
 			Another problem with LUKS is that it's container based; and just like a GPT Partition Table
 		can become corrupt, a LUKS Container can also be damaged and become corrupt, which will render
 		the encrypted data inside the LUKS permanently innacessible.
 
 		in the other hand, both fscrypt and gocryptfs allow 'fsck'(filesystem check) tools to normally run
-		and fix filesystem errors without requiring data to be decrypted at all.
-		
+		and fix filesystem errors without requiring data to be decrypted at all. Fscrypt and Gocryptfs are
+		also not container-based, so header(or container) damage can not happen at all.
+
+
 			DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 				'Gocryptfs' is cross-platform while 'fscrypt' is linux-only.
 			On linux, 'gocryptfs' is a FUSE-based filesystem while 'fscrypt' is not,
