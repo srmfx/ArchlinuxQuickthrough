@@ -262,6 +262,7 @@ USE LICENSE:
 			HOW TO CREATE SECURITY KEYS / KEYFILES ON LINUX
 			CLEANING JOURNALCTL
 			ENCRYPTING DIRECTORIES WITH FSCRYPT
+				FSCRYPT VS LUKS VS GOCRYPTFS
 				INFORMATION TO CONSIDER | 2024
 				INSTRUCTIONS & ENABLING FSCRYPT ENCRYPTION ON EXT4
 				ENCRYPTING NEW DIRECTORY WITH FSCRYPT
@@ -1241,6 +1242,8 @@ USE LICENSE:
 	FILESYSTEM ENCRYPTION USING GOCRYPTFS
 		REQUIREMENTS FOR USING GOCRYPTFS
 		ADVANTAGES OF GOCRYPTFS OVER ENCFS
+			LUKS VS FSCRYPT VS GOCRYPTFS
+				DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 		INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
 		MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
 		CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
@@ -16984,6 +16987,12 @@ ENCRYPTING DIRECTORIES WITH FSCRYPT
 
 fscrypt is also the name of a userspace tool to use the kernel feature of the same name. This article shows how to use the fscrypt tool to encrypt directories, including how to encrypt a home directory.
 https://wiki.archlinux.org/title/Fscrypt
+
+
+--FSCRYPT VS LUKS VS GOCRYPTFS
+	For more info, read the following topics:
+		LUKS VS FSCRYPT VS GOCRYPTFS
+			DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 
 --INFORMATION TO CONSIDER | 2024
 	as of 2024, Fscrypt does not yet support nested encrypted directories,
@@ -46532,6 +46541,11 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 		E) unlike 'encfs', 'gocryptfs' has multi-threading support.
 		F) unlike 'encfs', 'gocryptfs' can use both relative and absolute paths when decrypting/encrypting.
 
+		For more info, read the following topics:
+			LUKS VS FSCRYPT VS GOCRYPTFS
+				DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
+			ADVANTAGES OF GOCRYPTFS OVER ENCFS
+
 	INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
 		1) First create a directory meant for storage:
 			$ mkdir ~/Encrypted.storage
@@ -46631,6 +46645,10 @@ FILESYSTEM ENCRYPTION USING ENCFS
 
 		I) Features from most modern available File Systems can be fully utilized when accessing
 		and reading both the encrypted/decrypted data.
+
+		For more info, read the following topics:
+			LUKS VS FSCRYPT VS GOCRYPTFS
+				DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 
 	CREATING AN ENCRYPTED STORAGE AND MOUNT-DECRYPTING IT WITH ENCFS
 		1) MODPROBING REQUIRED ENCFS MODULES
