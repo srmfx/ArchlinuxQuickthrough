@@ -64,6 +64,7 @@ USE LICENSE:
 
 	USEFUL LINKS TO CHECK
 	THE DEVIL
+		SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 		THE DEVIL2
 	
 	---IMPORTANT HEALTH ADVICE
@@ -1131,6 +1132,7 @@ USE LICENSE:
 --MISCALENEOUS:
 	SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
+	SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 	SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 
 	SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
@@ -1562,8 +1564,9 @@ New Syntax(2023):
 ====================================================================================================
 
 -011
-
-
+		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS -> minor update
+		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME -> [no updates]
+		SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 		[*[SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE]*] -> Minor update
 			LUKS VS FSCRYPT VS GOCRYPTFS -> New content
 		SETTING UP A F2FS FILESYSTEM
@@ -1577,8 +1580,6 @@ New Syntax(2023):
 		RE-ENABLING WINDOWS AUTO-UPDATE
 		DISABLING WINDOWS HIBERNATION | DISABLING HIBERNATION PAGE ON WINDOWS
 		[*[SETTING UP A LVM STORAGE MANAGEMENT LAYER]*]
-		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
-		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME -> minor update
 		[*[SETTING UP AN EXT4 FILESYSTEM]*]
 		[*[SETTING UP A NTFS FILESYSTEM]*]
 		[*[SETTING UP AN EXFAT FILESYSTEM]*]
@@ -6258,7 +6259,11 @@ rm -r [path]
 				/usr/bin/
 				/etc/
 
-YOU'VE BEEN WARNED!!!
+	IMPORTANT: 
+		It's also possible to use a wraper to make things safer to use.
+
+		READ MORE ON:
+			SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 
 ------------------------------
 ================================================================================
@@ -46967,6 +46972,154 @@ RCLONE TUTORIAL
 ---------------
 ---------------
 ---------------
+SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
+		The following file wraps 'rm' command and makes it safer to use.
+	the function 'rm' is called each time the user runs '/usr/bin/rm' for removing files.
+	a function 'sudo' exists for the same reason, it allows '/usr/bin/rm' to be wraped when using alongside
+	'sudo' and 'run0'.
+
+
+	A) Note: Concatenate the contents to your already existing /et/zsh/zshrc file instead of creating a new
+	file in case it already exists.
+
+	B) Note: The user must fully type the 'YES' word in order to remove files safely.
+	defaults to 'NO' automatically.
+
+	C) Note: This is meant only for zsh shell.
+
+	E) READ MORE ON:
+		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
+
+	[file: /etc/zsh/zshrc ]
+		function is_not_rm_argument {
+			export return_v=1;
+			case ${@} in
+				-r)
+					;;
+				-R)
+					;;
+				--recursive)
+					;;
+				-f)
+					;;
+				--force)
+					;;
+				-i)
+					;;
+				-I)
+					;;
+				--interactive)
+					;;
+				--one-file-system)
+					;;
+				--one-preserve-root)
+					;;
+				--preserve-root)
+					;;
+				-d)
+					;;
+				--dir)
+					;;
+				-v)
+					;;
+				--verbose)
+					;;
+				--help)
+					;;
+				--version)
+					;;
+				*)
+					return_v=0;
+					;;
+			esac
+			return return_v;
+		}
+
+		function rm {
+			export VAR_INPUT="N";
+			export is_sudo=false;
+			export is_run0=false;
+
+			#Splits away --sudo and --run0 arguments if passed to this function
+			#this allows rm to be run as administrator. Also check sudo() and run0() functions.
+			export adm_cmd=${@[1]};
+			export cmd_v="";
+			export split_c=1;
+			if [[ "${adm_cmd}" == "--sudo" || "${adm_cmd}" == "--run0" ]]; then
+				if [[ "${adm_cmd}" == "--sudo" ]]; then
+					cmd_v="sudo";
+
+				elif [[ "${adm_cmd}" == "--run0" ]]; then
+					cmd_v="run0";
+				fi
+
+				split_c=2
+
+			else
+				split_c=1;
+			fi
+			
+			##Use this for debugging only if needed:
+			#echo "TEST: "${@[@]:${split_c}};
+
+			echo "\nDATA TO BE REMOVED:\n";
+			#Prints all data that is supposed to be removed :
+			foreach data_f in ${@[@]:${split_c}}; do
+				is_not_rm_argument ${data_f};
+				if [ ${?} -eq 0 ]; then
+					echo "${data_f}\n";
+				fi
+			done
+
+			echo "\nCURRENT WORK DIRECTORY IS: ${PWD}";
+			echo "\nDo you want to remove all of the ABOVE DATA? Type [YES/NO]";
+			read -r VAR_INPUT;
+			echo "";
+			if [[ "${VAR_INPUT}" == "YES" ]]; then
+				command ${cmd_v} rm ${@[@]:${split_c}};
+
+				if [[ ${?} -eq 0 ]]; then
+					echo "\nALL DATA REMOVED!\n";
+				elif [[ ${?} -eq 1 ]]; then
+					echo "\nDATA FAILED TO BE REMOVED!\n";
+				else
+					echo "\nERROR HAS OCCURRED: ${?}\n";
+				fi
+
+			else
+				echo "\nCANCELED!\n";
+
+			fi
+
+			unset -v VAR_INPUT;
+		}
+
+		function sudo {
+			if [[ "${@[1]}" == "rm" ]]; then
+				#Slices 'sudo' and 'rm' away:
+				rm --sudo ${@[@]:2};
+
+			else
+				command sudo ${@[@]:1}
+			fi
+		}
+
+		function run0 {
+			if [[ "${@[1]}" == "rm" ]]; then
+				#Slices 'sudo' and 'rm' away:
+				rm --run0 ${@[@]:2};
+
+			else
+				command run0 ${@[@]:1}
+			fi
+		}
+	[/file]
+
+---------------
+---------------
+---------------
+---------------
+---------------
 SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
 	By default, 'man' uses 'less' to display man pages on the terminal.
 When reading man pages for 'less' you can find information on 'LESS_TERMCAP_xx' environment variable,
@@ -48533,6 +48686,7 @@ SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUN
 
 	For an example of system wide bash function, read more on:
 		SETTING UP COLORS FOR MAN PAGES | MAN PAGE CUSTOM THEME
+		SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 
 ---------------
 ---------------
