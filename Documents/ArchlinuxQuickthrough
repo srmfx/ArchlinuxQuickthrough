@@ -1006,6 +1006,11 @@ USE LICENSE:
 		CHECKING IF HYPER-V IS ENABLED ON WINDOWS
 		CHECKING IF WSL IS ACTUALLY USING HYPER-V
 	SOME WSL CONFIGURATION FILES | WSL SETTINGS
+	ACCESSING WSL LINUX DISTRIBUTION FROM COMMANDLINE OR POWERSHELL
+		CREATING A SYMBOLIC LINK ON WINDOWS TO YOUR WSL LINUX DISTRIBUTION
+		CREATING A DRIVE LETTER FOR YOUR WSL LINUX DISTRIBUTION
+		RUNNING WSL PROCESSES ON WINDOWS VIA WSL NETWORK SHARE 
+	USING DISTROBOX ON WSL
 	MANAGING WINDOWS ACCOUNTS
 		MORE USER ACCOUNT OPTIONS
 		CHANGING USER PASSWORDS ON WINDOWS
@@ -1130,6 +1135,7 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS:
+	NICE AND RENICE PROCESSES | OPTIMIZATION, PERFORMANCE
 	SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
 	SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
@@ -1562,6 +1568,12 @@ New Syntax(2023):
 ====================================================================================================
 ========================================S-CHANGELOG=================================================
 ====================================================================================================
+
+-012
+		ACCESSING WSL LINUX DISTRIBUTION FROM COMMANDLINE OR POWERSHELL
+			CREATING A SYMBOLIC LINK ON WINDOWS TO YOUR WSL LINUX DISTRIBUTION
+			CREATING A DRIVE LETTER FOR YOUR WSL LINUX DISTRIBUTION
+			RUNNING WSL PROCESSES ON WINDOWS VIA WSL NETWORK SHARE 
 
 -011
 		SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS -> minor update
@@ -6136,6 +6148,10 @@ CLEANING REFERENCE LOGS
 			or
 		$ git reflog expire --expire=90.days.ago --expire-unreachable=now --all
 
+OPTIMIZING GIT REPOSITORY
+	$ git gc --prune=now
+	$ git gc --aggressive
+	$ git maintenance start
 
 ------
 THE FOLLOWING ERROR CAN BE EASILY FIXED: 
@@ -6656,7 +6672,8 @@ note.: not in order, use search function to find it:
 	debugfs, tree, dircolors, broot, pmap,  
 	diff, cmp, comm, join, uniq, *xdelta3, *parallel, args, xargs, awk,
 	*rclone, split, dar, tar, par2 (par2cmdline).
-	*strace
+	*strace, filelock-touch, filelock-create, filelock-check, filelock-remove, strace, nohup.
+	nice, renice.
 
 	look later:
 		dircolors for setting colors to 'ls'
@@ -6871,6 +6888,26 @@ $ dd if=/dev/zero of=raw_file.raw bs=10G count=2					#Creates a zeroed 20GB file
 											specifies how much RAM should be used
 											in the copy process.
 -------------------------------
+use 'genfstab -U <mount_point>' to generate a single fstab entry by UUID:
+	$ genfstab -U /mnt/ext4 | sudo tee -a /etc/fstab
+
+[file: /etc/fstab]
+	UUID=5f67c4bo-891c-9rbb-bce3-820185902ccd	/mnt/archlinux-old         	ext4      	rw,defaults,relatime,errors=remount-ro,nofail,noauto 0 2
+[/file]
+
+
+setting up number #2 as the final character, will allow fsck to run the filesystem check as the 2nd disk.
+
+-------------------------------
+# dumpe2fs -h /dev/sdxx					#Display several information about a EXT4 filesystem.
+							Note: can be used to check if the disk state is clean.
+
+# fsck.ext4 -n	/dev/sdxx				#Checks if the disk is clean without doing a full filesystem check
+							Note: Useful for very large, full or old disks, since running
+							'fsck.ext4' -Dfy will take an eternity on those disks.
+
+# fsck.ext4 -Dfy /dev/sdxx				#Forces running a filesystem check
+
 # fsck.ext4 -cDfty -C 0 /dev/sdxx			#Run a ext4 file system check and badblocks scan with progress info - NOT TESTED
 ------------------------------
 strace -ff -e trace=write -e write=1,2 -p SOME_PID	#Intercept stdin/stdout of another process
@@ -8913,6 +8950,9 @@ Login as another group:
 								 ^ same as above
 	
 	$ sg - <groupname> -c <program>				#Executes given program as another group in the system
+
+Running Commands:
+	$ su -c 'rename -- "-04" "" Folder-04.inv'
 
 ---
 userdbctl:							#Displays all users on the system
@@ -18264,6 +18304,10 @@ CREATING MODULAR KEYBINDINGS
 	Modular keybinds will allow you to switch which keys do what during runtime,
 without changing anything.
  
+VERY IMPORTANT: When you're writing code, use code instead of words, code for sigkill is always -9.
+Only the shell can replace word with codes, when doing system call using known programming language APIs,
+it will not work.
+
 For this, follow this step:
 	1 - Create a folder called xbindkeys_files
 		$mkdir -p ~/.hidden/xbindkeys_files/ ;
@@ -35955,6 +35999,13 @@ SOME BROOT FILE EXPLORER
 							[boot]
 							systemd=true
 
+							## This allows running known windows programs from linux,
+							## usually through wine. This gives a performance boost,
+							## when launching and using linux within WSL.
+							[interop]
+							enabled = true
+							appendWindowsPath = true
+
 							## A string of the command that you would like to run 
 							## when the WSL instance starts. This command is run 
 							## as the root user. Only available for Windows 11.
@@ -35981,7 +36032,7 @@ SOME BROOT FILE EXPLORER
 							enabled=true
 
 							[system-distro-env]
-							WESTON_RDP_MONITOR_REFRESH_RATE=75
+							#WESTON_RDP_MONITOR_REFRESH_RATE=75
 
 							[interop]
 							## Defaults to 'true' - Setting this key will determine 
@@ -36016,7 +36067,8 @@ SOME BROOT FILE EXPLORER
 							[system-distro-env]
 							WESTON_RDP_MONITOR_REFRESH_RATE=75
 						[/file]
-
+				
+				NOTE: This doesn't work and causes issues.
 
 	TEST YOUR MONITOR'S REFRESH RATE
 		Due to the nature of WSL and WSLg at the current state, it may not display Higher than 60Hz Refresh Rates:
@@ -36025,6 +36077,115 @@ SOME BROOT FILE EXPLORER
 			https://refresh-rate-visualizer.vercel.app/
 			https://frameratetest.com/refresh-rate-tester/
 
+
+	ACCESSING WSL LINUX DISTRIBUTION FROM COMMANDLINE OR POWERSHELL
+		You can easily access your linux data from either CMD or Powershell:
+
+			A) From CMD:
+				$ pushd \\wsl.localhost\<your_linux_distro_name>
+					or
+				$ pushd \\wsl$\<your_linux_distro_name>
+				
+				1.1) Changing directory to c:
+					$ popd
+
+			B) From Powershell:
+				$ cd \\wsl.localhost\<your_linux_distro_name>\
+					or
+				$ cd \\wsl$\<your_linux_distro_name>\
+
+				Note: you can also use 'pushd' and 'popd' instead under Powershell.
+
+				1.2) Changing directory to c:
+					$ cd c:
+
+			CREATING A SYMBOLIC LINK ON WINDOWS TO YOUR WSL LINUX DISTRIBUTION
+				On Windows, creating symbolink links requires administration privileges:
+
+				A) From CMD:
+					1) Launch CMD as Admin:
+						# cmd
+						
+					2) Create the hardlink:
+						# mklink /d c:\your_linux_distro \\wsl$\<your_linux_distro_name>
+
+				B) From Powershell:
+					1) Launch Powershell as Admin:
+						# New-Item -ItemType SymbolicLink -Path "C:\path\to\new_hardlink.txt" -Target "C:\path\to\original_file.txt"
+
+				Note: It's also possible to create 'directory junction' on windows, but it doesn't works
+				for Network Shares(UNC Paths).
+
+				Note 2: If junctions are absolutely needed, one can use DFS Namespaces:
+					https://learn.microsoft.com/en-us/windows-server/storage/dfs-namespaces/dfs-overview?tabs=server-manager
+
+			CREATING A DRIVE LETTER FOR YOUR WSL LINUX DISTRIBUTION
+				Note: B) isn't the best method.
+
+				A) From Powershell(BEST METHOD SO FAR):
+					$ net use * \\wsl$\<your_linux_distro_name>
+
+					Note: 
+						The following will not work:
+							$ net use * \\wsl$\<your_linux_distro_name>\path\to\folder
+
+				B) From either Powershell or CMD:
+					$ subst <letter>: <path>
+
+					Practical Example:
+						$ subst y: \\wsl.localhost\<your_linux_distro_name>
+
+				C) Third method creates a PSDrive:
+					1A) Create a PSDRIVE(TEMPORARY):
+						$ New-PSDrive -Name "Drive_A" -PSProvider "FileSystem" -Root "\\wsl$\<your_linux_distro>\path\to\dir\"
+
+
+					1B)(Alternate) Create a PSDRIVE(PERMANENT):
+						$ New-PSDrive -Name "I" -PSProvider "FileSystem" -Root "\\wsl$\<your_linux_distro>" -Persist
+
+						Note 1: -Name has to be a single letter
+						Note 2: -Root has to be the name of the distro only,
+						passing a directory that belongs to your distro will not work.
+						Note 3: you can pass '-Scope global' as argument if you intend
+						to run this on a script, otherwise it will not be "visible"
+						once the script ends.
+
+					2) access it using:
+						$ cd Drive_A:
+
+
+			RUNNING WSL PROCESSES ON WINDOWS VIA WSL NETWORK SHARE 
+
+				A) From CMD:
+					1) Change directory using:
+						$ pushd \\wsl$\share\
+
+					2) Then run the program:
+						$ .\app.exe
+							or
+
+				B) From Powershell:
+					$ Start-Process -FilePath "\\server\share\app.exe"
+
+
+	USING DISTROBOX ON WSL
+		After installing distrobox, create a normal user account, then log into it.
+		finally use this for creating and entering distrobox:
+			1) Creating:
+				$ distrobox create --root -n <name> -i <distro>
+
+				Example:
+					$ distrobox create -n fedora_36_v2 -i quay.io/fedora/fedora:36 --root
+
+			2) Entering:
+				$ distrobox enter --root <name>
+
+				Example:
+					$ distrobox enter --root fedora_36_v2
+			
+			
+		Note: If not on distrobox you can remove --root argument.
+			
 	MANAGING WINDOWS ACCOUNTS
 		Press 'system_key' + r >> Type in 'netplwiz' or 'netplwiz.exe'
 
@@ -47036,9 +47197,8 @@ SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 		}
 
 		function rm {
+			export bypass="false";
 			export VAR_INPUT="N";
-			export is_sudo=false;
-			export is_run0=false;
 
 			#Splits away --sudo and --run0 arguments if passed to this function
 			#this allows rm to be run as administrator. Also check sudo() and run0() functions.
@@ -47059,6 +47219,13 @@ SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 				split_c=1;
 			fi
 			
+			##When --bypass is used as argument to 'rm', it allows ignoring safety restrictions
+			if [[ "${@[split_c]}" == "--bypass" ]]; then
+				bypass="true";
+				VAR_INPUT="YES";
+				((split_c++));
+			fi
+
 			##Use this for debugging only if needed:
 			#echo "TEST: "${@[@]:${split_c}};
 
@@ -47073,7 +47240,10 @@ SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
 
 			echo "\nCURRENT WORK DIRECTORY IS: ${PWD}";
 			echo "\nDo you want to remove all of the ABOVE DATA? Type [YES/NO]";
-			read -r VAR_INPUT;
+			if [[ "${bypass}" == "false" ]]; then
+				read -r VAR_INPUT;
+			fi
+
 			echo "";
 			if [[ "${VAR_INPUT}" == "YES" ]]; then
 				command ${cmd_v} rm ${@[@]:${split_c}};
@@ -48649,6 +48819,24 @@ SETTING UP AN EXT4 FILESYSTEM
 					in 2.6.35+ kernels.)
 
 
+---------------
+---------------
+---------------
+---------------
+---------------
+NICE AND RENICE PROCESSES | OPTIMIZATION, PERFORMANCE
+	1) Launch Process normally
+		$ konsole
+
+	2) Get PID Of launched process
+		$ pid_num=$(pidof konsole);
+
+	3) Renice it:
+		$ renice -n -20 ${pid_num}
+
+	4) All programs launched through konsole terminal will have -20 niceness.
+		
+		
 ---------------
 ---------------
 ---------------
