@@ -3,7 +3,7 @@
 {S-CHANGELOG}
 {TEST LATER, SEARCH LATER, NEW FROM BELOW, REGEX ON NVIM}
 {OPTIMIZATION, TWEAK, PERFORMANCE, [PERFORMANCE]}
-{IMPROVEMENT, RECOMMENDED, PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK}
+{IMPROVEMENT, RECOMMENDED, PERFORMANCE, QUALITY, SPEED, WARNING, LINKS TO CHECK, IMPORTANT}
 
 NOTES:
 	MAN PAGE SAVES LIVES
@@ -1006,7 +1006,7 @@ USE LICENSE:
 		CHECKING IF HYPER-V IS ENABLED ON WINDOWS
 		CHECKING IF WSL IS ACTUALLY USING HYPER-V
 	SOME WSL CONFIGURATION FILES | WSL SETTINGS
-	ACCESSING WSL LINUX DISTRIBUTION FROM COMMANDLINE OR POWERSHELL
+	ACCESSING WSL LINUX DIRECTORIES FROM COMMANDLINE OR POWERSHELL
 		CREATING A SYMBOLIC LINK ON WINDOWS TO YOUR WSL LINUX DISTRIBUTION
 		CREATING A DRIVE LETTER FOR YOUR WSL LINUX DISTRIBUTION
 		RUNNING WSL PROCESSES ON WINDOWS VIA WSL NETWORK SHARE 
@@ -1135,6 +1135,7 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS:
+	SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
 	NICE AND RENICE PROCESSES | OPTIMIZATION, PERFORMANCE
 	SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
 	USING 'DD' FOR ATTACHING A FILE AS PART OF A SPARSE FILE
@@ -1570,7 +1571,9 @@ New Syntax(2023):
 ====================================================================================================
 
 -012
-		ACCESSING WSL LINUX DISTRIBUTION FROM COMMANDLINE OR POWERSHELL
+		SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
+		NICE AND RENICE PROCESSES | OPTIMIZATION, PERFORMANCE
+		ACCESSING WSL LINUX DIRECTORIES FROM COMMANDLINE OR POWERSHELL
 			CREATING A SYMBOLIC LINK ON WINDOWS TO YOUR WSL LINUX DISTRIBUTION
 			CREATING A DRIVE LETTER FOR YOUR WSL LINUX DISTRIBUTION
 			RUNNING WSL PROCESSES ON WINDOWS VIA WSL NETWORK SHARE 
@@ -6673,7 +6676,7 @@ note.: not in order, use search function to find it:
 	diff, cmp, comm, join, uniq, *xdelta3, *parallel, args, xargs, awk,
 	*rclone, split, dar, tar, par2 (par2cmdline).
 	*strace, filelock-touch, filelock-create, filelock-check, filelock-remove, strace, nohup.
-	nice, renice.
+	nice, renice, shellcheck, tcpdump, pushd, dirs, popd, pwd, pinky, finger, at.
 
 	look later:
 		dircolors for setting colors to 'ls'
@@ -6682,7 +6685,7 @@ note.: not in order, use search function to find it:
 		tcsetattr, termios, stty
 
 	---new ones:
-		pinky, pmap*, arp*, dig*, bmon*, install*, patch*, pushd, dirs, popd.
+		pinky, pmap*, arp*, dig*, bmon*, install*, patch*
 
 caption:
 	*: new/important
@@ -6744,6 +6747,35 @@ Very Important tools:
 $ pstree					#Lists process tree
 $ ps -el					#Report snapshot of current running processes
 
+---
+-------------------------------
+dirs						#Lists stacked directories, from 0 to Nth.
+						Note: The 1st path is the current one, it is always the path at 0th
+						position.
+
+dirs -v						#Same as above, will list all stacked directories with numbers.
+						Note: '0' always represents the current directory being accessed.
+
+dirs -v -l					#Will display dirs in long format.
+
+pushd <dir>					#Pushes directory into dir. stack and changes directory to it.
+						Note: the current dir. will be pushed down in the stack
+						after dir. change occurs.
+
+pushd -2					#Changes to the 2nd directory in the dir. stack.
+						Note: the current dir. will become the 2nd directory after
+						dir. change occurs.
+
+popd -2						#Removes 2nd directory from the dir. stack.
+
+cd <dir>					#Does the same as 'pushd <dir>'
+
+cd $OLDPWD					#Changes  to the previous directory.
+
+pwd						#Prints the current directory on the screen.
+---
+-------------------------------
+pinky						#Shows who is logged in on your system
 ---
 -------------------------------
 # pidof firefox | awk '{system("cat /proc/"$0"/status")}'	#For some reason, this should work, but it doesn't
@@ -6905,8 +6937,10 @@ setting up number #2 as the final character, will allow fsck to run the filesyst
 # fsck.ext4 -n	/dev/sdxx				#Checks if the disk is clean without doing a full filesystem check
 							Note: Useful for very large, full or old disks, since running
 							'fsck.ext4' -Dfy will take an eternity on those disks.
+							Note2: Not 100% reliable as filesystem may be damage even
+							if they're marked as clean!
 
-# fsck.ext4 -Dfy /dev/sdxx				#Forces running a filesystem check
+# fsck.ext4 -C0 -Dfy /dev/sdxx				#Forces running a filesystem check
 
 # fsck.ext4 -cDfty -C 0 /dev/sdxx			#Run a ext4 file system check and badblocks scan with progress info - NOT TESTED
 ------------------------------
@@ -7217,12 +7251,12 @@ HARD DISK COMMANDS:
 				^ Lists filesystem features.
 
 # tune2fs -O <feature> /dev/sdX	#Enables a given EXT4 feature(s) on a given EXT4 Partition/Disk
-				^ Requires umounting and using fsck.ext4 -Dfy after features have been enabled/disabled.
+				^ Requires umounting and using fsck.ext4 -C0 -Dfy after features have been enabled/disabled.
 				^ some features can be enabled/disabled when mounting instead.
 
 # e2fsck 			#Checks and Tests a linux ext4 filesystem 
 
-# fsck.ext4 -Dfy		#Enhances and fixes any disk errors, requires disk to be umounted
+# fsck.ext4 -C0 -Dfy		#Enhances and fixes any disk errors, requires disk to be umounted
 				^ This needs to be used whenever a new feature is enabled/disabled using tune2fs
 
 # mkfs.ext4 -m <reserved_block_space>		#Specify the percentage of the file system blocks reserved for 
@@ -8218,7 +8252,7 @@ mount:
 #losetup -D					#Detach all loop devices
 #losetup -d /dev/loop2				#Detach a loop device
 #fdisk -l /dev/loop2				#Lists all partitions in a given loop block device after it has been attached to a given file
-#fsck.ext4 -Dfy	/dev/loop2p2			#Runs filesystem checkdisk on an ext4 partition located in the /dev/loop2 device after it has been attached
+#fsck.ext4 -C0 -Dfy	/dev/loop2p2			#Runs filesystem checkdisk on an ext4 partition located in the /dev/loop2 device after it has been attached
 						^ in this case, it's partition number 2. ###SPECIAL STEP
 
 Mount a directory to another directory:
@@ -8261,7 +8295,7 @@ RESIZING EXISTING RAW IMAGES | RESIZING LOOP DEVICES:
 
 	4 - (Optional - If gparted doesn't work at first)
 		4.1 - Type:
-			#fsck.ext4 -Dfy /dev/loop2
+			#fsck.ext4 -C0 -Dfy /dev/loop2
 
 		4.2 - Repeat step #3
 
@@ -20720,6 +20754,10 @@ git clone https://aur.archlinux.org/yay-bin.git
 cd yay-bin
 makepkg -si
 
+ALTERNATE: - Run command all at once - 
+	$ sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+
+----
 	FIRST YAY USE:
 		Step 1 - Generates a development package database for *-git packages that were installed without yay. This command should only be run once.
 		Step 2 - Will check for development package updates
@@ -20802,7 +20840,7 @@ INCREASING SSD LIFETIME
 			or similar commands!
 
 		2.5.2 - Run fsck.ext4:
-			#fsck.ext4 -Dfy /dev/sdx
+			#fsck.ext4 -C0 -Dfy /dev/sdx
 		
 	2.6 - Setting up a Disk Scheduler Options:	
 		2.6 - List available disk scheduling options:
@@ -23669,8 +23707,8 @@ be the solution to the problem.
 Once your system is booting from installation media, do as follows:
 
 0 - Execute a filesystem check to make sure everything is 'ok' before mounting
-	# fsck.ext4 -Dfy /dev/sdXY
-	ex.: fsck.ext4 -Dfy /dev/sdb2
+	# fsck.ext4 -C0 -Dfy /dev/sdXY
+	ex.: fsck.ext4 -C0 -Dfy /dev/sdb2
 
 1 - Mount the partition where your linux is installed:
 	# mount -m /dev/sdXY /mnt/my_linux_system
@@ -29163,7 +29201,7 @@ OPTIONAL TOOLS FOR IPTABLES
 	lsof,
 	gufw, psad, ss, ip, ifconfig, netwatch, 
 	watch, firetable, fwlogwatch, whois, host, wireshark.
-	traceroute, networkmanager, netstat.
+	traceroute, networkmanager, netstat, tcpdump.
 	
 	very important: *don't use gufw if you're using iptables.
 	very important2: read more about other tools on topic: "MONITORING TOOLS" and "EXAMPLES OF KNOWN PROGRAMS THAT USE LD_PRELOAD"
@@ -32869,7 +32907,7 @@ Frame interpolation / motion interpolation would then insert an extra frame for 
 		2) Elise-ng
 			https://fly.elise-ng.net/news/fly-elise-ng-6-2-1-software-release/
 
-		3) SVP Project
+		3) SVP Project(30 Days trial)
 		 	Meant for video play only.
 			On archlinux, you can install it under 'svp-bin' package.
 
@@ -36032,6 +36070,7 @@ SOME BROOT FILE EXPLORER
 							enabled=true
 
 							[system-distro-env]
+							##This is known to cause issues and hanging processes!
 							#WESTON_RDP_MONITOR_REFRESH_RATE=75
 
 							[interop]
@@ -36065,6 +36104,7 @@ SOME BROOT FILE EXPLORER
 					EXAMPLE - Setting up default refresh rate of 75Hz - :
 						[file: C:\ProgramData\Microsoft\WSL\.wslgconfig ]
 							[system-distro-env]
+							##This is known to cause issues and hanging processes!
 							WESTON_RDP_MONITOR_REFRESH_RATE=75
 						[/file]
 				
@@ -36078,7 +36118,7 @@ SOME BROOT FILE EXPLORER
 			https://frameratetest.com/refresh-rate-tester/
 
 
-	ACCESSING WSL LINUX DISTRIBUTION FROM COMMANDLINE OR POWERSHELL
+	ACCESSING WSL LINUX DIRECTORIES FROM COMMANDLINE OR POWERSHELL
 		You can easily access your linux data from either CMD or Powershell:
 
 			A) From CMD:
@@ -36985,7 +37025,7 @@ SOME BROOT FILE EXPLORER
 				  scc-bin dbgl pipes.sh 
 
 			This requires compilation, so doing them individually is the best:
-				$ yay -S dosbox-x-sdl2 qmplay2 memstat pcmanx-gtk2 syncterm cheat svp-bin ssed dar
+				$ yay -S dosbox-x-sdl2 qmplay2 memstat pcmanx-gtk2 syncterm cheat ssed dar
 
 
 		BASICS ON HOW TO USE PACMAN
@@ -37142,7 +37182,16 @@ SOME BROOT FILE EXPLORER
 
 				Example: 
 					$ wsl --mount \\.\PHYSICALDRIVE1 --partition 2
-			
+						or
+					$ wsl --mount \\.\PHYSICALDRIVE1 --partition 2 --bare 
+				
+				Important Note:
+					Certain specific filesystem options might not be available unless you specify
+				them to wsl during the mount, example:
+
+					$ wsl --mount \\.\PHYSICALDRIVE1 --partition 2 --type ext4 --options "discard,data=ordered"
+						or
+					$ wsl --mount \\.\PHYSICALDRIVE1 --partition 2 --bare --options "discard,data=ordered" --type ext4
 
 		UMOUNTING DEVICES ON WSL
 			VERY IMPORTANT: Before unmounting make sure to use 'lsblk' to ensure no loop devices or 
@@ -37216,7 +37265,7 @@ SOME BROOT FILE EXPLORER
 
 							4.3 - (Optional - EXT4 Filesystems only) If you so desire, 
 							you can run 'fsck' to perform a filesystem check and fix:
-								# fsck.ext4 -Dfy /dev/sdX2
+								# fsck.ext4 -C0 -Dfy /dev/sdX2
 
 							4.4 - Mounting
 								# mount --mkdir /dev/sdX2 /mnt/my_linux_mount_point
@@ -37252,7 +37301,7 @@ SOME BROOT FILE EXPLORER
 
 						4.3 - (Optional - EXT4 Filesystems only) If you so desire, 
 						you can run 'fsck' to perform a filesystem check and fix:
-							# fsck.ext4 -Dfy /dev/sdX2
+							# fsck.ext4 -C0 -Dfy /dev/sdX2
 
 						4.4 - Mounting
 							# mount --mkdir /dev/sdX2 /mnt/my_linux_mount_point
@@ -47845,7 +47894,7 @@ SETTING UP LUKS ENCRYPTION ON A STORAGE DEVICE
 
 					# fdisk /dev/mapper/<device_alias>
 					# mfks.ext4 -E discard -O extent /dev/mapper/<device_alias>
-					# fsck.ext4 -Dfy /dev/mapper/<device_alias>
+					# fsck.ext4 -C0 -Dfy /dev/mapper/<device_alias>
 					# tune2fs -o discard /dev/mapper/<device_alias>
 					
 					Note: running 'fsck' is needed for setting auto-mount options using
@@ -48315,7 +48364,7 @@ SETTING UP A LVM STORAGE MANAGEMENT LAYER
 
 			1) You'll have to shrink using available tools for your filesystem:
 				1.1) First run fsck:
-					# fsck.ext4 -Dfy /dev/volume-group1/logical-volume-data
+					# fsck.ext4 -C0 -Dfy /dev/volume-group1/logical-volume-data
 
 				1.2) Resize to it's minimum size:
 					# resize2fs -pM /dev/volume-group1/logical-volume-data
@@ -48819,6 +48868,31 @@ SETTING UP AN EXT4 FILESYSTEM
 					in 2.6.35+ kernels.)
 
 
+---------------
+---------------
+---------------
+---------------
+---------------
+SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
+	shells in general do not allow special characters to be part of file or path names,
+HOWEVER, will filesystems will allow special characters to be used as part of a given filename or pathname.
+
+In order to deal with these types of filesnames, the shell allows the use of single-quotes and '--' operator
+to be used:
+
+	Ex 1.: - Renaming a file - CORRECT
+		$ rename -- '-file' '' '!special-file'
+	
+	Ex 2.: - Renaming a file - INCORRECT
+		$ rename '-file' '' '!special-file'
+	
+	Ex 3.: - Renaming a file - INCORRECT
+		$ rename -- "-file" "" "$special-file"
+	
+		Note: "$special-file" will be treated as a variable in bash instead of a filename.
+	
+Single Quotes ('') treat the text inside literally. No special character expansion occurs.
+Double Quotes ("") allow for variable expansion, command substitution, and special character interpretation.
 ---------------
 ---------------
 ---------------
