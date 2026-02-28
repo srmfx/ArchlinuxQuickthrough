@@ -1135,6 +1135,7 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS:
+	FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
 	SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
 	NICE AND RENICE PROCESSES | OPTIMIZATION, PERFORMANCE
 	SETTING UP SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS | CREATING SYSTEM WIDE BASH FUNCTIONS OR SCRIPTS
@@ -1571,6 +1572,8 @@ New Syntax(2023):
 ====================================================================================================
 
 -012
+		FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
+		UMOUNTING DEVICES ON WSL -> [update]
 		SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
 		NICE AND RENICE PROCESSES | OPTIMIZATION, PERFORMANCE
 		ACCESSING WSL LINUX DIRECTORIES FROM COMMANDLINE OR POWERSHELL
@@ -37198,11 +37201,24 @@ SOME BROOT FILE EXPLORER
 			any other devices are mounted. Also make sure that no processes are using the physical device
 			using 'lsof' before umounting:
 
+				$ wsl --unmount \\.\PHYSICALDRIVE1
+					or
 				$ wsl --unmount \\.\PHYSICALDRIVE1 --partition 2
 
 
-				NOTE: You can optionally use 'wsl --shutdown' if you're 100% sure no running process
-				or mounted device is holding the device.
+				A) NOTE: If you didn't use the --bare option when mounting, you can simply unmount
+				the disk here. Always take in consideration 'B) NOTE' and 'C) NOTE' below.
+				When using --bare mount you'll need to manually unmount the partition in your linux.
+				Also, when not using the --bare option during mount, you'll be unable to manually
+				unmount it inside your linux distribution.
+			
+
+				B) NOTE: You can optionally use 'wsl --shutdown' if you're 100% sure no running process,
+				mounted device or bind mounts is holding the device.
+
+				C) NOTE: When using the 'arch-chroot' script, it'll automatically mount some stuff,
+				you'll need to make sure to unmount it first before unmounting the actual partition.
+				Use 'findmnt' for displaying it.
 
 			UMOUNTING DEVICES MANUALLY ON WSL LINUX DISTRO
 				You can use these steps if you're having trouble umounting using wsl itself.
@@ -48873,6 +48889,16 @@ SETTING UP AN EXT4 FILESYSTEM
 ---------------
 ---------------
 ---------------
+FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
+	$ ps -e -o pid,vsz,rss,comm=PROCESS | sort -n -k 2
+
+	Note: 2nd and 3rd column give virtual and physical RAM Memory respectively.
+
+---------------
+---------------
+---------------
+---------------
+---------------
 SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
 	shells in general do not allow special characters to be part of file or path names,
 HOWEVER, will filesystems will allow special characters to be used as part of a given filename or pathname.
@@ -48889,7 +48915,13 @@ to be used:
 	Ex 3.: - Renaming a file - INCORRECT
 		$ rename -- "-file" "" "$special-file"
 	
-		Note: "$special-file" will be treated as a variable in bash instead of a filename.
+		A) Note: "$special-file" will be treated as a variable in bash instead of a filename.
+		B) Note: If the file/dir name contains single-quotes, you'll have to include it using an escape
+		character like this:
+			$ rename -- '-file' '-file\''s data' '!special-file'
+
+			Resultin name from this command would be:
+				!special-file's data
 	
 Single Quotes ('') treat the text inside literally. No special character expansion occurs.
 Double Quotes ("") allow for variable expansion, command substitution, and special character interpretation.
