@@ -8495,13 +8495,16 @@ Total CPUs = Cores_Per_Socket * Sockets * Threads_Per_Core
 -------------------------------
 SYMLINKS(SOFTLINKS) LN SYNTAX:
 
-The man pages are obnoxious regarding the creation of symlinks:
-	ln -s <TARGET> <LINK_NAME> 
+	$ ln -s <TARGET> <LINK_NAME> 
+		or
+	$ ln -s <TARGET>
 
 TARGET is the actual current directory that the symlink file will point to, 
 LINK_NAME is the symlink's filename, since this is actually a file it can be moved elsewhere using mv or copied using cp.
 because of that there can't exist any file/directory with the same name as the LINK_NAME,
 backup or removal will be required.
+
+On the 2nd form, creates a symlink file to TARGET in the current directory.
 
 example:
 	ln -s /tmp/mydir/ram/<program_name> <program_name>
@@ -10020,6 +10023,15 @@ PHASMOPHOBIA:
 
 	NOTE: Install 'vosk-api' and 'python-vosk' for Voice Recognition to work.
 		# pacman -S vosk-api python-vosk
+
+THIS IS A GHOST:
+	Just for older GPUs that don't support Directx12:
+		-force-d3d11
+			or
+		%command% -force-d3d11
+	
+	Note: This can be used in any game that complain about old GPU Drivers.
+	This fix is only meant for Unreal Engine games.
 
 DRAGON BALL SPARKING ZERO:
 	PROTON_ENABLE_NVAPI=1 ENABLE_VKBASALT=1 gamescope --force-grab-cursor -f -S stretch -w 1280 -h 800 -W 1280 -H 800 -- %command%
@@ -11563,11 +11575,13 @@ STEAM GAMES ON RAM:
 
 SYMLINKS(SOFTLINKS) LN SYNTAX:
 
-The man pages are obnoxious regarding the creation of symlinks:
 	ln -s <TARGET> <LINK_NAME> 
+		or
+	ln -s <TARGET>
 
 TARGET is the actual current directory that the symlink file will point to, 
 LINK_NAME is the path and name where the symlink will be created. 
+On the 2nd form, creates a symlink file to TARGET in the current directory.
 
 example:
 	ln -s /tmp/mydir/ram/kdenlive /bin/kdenlive
