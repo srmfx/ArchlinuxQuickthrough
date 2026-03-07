@@ -1572,6 +1572,8 @@ New Syntax(2023):
 ====================================================================================================
 
 -012
+
+		FILESYSTEM ENCRYPTION USING GOCRYPTFS -> [minor update]
 		FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
 		UMOUNTING DEVICES ON WSL -> [update]
 		SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
@@ -46797,17 +46799,17 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 			2A) Note: when not specifying '--config', a .conf file will be created at the encrypted.storage
 			directory.
 
-			2B) Note: An extra .diriv file will be created at encrypted.storage directory,
-			this file can not be stored elsewhere and it's related to hiding directory name and file names by
-			obfuscating them behind completely random names.
+			2B) Note: extra .diriv files will be created at every directory level of a gocryptfs
+			encrypted path, these files can not be stored elsewhere and it is used for hiding directory
+			and file names by obfuscating them behind completely random names.
 
 			2C) Note: Cloud storage might have issues with files that are accessed/read too many times
-			as is the case with .diriv file, make sure to enable cached mode '--vfs-cache-mode full' 
-			when using a tool like 'rclone'. If this is a problem for you, .diriv file can be disabled 
+			as is the case with .diriv files, make sure to enable cached mode '--vfs-cache-mode full' 
+			when using tools like 'rclone'. If this is a problem for you, .diriv file can be disabled 
 			with the --deterministic-names option upon creation and mount.
 			
 			2D) Note: Backup both .conf and .diriv, the .diriv file needs to be backed up from time to 
-			time as new files are added or renamed.
+			time as new files and directories are created or updated.
 		
 	MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
 		$ gocryptfs --config "/etc/gocryptfs/gdrive_cougar_A.conf" ~/Encrypted.storage ~/Mount.point
