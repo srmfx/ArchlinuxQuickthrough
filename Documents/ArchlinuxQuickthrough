@@ -1255,6 +1255,7 @@ USE LICENSE:
 				DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 		INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
 		MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
+		BACKING UP ALL .DIRIV FILES AT ONCE
 		CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
 		SOME LINKS ON GOCRYPTFS
 
@@ -1574,6 +1575,7 @@ New Syntax(2023):
 -012
 
 		FILESYSTEM ENCRYPTION USING GOCRYPTFS -> [minor update]
+			BACKING UP ALL .DIRIV FILES AT ONCE
 		FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
 		UMOUNTING DEVICES ON WSL -> [update]
 		SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
@@ -46818,6 +46820,30 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 
 		A) Note: Only specify --deterministic-names for mounting if you have initialized/created a 'gocryptfs' 
 		with it.
+	
+	BACKING UP ALL .DIRIV FILES AT ONCE
+		Backing up all .diriv can be easily done using archiving tools like 'dar'.
+
+		1) Change directory to Encrypted.storage dir:
+			$ cd ~/Encrypted.storage
+
+		2) Run find for adding .diriv file into text file:
+			$ find . -iname '*.diriv' > ./diriv.files
+		
+		3) Add .conf file as well:
+			$ ls -1 /etc/gocryptfs/google\ cougar.conf >> ./diriv.files
+
+		3) Archiving all files using 'dar':
+			$ dar -c ./diriv\ archive -\[ ./diriv.files
+				or
+			$ dar -c ./diriv\ archive --include-from-file ./diriv.files
+
+		4)(Alternate/Optional) Archiving all files using 'tar':
+			$ tar -cfv ./diriv\ archive.tar -T ./diriv.files
+				or
+			$ tar -cfv ./diriv\ archive.tar --null --files-from ./diriv.files
+
+
 
 	CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
 		$ gocryptfs --passwd ~/Encrypted.storage
