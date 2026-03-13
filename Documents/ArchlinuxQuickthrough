@@ -1255,6 +1255,7 @@ USE LICENSE:
 				DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 		INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
 		MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
+		ALLOWING ACCESS TO USERS OTHER THAN ROOT
 		BACKING UP ALL .DIRIV FILES AT ONCE
 		CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
 		SOME LINKS ON GOCRYPTFS
@@ -1408,6 +1409,8 @@ USE LICENSE:
 			CLEANING COMMIT HISTORY - THE EASIER WAY
 			CLEANING COMMIT HISTORY FROM MAIN BRANCH
 			CLEANING REFERENCE LOGS
+			HOW TO UNDO A GIT RESET
+			OPTIMIZING GIT REPOSITORY
 	TUTORIAL AWESOME-WM
 	TUTORIAL DWM / I3-WM 2020
 	NEW QEMU TUTORIAL 2020.2-T
@@ -1573,8 +1576,10 @@ New Syntax(2023):
 ====================================================================================================
 
 -012
-
+		HOW TO UNDO A GIT RESET
+		OPTIMIZING GIT REPOSITORY
 		FILESYSTEM ENCRYPTION USING GOCRYPTFS -> [minor update]
+			ALLOWING ACCESS TO USERS OTHER THAN ROOT
 			BACKING UP ALL .DIRIV FILES AT ONCE
 		FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
 		UMOUNTING DEVICES ON WSL -> [update]
@@ -6158,6 +6163,17 @@ CLEANING REFERENCE LOGS
 			or
 		$ git reflog expire --expire=90.days.ago --expire-unreachable=now --all
 
+HOW TO UNDO A GIT RESET
+	1) Display git reference log and find the reset commit
+		$ git reflog
+
+	2) Reset the repository to that specific commit
+		$ git reset --hard <commit_number>
+			or
+		$ git reset --hard HEAD@{1}
+	
+	NOTE:  For undoing changes in a shared or public repository, use git-revert instead of git-reset.
+
 OPTIMIZING GIT REPOSITORY
 	$ git gc --prune=now
 	$ git gc --aggressive
@@ -8996,7 +9012,9 @@ Login as another group:
 	$ sg - <groupname> -c <program>				#Executes given program as another group in the system
 
 Running Commands:
-	$ su -c 'rename -- "-04" "" Folder-04.inv'
+
+	by using 'su -c':
+		$ su - root -c -- 'cd -- '${PWD}'; rename -- '-04' '' Folder-04.inv'
 
 ---
 userdbctl:							#Displays all users on the system
@@ -46820,7 +46838,19 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 
 		A) Note: Only specify --deterministic-names for mounting if you have initialized/created a 'gocryptfs' 
 		with it.
-	
+
+	ALLOWING ACCESS TO USERS OTHER THAN ROOT
+		By default, only the user who mounts has access to the decrypted, if you want to allow other users
+		to access, you'll need to follow this.
+
+		1) Edit the file and uncomment the following line:
+			[file: /etc/fuser.conf ]
+				user_allow_other
+			[/file]
+
+		2) Mount your gocryptfs decrypted-data using '-o allow_other' mount option:
+			$ gocryptfs -o allow_other --config "/etc/gocryptfs/gdrive_cougar_A.conf" ~/Encrypted.storage ~/Mount.point
+
 	BACKING UP ALL .DIRIV FILES AT ONCE
 		Backing up all .diriv can be easily done using archiving tools like 'dar'.
 
