@@ -1134,7 +1134,28 @@ USE LICENSE:
 		RE-ENABLING WINDOWS AUTO-UPDATE
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
---MISCALENEOUS:
+--MISCALENEOUS A:
+	THE STANDARD UNIX PASSWORD MANAGER | 'PASS' UTILITY
+		'PASS' FEATURES
+		INSTANTIATING PASS STORAGE
+		CREATING A GIT REPOSITORY FOR VERSION CONTROL
+		INSERTING A NEW PASSWORD
+			MANUALLY EDITING ENCRYPTED PASSWORD/CONTENT BY HAND
+			GENERATING RANDOM PASSWORDS
+		LISTING/RETRIEVING PASSWORDS
+		SEARCHING FOR PASSWORD CONTENT
+		SEARCHING FOR SPECIFIC ID-NAME
+		EXPLAINNING PASS CP, PASS RM AND PASS MV COMMANDS
+			CREATING NEW DIRECTORY FOR ORGANIZING EXISTING PASSWORDS
+
+	BASH HEREDOCS AND HERESTRING
+	COMMAND SUBSTITUTION VS PROCESS SUBSTITUTION
+	SHARING YOUR TERMINAL OVER THE WEB USING TTYD
+	TESTING UP PIPEFAIL ON TERMINAL
+	CUSTOMIZING GTK | GTK CUSTOMIZATION
+
+
+--MISCALENEOUS B:
 	FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
 	SANITIZING FILE AND PATH NAMING | FILENAME AND PATHNAME | FILENAMING AND PATHNAMING CONVENTIONS | IMPORTANT
 	NICE AND RENICE PROCESSES | OPTIMIZATION, PERFORMANCE
@@ -1575,6 +1596,16 @@ New Syntax(2023):
 ========================================S-CHANGELOG=================================================
 ====================================================================================================
 
+-013
+		THE STANDARD UNIX PASSWORD MANAGER | 'PASS' UTILITY
+		SOME FIND COMMANDS -> [minor update]
+		BASH HEREDOCS AND HERESTRING
+		COMMAND SUBSTITUTION VS PROCESS SUBSTITUTION
+		SHARING DATA WITH OTHER PROCESS WITHOUT RESORTING TO CREATING A NEW FILE
+		SHARING YOUR TERMINAL OVER THE WEB USING TTYD
+		CUSTOMIZING GTK | GTK CUSTOMIZATION
+		TESTING UP PIPEFAIL ON TERMINAL
+
 -012
 		HOW TO UNDO A GIT RESET
 		OPTIMIZING GIT REPOSITORY
@@ -1942,6 +1973,9 @@ $ pwd         		#shows current directory
 $ echo $PWD
 
 $ echo $OLDPWD		#shows previous directory
+
+Alternative:
+	cd ~-		#toggles between $OLDPWD and $PWD
 
 mount all avaiable disks:
 	# mount -a 	#this will only mount disks setup on /etc/fstab
@@ -6795,6 +6829,8 @@ cd <dir>					#Does the same as 'pushd <dir>'
 
 cd $OLDPWD					#Changes  to the previous directory.
 
+cd ~-						#Toggles between $OLDPWD and $PWD
+
 pwd						#Prints the current directory on the screen.
 ---
 -------------------------------
@@ -6838,6 +6874,7 @@ file -i <filename>				#Gives info on filetype
 stat <file/dir>					#Gives full stats on file/dir. access, modification and birth dates,
 						and also inode number, permission-set for user, group, others as well
 						as ownership of the given file/directory.
+ls -i <file/dir>				#Same as stat
 ---
 -------------------------------
 diff -rdq <dir1> <dir2>			#Does a recursive comparison of all files and sub-directories, only reporting
@@ -6994,6 +7031,10 @@ SOME FIND COMMANDS
 # file /proc/					#'File' tool can be used to determine filetypes
 						^ Swiss kinfe when used in conjunction with awk and find
 
+
+example 1: - Selecting 'images' and 'videos' filetypes only -
+	$ find . -type f -exec file --mime-type {} + | rg '(image/|video/)' | rg -iPo '.*(?=:)' | fzf 
+
 # find ./ -size +10M				#Finds files with more than 10M,
 # find ./ -size -10M				#Finds files with less than 10M.
 
@@ -7047,6 +7088,12 @@ MORE FIND COMMANDS:
 
 # find . -type f -exec file -N -i -- {} + | grep "\.gif" | sed -n 's!: image/[^:]*$!!p' 	#Finds all animated gifs, but returns
 										    		filename only
+
+example 1: - Selecting 'images' and 'videos' filetypes only -
+	$ find . -type f -exec file --mime-type {} + | rg '(image/|video/)' | rg -iPo '.*(?=:)' | fzf 
+
+	note: this example uses 'ripgrep' and 'fuzzyfinder'
+
 	---------------------
 --Using 'find' on text/binary files using find, awk and grep:
 	Finding all 'password' entries in the text files on the current dir(recursive for all dirs):
@@ -7690,7 +7737,7 @@ gpg --out <new_key> --export <USERNAME>
 gpg --out <new_key> --export <KEYNAME>
 	#Export/Save key as a file - VERY GOOD - VERY IMPORTANT COMMAND
 		example:
-			#gpg --out /my_key_file --export fscrypt_key
+			#gpg --out ./my_key_file --export fscrypt_key
 
 --EXPORTING PRIVATE GPG KEY | EXPORTING SECRET GPG KEY
 gpg --out <new_key> --export-secret-keys
@@ -8647,6 +8694,8 @@ CD: - CHANGE DIRECTORY | CP: COPY | CHMOD
 $ cd $OLDPWD			#Changes directory to the previous directory CD was used
 					example: cd $OLDPWD/another.directory/
 					$PWD contains the current path, can be used with echo $PWD!
+$ cd ~-				#Toggles between $OLDPWD and $PWD
+
 $ cd ~				#Changes directory to user home space
 $ cd ~username			#Changes directory to the given username home path 
 
@@ -8911,6 +8960,19 @@ lslocks						#Lists processes that have file locks - 2024
 ---------------------------
 MANAGING USERS
 useradd/adduser and userdel:
+
+
+-----
+A) Creating a user and adding it to existing suplementary group:
+	# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
+		or
+	# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+B) Creating a user without suplementary group:
+	# useradd -s /bin/zsh -mU <username>
+		or
+	# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
+----
 
 # useradd test -m 				#Creates a user called 'test' with no group, along with it's home directory
 						^ use the following to create pass for the given user:
@@ -10638,11 +10700,15 @@ Shadow password suite configuration:
 			$ sudo -iu root
 
 		2) Creating a user 
-			# useradd --create-home UserName
-				or
-			# useradd --shell /usr/bin/zsh --create-home UserName
-				or
-			# useradd --home-dir /mnt/user_home_dir --shell /usr/bin/zsh --create-home UserName
+			A) Creating a user and adding it to existing suplementary group:
+				# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
+					or
+				# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+			B) Creating a user without suplementary group:
+				# useradd -s /bin/zsh -mU <username>
+					or
+				# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
 
 
 		3) Add password to the newly created user
@@ -10682,6 +10748,19 @@ READ MORE ON:
 		[*[THE VERY BASICS ABOUT FILESYSTEM USER AND GROUP OWNERSHIP]*]
 ----------------------------------------------------------------------------------
 --CREATING NON-SYSTEM USERS:
+
+---
+	A) Creating a user and adding it to existing suplementary group:
+		# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
+			or
+		# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+	B) Creating a user without suplementary group:
+		# useradd -s /bin/zsh -mU <username>
+			or
+		# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
+---
+
 useradd <username> -m -p <password> -g <group_name> 		#creates a user guest, -m creates it's home directory, 
 								and add Primary Group called games; 
 
@@ -10702,7 +10781,17 @@ useradd <username> -p <password> -U <user_group_name>		#Same as above, but creat
 								username.
 
 CREATING USER AND ADD A DIFFERENT SHELL:
-useradd <username> -s <shellname> 				#The name of the users login shell
+
+A) Creating a user and adding it to existing suplementary group:
+	# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
+		or
+	# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+B) Creating a user without suplementary group:
+	# useradd -s /bin/zsh -mU <username>
+		or
+	# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
+---
 
 User Account Information:
 	/etc/password
@@ -10888,10 +10977,6 @@ Manpage for adduser says:
 
 Manpage for useradd says:
 	useradd is a low level utility for adding users. On Debian, administrators should usually use adduser(8) instead.
-
-THINGS TO DO LATER:
-	Check what useradd -r actually does. - Answer: useradd -r creates a UID number of a System User for the given username
-	What happens when a home/user space isn't created with -m. - Answer: ??
 
 ==================================================END==================================================
 SUDO AND SU DIFFERENCES:
@@ -24920,7 +25005,9 @@ USING PIPEWIRE INSTEAD OF PULSEAUDIO (2024)
 
 		VERIFYING PERFORMANCE BOOST
 			After restarting the system type:
-				$systemd-analyze
+				$ systemd-analyze
+					or
+				$ systemd-analyze critical-chain
 
 			this trick should've saved 2~4 whole seconds, depending on the system
 			from the boot process.
@@ -30366,6 +30453,10 @@ ADVANCED REGEX WITH GREP
 			^ negative lookbehind assertion
 			^ this will highlight all 'bar' words not preceded by a digit.
 
+		example 2: - Selecting 'images' and 'videos' filetypes only -
+			$ find . -type f -exec file --mime-type {} + | rg '(image/|video/)' | rg -iPo '.*(?=:)' | fzf 
+
+
 	SOME GREP EXAMPLES USING PCRE
 		Leaving here some examples.
 
@@ -30455,12 +30546,18 @@ ADVANCED REGEX WITH GREP
 	source: https://caspar.bgsu.edu/~courses/Stats/Labs/Handouts/grepadvanced.htm
 
 	ONCE-ONLY SUBPATTERNS 
-		once-only subpatterns allow for faster results, the below is a once-only subpattern,
+
+		This will select all text before LAST occurrence of 'bar' is found
+			echo "123456bar 1234567 456baz 768bar" | grep -P ".*(?=bar)"
+				or
+			echo "123456bar 1234567 456baz 768bar" | grep -P ".*(?=bar) -o"
+
+		once-only subpatterns also allow for faster results, the below is a once-only subpattern,
 	it uses (?>) pattern:
 
 		$ echo "123456bar 1234567 12349121bar" | grep -P "(?>\d+)bar"
 	
-	the below is a slower version of the same regex that doesn't uses one-only subpattern finding:
+	the below is a slower version of the same regex that doesn't uses once-only subpattern finding:
 
 		$ echo "123456bar 1234567 12349121bar" | grep -P "\d+bar"
 	
@@ -30501,6 +30598,11 @@ ADVANCED REGEX WITH GREP
 
 			Finding all 'www' references in all application files in a given directory(recursive for all dirs):
 		# find . -type f -exec file -N -i -- {} + | sed -n 's!: application/[^:]*$!!p' | awk '{system("grep --color -Hi \"www\" -- \""$0"\"")}'
+
+		example 2: - Selecting 'images' and 'videos' filetypes only -
+			$ find . -type f -exec file --mime-type {} + | rg '(image/|video/)' | rg -iPo '.*(?=:)' | fzf 
+
+			note: this example uses ripgrep(rg), but the arguments are the same.
 
 ----------------------------
 ----------------------------
@@ -34016,6 +34118,11 @@ when needed.
 						NOTE: If you just need the return value of these tests for a script, you have the choice of not using 'grep' at all.
 						you can get the return value straight from system call or from the environmental '$?' you can test with:
 							$ echo $?
+								or
+							1) run this before executing the command:
+								$ set -o pipefail;
+							2) Fetch return value of the pipe
+								$ echo ${pipestatus}
 								
 
 						RECOMMENDED READINGS:
@@ -36572,7 +36679,17 @@ SOME BROOT FILE EXPLORER
 			# pacman -S zsh sudo
 
 		3) Create new user:
-			# useradd --shell /usr/bin/zsh --create-home <user_name>
+			Note: Skeleton directory and files are copied from /etc/skel for every user created
+
+			3.1) Creating a user and adding it to existing suplementary group:
+				# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
+					or
+				# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+			3.2) Creating a user without suplementary group:
+				# useradd -s /bin/zsh -mU <username>
+					or
+				# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
 
 		4) Change password for user:
 			# passwd <user_name>
@@ -36661,20 +36778,31 @@ SOME BROOT FILE EXPLORER
 				1) First create the user:
 					Note: Choose 'A' or 'B'
 
-					A) Creating user using the default home directory /home/<USERNAME>/ :
-						# useradd --shell /usr/bin/zsh --create-home <user_name>
-							or
-						# useradd -s /usr/bin/zsh -m <user_name>
 
-					B) Creating user in a specific home directory
-						# useradd --shell /usr/bin/zsh --create-home --home-dir <path_to_home> <USERNAME>
+
+		3) Create new user:
+			Note: Skeleton directory and files are copied from /etc/skel for every user created
+
+			3.1) 
+
+
+					A) Creating a user and adding it to existing suplementary group:
+						# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
 							or
-						# useradd -s /usr/bin/zsh -m -d <path_to_home> <USERNAME>
+						# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+					B) Creating a user without suplementary group:
+						# useradd -s /bin/zsh -mU <username>
 							or
-						# useradd -s /usr/bin/zsh -md <path_to_home> <USERNAME>
+						# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+					C) Creating user in a specific home directory
+						# useradd --shell /usr/bin/zsh --create-home --home-dir <path_to_home> --user-group <USERNAME>
+							or
+						# useradd -s /usr/bin/zsh -md <path_to_home> -U <USERNAME>
 
 						EXAMPLE:
-							# useradd -s /usr/bin/zsh -md /home/NEW_USER NEW_USER
+							# useradd -s /usr/bin/zsh -md /home/NEW_USER -U NEW_USER
 						
 
 				2) Change password for the user:
@@ -36835,15 +36963,15 @@ SOME BROOT FILE EXPLORER
 			Note: you'll probably have to install YAY Package Manager for the AUR(Archlinux User Repository),
 			since standard package manager will not find any in the default archlinux repository.
 
-				$ yay -sS font | grep -i -P "[ot]tf|font" | less
+				$ yay -sS font | grep -i -P "[ot]tf|font" | less -r
 					or
-				$ pacman -sS font | grep -i -P "[ot]tf|font" | less
+				$ pacman -sS font | grep -i -P "[ot]tf|font" | less -r
 
 			LOOKING FOR HANDWRITTEN FONTS FOR INSTALLATION
 			
-				$ yay -sS font | grep -i -B2 -A1 -P "handw" | less
+				$ yay -sS font | grep -i -B2 -A1 -P "handw" | less -r
 					or
-				$ pacman -sS font | grep -i -B2 -A1 -P "handw" | less
+				$ pacman -sS font | grep -i -B2 -A1 -P "handw" | less -r
 
 		INSTALLING NEW FONTS ON THE SYSTEM
 			1) Installing a few known fonts:
@@ -37779,7 +37907,15 @@ SOME BROOT FILE EXPLORER
 					this way it's much easier to create new users and share the same directories
 					under the same permissions with them. Ex:
 						3.0) Create user:
-							# useradd --shell /usr/bin/zsh --create-home <username>
+							A) Creating a user and adding it to existing suplementary group:
+								# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
+									or
+								# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+							B) Creating a user without suplementary group:
+								# useradd -s /bin/zsh -mU <username>
+									or
+								# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
 							
 						3.1) Set new user pass:
 							# passwd <username>
@@ -46605,6 +46741,16 @@ SETTING UP A VSFTP SERVER
 			1) Create user as root:
 				# useradd --shell /usr/bin/zsh --create-home ftpsecure
 
+				A) Creating a user and adding it to existing suplementary group:
+					# useradd -G <existing_groupname> -s /bin/zsh -mU <username>
+						or
+					# useradd -G <existing_groupname> --shell /usr/bin/zsh --create-home --user-group <user_name>
+
+				B) Creating a user without suplementary group:
+					# useradd -s /bin/zsh -mU <username>
+						or
+					# useradd --shell /usr/bin/zsh --create-home --user-group <user_name>
+
 			2) Change password for the given user:
 				# passwd ftpsecure
 
@@ -47244,6 +47390,9 @@ RCLONE TUTORIAL
 
 		note: using 'stat <file/folder>' will also reveal the inode number, which
 		will indicate to which device the file/folder belongs to.
+			$ stat <file/folder>
+				or
+			$ ls -i <file/folder>
 
 		$ rclone sync --dry-run <remote_name>: /path/to/proton.storage/backup
 			or
@@ -48961,6 +49110,293 @@ SETTING UP AN EXT4 FILESYSTEM
 ---------------
 ---------------
 ---------------
+CUSTOMIZING GTK | GTK CUSTOMIZATION
+	This configuration file adds Dark Theme, and lowers scale and dpi-scale.
+	if you want changes applied to local-user only, then apply these changes to ~/.zshrc
+
+	[file: /etc/zsh/zshrc ]
+		export GDK_SCALE=0.9
+		export GDK_DPI_SCALE=0.9
+		export GTK_THEME=Adwaita:dark
+
+	[/file]
+
+	NOTE: You can also apply or change these settings on a per-program basis by making a warper.
+		READ MORE ON FOR AN EXAMPLE: 
+			SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
+---------------
+---------------
+---------------
+---------------
+---------------
+THE STANDARD UNIX PASSWORD MANAGER | 'PASS' UTILITY
+	Pass is a command-line password manager that stores each of your password ussing different files encrypted with GPG Key. It's a nice alternative to GUI tools like 'keepassxc' since it allows the user to fetch any password straight from commandline using their own GPG Key and it can also pipe passwords down into other commandline tools that may require password.
+
+	TODO:
+		create practical examples using pipes;
+		
+	'PASS' FEATURES
+		A) As an option, it can version-manage passwords as a git repository,
+		allowing the user to keep track of old passwords and it's changes using git's very own commands.
+
+		B) It allows easy integration with tools and scripts.
+
+		C) Allows to content search the password files using regex using 'pass grep'
+
+		D) Finding password by <id-name> or it's <partial-id-name>.
+
+		E) Password generator
+
+		F) Easily copying passwords to clipboard. 
+		
+		G) Very fast, specially when compared to great password managers like 'keepassxc'.
+
+
+	INSTANTIATING PASS STORAGE
+		A new 'pass' storage must be created per user before actual usage.
+
+		1) Create a new GPG KEY just for the password:
+			$ gpg --full-gen-key
+
+			A) Note: GPG Key must not be created as root, so neither 'sudo' or 'su' is allowed.
+
+			VERY IMPORTANT:
+				It's important to export your generated GPG Keys and backup them elsewhere!
+				Without the gpg key you'll be unable to access any stored password!
+
+				$ gpg --out <new_key> --export <KEY-ID>
+
+				Ex:
+					$ gpg --out ~/key_backup.gpg-key --export 3XTE31d7282bEa0975C633E1E8CF078118ABSLDW
+
+		2) List the secret key
+			$ gpg --list-public-keys
+			
+			A) Note: --list-secret-keys will not work as it will list keys stored by root instead
+			in this case.
+			
+
+			B) Note: key will be in the following format:
+				3XTE31d7282bEa0975C633E1E8CF078118ABSLDW
+
+		2) Instantiate the new storage:
+			$ pass init <GPG KEY>
+
+			ex:
+				$ pass init 3XTE31d7282bEa0975C633E1E8CF078118ABSLDW
+
+	CREATING A GIT REPOSITORY FOR VERSION CONTROL
+		Optionally, 'pass' supports creating a git repository, allowing the user to keep track
+		of old passwords and changes using git's very own commands.
+
+			1) Initializing a 'pass' git repository
+				$ pass git init
+
+				A) Note: you'll need to follow the given instructions by git at this point
+				for properly setting up the repo.
+
+				B) Note: you can also use a GPG Key for doing git commits, keeping the repository
+				safe from unwanted external changes.
+					READ MORE ON:
+						GIT GPG - SIGNING GITHUB COMMIT LOCALLY AND REMOTELY
+
+			2) Commiting changes to 'pass' structures:
+				Everytime a new password is either inserted, removed or updated
+				using 'pass', it'll automatically commit the changes made.
+
+				When using 'pass mv', 'pass cp' or 'pass rm' it'll also commit changes
+				automtically without the need to use 'pass git commit' manually.
+
+			3) Some other useful commands:
+				git log, git checkout, etc.
+
+	INSERTING A NEW PASSWORD
+		This can also be used for updating a password:
+			$ pass insert <id-name>
+				or
+			$ pass insert -m <id-name>
+
+		A) Note: -m allows to insert multi-line passwords.
+		note that password will be fully visible on scree when using -m,
+		do not insert single lined passwords when using -m as it's not safe.
+
+		B) Note: multi-line option above can be used to insert other important
+		sensitive information.
+
+		MANUALLY EDITING ENCRYPTED PASSWORD/CONTENT BY HAND
+			This will launch a vi editor for creating/updating passwords:
+				$ pass edit <id-name>
+
+		GENERATING RANDOM PASSWORDS
+			This can also be used for creating/updating passwords:
+				$ pass generate -n -c <id-name> [pass-length]
+
+				A) Note: -c allows the generated password to be directly copied
+				to the clipboard.
+
+				B) Note: -n prevents the generator from inserting symbols into the password,
+				some web services may not accept symbols as a password character.
+
+				C) Note: [pass-length] refers to length of the password,
+				some web services may have some restrictions regarding password length.
+
+
+	LISTING/RETRIEVING PASSWORDS
+
+		1) List Available Passwords by <id-name> only:
+			$ pass
+				or
+			$ pass list
+				or
+			$ pass show
+
+		2) Retrieving the actual password:
+			Three options available out-of-box:
+				$ pass -c <id-name>
+					or
+				$ pass list -c <id-name>
+					or
+				$ pass show -c <id-name>
+
+			A) Note: -c allows password to be copied directly to clippboard.
+
+			B) Note: without -c option, it will display the entire password string on the screen.
+
+			C) Note: this will require the user to insert their GPG Password at least once,
+			caching later consecutive attempts.
+			
+			D) due to Note (A), you should use the following command for cleaning the cache
+			once you're finished with the job:
+				$ echo RELOADAGENT | gpg-connect-agent
+
+				VERY IMPORTANT: - Create an alias on the following file(zsh users only) -
+				
+				[file: /etc/zsh/zshrc ]
+					alias pass-clear="echo RELOADAGENT | gpg-connect-agent > /dev/null 2>&1"
+				[/file]
+
+
+	SEARCHING FOR PASSWORD CONTENT
+		'Pass' tool allows you to search using 'regex' for password contents
+
+			$ pass grep -c <regex-expression>
+
+		A) Note: '-c' in this case allows grep to ommit/hide the actual password,
+		or else it'll be displayed on screen.
+	
+	SEARCHING FOR SPECIFIC ID-NAME
+		'Pass' allows you to search for a password's <id-name>:
+
+			$ pass find <full-id-name/partial-id-name>
+
+	EXPLAINNING PASS CP, PASS RM AND PASS MV COMMANDS
+		'Pass' allows for backing up existing content in the storage repository by using 'pass cp'.
+		'pass mv' can be used for quickly moving already existing contents into new directories.
+		'pass rm' to quickly remove existing content permanently.
+
+		A) NOTE: if a git repository was created with "pass git init", these commands will
+		automatically commit all modification that is done.
+
+		CREATING NEW DIRECTORY FOR ORGANIZING EXISTING PASSWORDS
+			1) The example below will copy existing bank password and card infos to newly
+			created 'bank' directory for organization:
+
+				$ cd ~/.password-store/;
+				$ mkdir ./bank
+				$ pass mv ./bank-{pass,card_A,card_B} ./bank
+
+			2) Effectively searching for content in the storage repo:
+				$ pass -c bank/bank-pass
+					or
+				$ pass -c find bank/bank-pass
+
+		BACKING UP EXISTING PASSWORD
+			1) Using the example above:
+				$ pass cp ./bank ./bank-backup
+
+		REMOVING PASSWORD FROM STORAGE
+			1) Removing/deleting password permanently:
+				$ pass rm ./bank-backup
+	
+	
+---------------
+---------------
+---------------
+---------------
+---------------
+BASH HEREDOCS AND HERESTRING
+	TODO
+---------------
+---------------
+---------------
+---------------
+---------------
+COMMAND SUBSTITUTION VS PROCESS SUBSTITUTION
+	TODO
+---------------
+---------------
+---------------
+---------------
+---------------
+SHARING YOUR TERMINAL OVER THE WEB USING TTYD
+	1) Create a writable shareable terminal
+		$ ttyd -W zsh
+
+	2) Access it on:
+		http://localhost:7681
+
+	3) Once you're finished, Kill the program from the running window:
+		ctrl+c
+
+---------------
+---------------
+---------------
+---------------
+---------------
+SHARING DATA WITH OTHER PROCESS WITHOUT RESORTING TO CREATING A NEW FILE
+	1) First create a named pipe from program A:
+		$ mkfifo ./named\ pipe
+
+	2) In 'Program A', type for writting into the 'named pipe':
+		$ echo "output test" > ./named\ pipe 
+		
+		note: 'Program A' becomes locked until 'named pipe' is readen from.
+
+	3) From 'Program B', type to read from 'named pipe':
+		$ cat ./named\ pipe
+
+		note: this will free 'Program A' from lock.
+
+---------------
+---------------
+---------------
+---------------
+---------------
+TESTING UP PIPEFAIL ON TERMINAL
+	1) run this before executing the command for enabling ${pipestatus}:
+		$ set -o pipefail;
+
+		note: this only needs to be set 'once' per shell session.
+
+	2) Fetch return value of the pipe
+		$ echo ${pipestatus};
+			or
+		$ echo ${PIPESTATUS[@]};
+
+	--- PRACTICAL EXAMPLE --;
+		This will print result status for both 'cat' and 'du':
+
+			For BASH USERS:
+				$ set -o pipefail; cat /dev/null | du -h && echo -e "\nPIPESTATUS: ${PIPESTATUS[@]}"
+
+			For ZSH USERS:
+				$ set -o pipefail; cat /dev/null | du -h && echo -e "\nPIPESTATUS: ${pipestatus}"
+
+---------------
+---------------
+---------------
+---------------
+---------------
 FETCHING RAM AND VIRTUAL MEMORY USED BY GIVEN RUNNING APPLICATIONS
 	$ ps -e -o pid,vsz,rss,comm=PROCESS | sort -n -k 2
 
@@ -49170,6 +49606,9 @@ FIND, AWK GREP AND UGREP || GOOD AND BAD EXAMPLES
 		# find . -type f | awk '{system("grep -C 3 -P \"pass(?=(:|word|wd|d))|\\bpass\\b\" -- \""$0"\"")}' | wc -l
 
 	
+	example 2: - Selecting 'images' and 'videos' filetypes only -
+		$ find . -type f -exec file --mime-type {} + | rg '(image/|video/)' | rg -iPo '.*(?=:)' | fzf 
+
 	LOOKING FOR SIMILAR PACKAGES ON THE PACKAGE MANAGER REPOSITORY
 		Meant for archlinux only, but can likely be adapted for others
 			$ pacman -sS awk | ugrep -C 3 -P -i "\bawk\b|\bawk.*"
@@ -49182,7 +49621,7 @@ FIND, AWK GREP AND UGREP || GOOD AND BAD EXAMPLES
 
 	FORMATTING IPTABLES LOG ON A  HUMAN READABLE FORMAT
 		This will format any log with the [IPV6 ACCEPTING] name in it.
-# journalctl -b-0 | grep "IPV6" | sed -e 's/MAC=.*SRC/SRC/' -e 's/\[IPV6 ACCEPTING\]/\n\n\[IPV6 ACCEPTING\]\n/' -e 's/ /&\n/g' | less
+# journalctl -b-0 | grep "IPV6" | sed -e 's/MAC=.*SRC/SRC/' -e 's/\[IPV6 ACCEPTING\]/\n\n\[IPV6 ACCEPTING\]\n/' -e 's/ /&\n/g' | less -r
 
 
 STRIPPING OUT TEXT WITH TR
@@ -49214,7 +49653,7 @@ Smaller TODO list:
 	1 - systemd-run can execute programs as service on the background.
 	2 - machinectl login executes a login shell by initiating a new pts
 	3 - study run levels and targets on linux
-	4 - explain how 'systemd-analyze blame' works by reading the man-page:
+	4 - explain how 'systemd-analyze blame' or 'systemd-analyze critical-chain' works by reading the man-page:
 		it works by timing how long each service took to initiate.
 		it doesn't time how long it took for finishing.
 	5 - explain how setuid, setgid and sticky bit works:
