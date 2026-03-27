@@ -49136,9 +49136,10 @@ THE STANDARD UNIX PASSWORD MANAGER | 'PASS' UTILITY
 
 	TODO:
 		create practical examples using pipes;
+		write about piping password and username at the same time using 'git push'
 		
 	'PASS' FEATURES
-		A) As an option, it can version-manage passwords as a git repository,
+		A) As an option, it can version-manage passwords using a git repository,
 		allowing the user to keep track of old passwords and it's changes using git's very own commands.
 
 		B) It allows easy integration with tools and scripts.
