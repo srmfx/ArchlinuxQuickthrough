@@ -49267,7 +49267,17 @@ THE STANDARD UNIX PASSWORD MANAGER | 'PASS' UTILITY
 			C) Note: this will require the user to insert their GPG Password at least once,
 			caching later consecutive attempts.
 			
-			D) due to Note (A), you should use the following command for cleaning the cache
+			D) Note: It's advised to create an alias for copying password to clipboard,
+			since standard method will leak out password information on-screen when not piped.
+
+				VERY IMPORTANT: - Create an alias on the following file(zsh users only) -
+
+				[file: /etc/zsh/zshrc ]
+					alias pass-get="pass -c"
+				[/file]
+				
+
+			E) due to Note (A), you should use the following command for cleaning the cache
 			once you're finished with the job:
 				$ echo RELOADAGENT | gpg-connect-agent
 
