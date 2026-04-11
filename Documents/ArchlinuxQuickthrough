@@ -1135,6 +1135,44 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS A:
+	YAZI, THE COMMANDLINE FILE EXPLORER
+		SETTING UP DEFAULT PROGRAMS ON LINUX
+
+	ALTERNATIVE COMMANDS TO 'LESS' TOOL
+
+	EZA, THE ALTERNATIVE TO 'LS' COMMAND
+		CREATING AN ALIAS FOR 'EZA'
+		'EZA' PRACTICAL EXAMPLES
+			LISTING FILES RECURSIVELY USING TREE STYLE
+			LISTING CURRENT DIRECTORY FILENAMES ONLY
+
+	FD, THE ALTERNATIVE 'FIND' COMMAND
+		MAN PAGE FOR 'FD' TOOL
+		SYNTAX FOR 'FD' TOOL
+			MAIN DIFFERENCES BETWEEN 'FD' AND 'FIND'
+		PRACTICAL 'FD' EXAMPLES
+			SEARCHING FOR A GIVEN PATTERN IN A GIVEN DIRECTORY
+			SEARCHING FOR A PATTERN INCLUDING HIDDEN FILES/DIRECTORIES
+			SEARCHING FOR A PATTERN INCLUDING HIDDEN FILES, DIRECTORIES AND FILES LISTED IN IGNORE FILES
+			SEARCHING FOR PATTERN IN A GIVEN SPECIFIED PATH
+			SEARCHING FOR SPECIFIC FILETYPE EXTENSION IN CURRENT DIRECTORY
+			EXECUTING A PROGRAM AFTER THE SEARCH QUERY IS COMPLETED
+			EXECUTING FILES ONE BY ONE BEFORE QUERY IS COMPLETED
+			FINDING FILE TYPE OF EACH FILE QUERIED
+			QUERYING ALL FILES OF TYPE TEXT, THEN STRIPPING OUT THE MIME TYPE INFORMATION
+			EXECUTING COMMAND ON ALL FILES, USING COMMANDS THAT DON'T HAVE RECURSIVE OPTIONS
+
+	SETTING BASH TO 'VI' MODE | VI, VIM, NVIM
+		SETTING BASH 'VI' MODE AS SYSTEM WIDE CONFIGURATION
+		SETTING BASH --POSIX 'VI' MODE AS SYSTEM WIDE CONFIGURATION
+
+	FZF, FUZZY FINDER COMMAND
+		PRACTICAL FZF EXAMPLES
+
+	ZOXIDE, A SMARTER CD COMMAND
+		SETTING UP ZOXIDE 
+		HOW TO USE ZOXIDE
+
 	THE STANDARD UNIX PASSWORD MANAGER | 'PASS' UTILITY
 		'PASS' FEATURES
 		INSTANTIATING PASS STORAGE
@@ -1601,6 +1639,16 @@ New Syntax(2023):
 ====================================================================================================
 
 -013
+		YAZI, THE COMMANDLINE FILE EXPLORER
+			SETTING UP DEFAULT PROGRAMS ON LINUX
+
+		ALTERNATIVE COMMANDS TO 'LESS' TOOL
+		EZA, THE ALTERNATIVE TO 'LS' COMMAND
+		FD, THE ALTERNATIVE 'FIND' COMMAND
+		ENABLE LOGGING FOR DETECTED INFECTED DATA -> Minor Update
+		SETTING BASH TO 'VI' MODE | VI, VIM, NVIM
+		FZF, FUZZY FINDER COMMAND
+		ZOXIDE, A SMARTER CD COMMAND
 		THE STANDARD UNIX PASSWORD MANAGER | 'PASS' UTILITY
 		SOME FIND COMMANDS -> [minor update]
 		BASH HEREDOCS AND HERESTRING
@@ -2193,18 +2241,35 @@ since it allows you to re-install previous working packages when they break.
 	Log File  : /var/log/pacman.log
 
 HOW TO RECOVER LOST PACKAGES HINTS AND TIPS
+
+	VERY IMPORTANT:
+		The difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks for missing 
+	installed files and 'paccheck' actually checks for data corruption using the package information stored 
+	on the MTREE file for each package.
+
+		# paccheck --sha256sum --quiet				
+
 	1 - Use pacman -Qkk to find out which packages are broken:
 
 		# pacman -Qqk > /home/<your_username>/pacman.qqk.log	#Lists only packages whose files are missing files, it uses -q for quite mode.
 									^ This has to be executed as root, to check for all files in the system.
 				or
 		# pacman -Qkk
+
+		VERY IMPORTANT: the difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks for missing 
+		installed files and 'paccheck' actually checks for data corruption using the package information stored 
+		on the MTREE file for each package.
 	
 	2 - When executing and redirecting to a file using:
 		# pacman -Qqk > /home/<your_username>/pacman.qqk.log	#Lists only packages whose files are missing files, it uses -q for quite mode.
 									^ This has to be executed as root, to check for all files in the system.
 					or
 		# pacman -Qkk > ~/pacman.log.qkk 
+
+			or
+
+	3 - Checks package integrity, but requires 'pacutils' to be installed:
+		# paccheck --sha256sum --quiet				
 
 
 	When using -Qkk instead of -Qqk :
@@ -2215,7 +2280,7 @@ HOW TO RECOVER LOST PACKAGES HINTS AND TIPS
 		warning: libplist: /usr/lib/python3.10/site-packages/plist.so (No such file or directory)
 		warning: libproxy: /usr/lib/python3.10/site-packages/libproxy.py (No such file or directory)
 
-	3 - (For -Qkk only) You can parse files using REGEX once th output of pacman -Qkk has been redirected to a file:
+	3 - (For -Qkk only) You can parse files using REGEX once the output of pacman -Qkk has been redirected to a file:
 		$ cat ~/pacman.log.qkk | less
 
 		3.1 - Then press '/' and type:
@@ -2248,6 +2313,13 @@ installed by the user, these instructions will likely not work for you and will 
 
 ------
 USEFUL CHAIN PACMAN COMMANDS:
+
+	VERY IMPORTANT:
+		the difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks for missing 
+		installed files and 'paccheck' actually checks for data corruption using the package information stored 
+		on the MTREE file for each package.
+
+			# paccheck --sha256sum --quiet				#Checks package integrity, but requires 'pacutils' to be installed.
 
 # pacman -Qkk | cut -f1 -d: | sort -u | grep python | xargs sudo pacman -Syu				#Fetches all packages with name python in it
 
@@ -2388,6 +2460,15 @@ $pacman -Ql <package_name>	#List all files owned by a given package
 
 # pacman -Qqk 						#Lists only packages whose files are missing files, it uses -q for quite mode.
 							^ This has to be executed as root, to check for all files in the system.
+
+	VERY IMPORTANT:
+		the difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks for missing 
+	installed files and 'paccheck' actually checks for data corruption using the package information stored 
+	on the MTREE file for each package.
+
+		# paccheck --sha256sum --quiet				#Checks package integrity, but requires 'pacutils' to be installed.
+
+
 # pacman -Qkk						#Checks all packages integrity
 							^ Specifying 'k' twice will perform detailed checking(permission, file size, modification time)
 # pacman -Qkk | grep "No such file or directory"	#Allow retrieving only packages that have been accidently deleted
@@ -23875,6 +23956,14 @@ Once your system is booting from installation media, do as follows:
 									^ This has to be executed as root, to check for all files in the system.
 				or
 		# pacman -Qkk > /home/<your_user_name>/pacman.qkk.log-<date>		#Lists all packages.
+			and
+
+		# paccheck --sha256sum --quiet				#Checks package integrity, but requires 'pacutils' to be installed.
+
+
+	Note: the difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks for missing 
+	installed files and 'paccheck' actually checks for data corruption using the package information stored 
+	on the MTREE file for each package.
 
 	3.2.1 - ex.: # pacman -Qkk > /home/me_myself/pacman.qkk.log-20-jul-2023
 
@@ -24045,6 +24134,13 @@ CLAMAV CONFIGURATION FILES
 
 	ENABLE LOGGING FOR DETECTED INFECTED DATA
 		Will store data for each detected infected file on the system:
+
+		VERY IMPORTANT:
+			Before enabling logging, log files can become quite big on the long road,
+			as big as 50GB; if those are not important, it's advisable to disable it.
+			warnings can be normally found on 'journalctl'.
+
+			# journalctl --vacuum-time=1s
 
 		example:
 			[file: /etc/clamav/clamd.conf ]
@@ -27043,6 +27139,13 @@ PACKAGE MANAGER
 
 	You can also check the package integrity with:
 		$ pacman -Qkk xorg-server
+	
+
+	Note: the difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks for missing 
+	installed files and 'paccheck' actually checks for data corruption using the package information stored 
+	on the MTREE file for each package.
+
+		# paccheck --sha256sum --quiet				#Checks package integrity, but requires 'pacutils' to be installed.
 
 	Listing package meta-data after installation is also a thing,
 	ofc, given they're already installed in the system:
@@ -32388,10 +32491,16 @@ Running "#pacman -Rns $(pacman -Qtdq)" from time to time helps keeping the syste
 
 #4: TROUBLESHOOTING NVIDIA / BROKEN XORG 2023
 nvidia-utils require glvnd to work properly, so make sure that all package files are working correctly:
-	pacman -Qkk nvidia-utils nvidia-dkms libglvnd
+	$ pacman -Qkk nvidia-utils nvidia-dkms libglvnd
+
+	VERY IMPORTANT: the difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks for missing 
+	installed files and 'paccheck' actually checks for data corruption using the package information stored 
+	on the MTREE file for each package.
+
+		# paccheck --sha256sum --quiet				#Checks package integrity, but requires 'pacutils' to be installed.
 
 if any of the files are modified/broken, just fix them with:
-	pacman -Sy --overwrite '*' <package_name>
+	# pacman -Sy --overwrite '*' <package_name>
 
 Something about libglvnd - glvnd and glx:
 
@@ -37243,6 +37352,14 @@ SOME BROOT FILE EXPLORER
 				# pacman -Qqk
 					and
 				$ yay -Qqk
+					and
+
+				# paccheck --sha256sum --quiet
+
+
+				Note: the difference between 'pacman -Qqk' and 'paccheck' is that '-Qqk' only checks
+				for missing installed files and 'paccheck' actually checks for data corruption
+				using the package information stored on the MTREE file for each package.
 		
 			note 5 - listing all user installed packages
 				# pacman -Qe
@@ -49150,6 +49267,397 @@ CUSTOMIZING GTK | GTK CUSTOMIZATION
 	NOTE: You can also apply or change these settings on a per-program basis by making a warper.
 		READ MORE ON FOR AN EXAMPLE: 
 			SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
+---------------
+---------------
+---------------
+---------------
+---------------
+YAZI, THE COMMANDLINE FILE EXPLORER
+	Yazi supports 'vi' keys by default, colors and icons; it also suports 'vi' command-mode for runing shell and
+	other commands.
+
+	It uses 'xdg' for detecting which programs should be open for which file types, more specifically
+	'xdg-mime' for mime-types.
+
+	SETTING UP DEFAULT PROGRAMS ON LINUX
+		Both packages 'selectdefaultapplication-fork-git' and 'selectdefaultapplication-qt6-git'
+		provides a nice GUI for allowing the user to pick default programs to execute file types with.
+
+		This will in turn allow 'yazi' to execute programs automatically based on it's filetype and 
+		it's associated program(s).
+
+		Github:
+			https://github.com/magnus-ISU/selectdefaultapplication		#Older(more known, more stable).
+			https://github.com/THShafi170/selectdefaultapplication-Qt6	#Newer(less known, less stable).
+
+---------------
+---------------
+---------------
+---------------
+---------------
+ALTERNATIVE COMMANDS TO 'LESS' TOOL
+	'less' is a linux pager tool for allowing linux user to reading either reading files or the stdout of a program
+	at their own pace.
+
+	Alternative paging tools, From better to worse:
+		1 - moor
+			Uses 'vi' keys and has support to icons and colors.
+
+		2 - lnav
+			Uses 'vi' keys and has support to icons and colors.
+			also capable of saving file/output history.
+
+		3 - bat
+			Uses 'vi' keys but no support to icons, only colors.
+
+---------------
+---------------
+---------------
+---------------
+---------------
+EZA, THE ALTERNATIVE TO 'LS' COMMAND
+	eza is an excellent alternative to 'ls' command, supporting both colors and icons by default.
+
+	Very important:
+		By default, both 'eza' and 'ls' will ignore hidden files and hidden directories,
+		unless -a is included, example:
+			$ eza -tlra
+			
+	CREATING AN ALIAS FOR 'EZA'
+
+		Alias can be created for elza to allow other piped programs to read colors and icons,
+		otherwise colors and icons will be unavailable when piped.
+
+		ZSH USERS:
+			[file: /etc/zsh/zshrc ]
+				alias eza='eza --icons=always --color=always';
+			[/file]
+
+	'EZA' PRACTICAL EXAMPLES
+		LISTING FILES RECURSIVELY USING TREE STYLE
+			$ eza -Tlr | moor
+				or
+			$ eza -Tlr | lnav
+				or
+			$ eza -Tlr | bat
+				or
+			$ eza -Tlr | less
+
+		LISTING CURRENT DIRECTORY FILENAMES ONLY
+			$ eza -1 | moor
+				or
+			$ eza -1 | lnav
+				or
+			$ eza -1 | bat
+				or
+			$ eza -1 | less
+
+
+		TIP:
+			If you intend to use 'eza' for advanced file manipulation,
+			consider using 'find' or 'fd' instead as it's more appropriate.
+---------------
+---------------
+---------------
+---------------
+---------------
+FD, THE ALTERNATIVE 'FIND' COMMAND
+	fd is a simple, fast and user-friendly alternative to 'find'.
+	By default 'fd' doesn't search for hidden files, this speeds up search at the cost of ommitting unwanted
+	directories, unless -H is used as argument.
+
+	It will also ignore files listed in .gitignore rules and ignore rules in .ignore or .fd.ignore files,
+	unless -u is given as argument; in fact -u is an alias for '--hidden --no-ignore' and will also list hidden
+	files in it's search.
+
+	--search-path can be optionally used to include directory in a given search multiple times as argument.
+	
+	By default, fd also uses case-insensitive searches, unless '-s' is either passed as argument OR 
+	pattern uses an uppercase letter.
+
+	By  default fd uses regular expressions for the pattern, which may lead to undesired results.
+	However, this can be changed to use simple glob patterns with the '--glob' or '-g' option.
+
+
+	MAN PAGE FOR 'FD' TOOL
+		For a description on what each argument does, look on man page:
+			$ man fd
+
+	SYNTAX FOR 'FD' TOOL
+		$ fd [-HIEsiaLp0hV] [-d depth] [-t filetype] [-e ext] [-E exclude] [-c when] [-j num] [-x cmd] [pattern [path...]]
+
+		MAIN DIFFERENCES BETWEEN 'FD' AND 'FIND'
+
+			1) Unlike 'find', the path is always passed as the final argument to 'fd'.
+
+			Ex: - Searching for all files that contain the ".cpp" pattern as filename in the current directory -
+				$ fd ".cpp" ~/
+					x
+				$ find . -path '*/.*' -prune -o -iname "*.cpp" -print
+
+				Note: 'find' by default will include hidden directories and hidden files
+				in it's search and often requires a complicated and hard to remember arguments
+				to eliminate them from the search like the example above.
+
+			2) Unlike 'find', on 'fd' the string pattern is given right before the final argument.
+
+			3) On 'find', the pattern is always given as an attribute value for -iname and/or -name arguments,
+			depending on whether case-sensitivity is desired or not.
+
+			4) 'fd' uses a more linux-friendly approach when using arguments, single '-' hyphen for single-char
+			arguments and '--' double-hyphen for full-word arguments; 'find' on the other hand uses
+			single '-' hyphen for both single-character and full-words arguments.
+
+			5) By default, 'find' doesn't uses regex and uses simple globbing instead, whereas 'fd' uses
+			regex for pattern queries and provides '-g' argument for glob search.
+
+	PRACTICAL EXAMPLES
+		SEARCHING FOR A GIVEN PATTERN IN A GIVEN DIRECTORY
+			$ fd "am" ~
+			
+			Note: searches for the string "am" pattern in the user home directory.
+
+		SEARCHING FOR A PATTERN INCLUDING HIDDEN FILES/DIRECTORIES
+			$ fd -H "pattern" ~
+
+			Note: searches for the string "pattern" in the user home directory.
+			the search includes hidden files/dirs that start with '.' character,
+			but do not include files from .gitignore rules and ignore rules in .ignore or
+			.fd.ignore files.
+
+		SEARCHING FOR A PATTERN INCLUDING HIDDEN FILES, DIRECTORIES AND FILES LISTED IN IGNORE FILES
+			$ fd -u "pattern" ~
+
+		SEARCHING FOR PATTERN IN A GIVEN SPECIFIED PATH
+			$ fd -p "/source/*.cpp" ~
+
+			Note: this will search the entire home directory for a path that includes '/source/'
+			with *.cpp substring pattern as part of dir/file names.
+			
+			'-p' is equivalent to '--full-path'
+
+		SEARCHING FOR SPECIFIC FILETYPE EXTENSION IN CURRENT DIRECTORY
+			$ fd -e .cpp -e .h
+				or
+			$ fd -e .cpp -e .h .
+
+			Note: this always executes a case-insensitive search, regardless if '-s' is passed as argument.
+
+		EXECUTING A PROGRAM AFTER THE SEARCH QUERY IS COMPLETED
+			$ fd -e .cpp -X nvim
+
+			Note: from 'nvim' you can type ':buffers' for a complete list of opened files.
+			':b<number>' for accessing each file.
+
+		EXECUTING FILES ONE BY ONE BEFORE QUERY IS COMPLETED
+			$ fd -e .cpp -x echo
+
+			Note: will print found files one-by-one before query is actually completed.
+
+		FINDING FILE TYPE OF EACH FILE QUERIED
+			$ fd -x file --mime-type
+
+			Note: 'fd' will execute 'file' tool for each file found in the queried result.
+
+		QUERYING ALL FILES OF TYPE TEXT, THEN STRIPPING OUT THE MIME TYPE INFORMATION
+			$ fd --type f -x file --mime-type {} + | rg '(text/)' | rg -iPo ".*(?=:)" | less
+				or
+			$ fd --type f -x file --mime-type | rg '(text/)' | rg -iPo ".*(?=:)" | less
+
+		EXECUTING COMMAND ON ALL FILES, USING COMMANDS THAT DON'T HAVE RECURSIVE OPTIONS
+			$ fd -x stat
+				or
+			$ fd -x stat > /tmp/stat\ files
+
+
+---------------
+---------------
+---------------
+---------------
+---------------
+SETTING BASH TO 'VI' MODE | VI, VIM, NVIM
+	Bash also has a 'vi' mode just like 'zsh' does:
+		$ bash
+		$ set -o vi
+
+	hint: then finally press 'esc' and use vi keys to navigate,
+	it's also possible to go through command history using 'jk'.
+
+	SETTING BASH 'VI' MODE AS SYSTEM WIDE CONFIGURATION
+		Edit the following file and concatenate/add the following:
+			[file: /etc/bash.bashrc ]
+				set -o vi
+			[/file]
+
+		finally, if already running bash, then reload the script with:
+			$ source /etc/bash.bashrc
+
+		for local user configuration, use ~/.bashrc instead.
+
+	SETTING BASH --POSIX 'VI' MODE AS SYSTEM WIDE CONFIGURATION
+		Bash can run as --posix compliant mode, in which case it will use a different configuration file:
+			[file: /etc/profile ]
+				set -o vi
+			[/file]
+		
+		Use this to run bash in posix compliant mode:
+			$ sh
+				or
+			$ bash --posix
+
+		A) Bote: 'sh' is a symlink located in /usr/bin/ which may point to a shell different than 'bash'.
+		on most linux distributions, this will point to /usr/bin/bash and thus will run bash in --posix mode.
+
+		B) Note: for local user configuration, use ~/.profile instead
+
+
+---------------
+---------------
+---------------
+---------------
+---------------
+FZF, FUZZY FINDER COMMAND
+	An interactive filter program for any kind of list; files, command history, processes, hostnames, bookmarks, git commits, etc. It implements a "fuzzy" matching algorithm, so you can quickly type in patterns with omitted characters and still get the results you want.
+
+	PRACTICAL FZF EXAMPLES
+		Ex 1: - Using fzf's selected data preview  for .cpp files using 'moor' for previewing - 
+			This example uses 'moor' for previewing .cpp files only:
+				$ fzf --preview 'moor {}' -q "source/.cpp"
+
+		Ex 2: - Executing a program on the selected cursor object upon 'enter' key press -
+			This example binds the enter-key to execute 'nvim' on the selected file,
+			it also uses 'bat' for previewing documents as text-files inside 'fzf':
+				$ fzf --bind "enter:execute(nvim {})" -q "source/" --preview 'bat -l c++ {}'
+
+			A) Note: 'bat' and 'nvim' must be installed on the system for this to work.
+
+		Ex 3: - Displaying both metadata and image - 
+			This example uses 'chafa' and 'identify' for displaying metadata about image filetypes,
+			in the current directory:
+				$ fzf --preview 'chafa {} && identify {}'
+
+		Ex 4: - Re-execute command on key bind -
+			This example executes 'ps' for listing processes and allows the user to keep
+			an eye on the process by setting a keybind to 'ctrl-r' for reloading fzf by 
+			executing 'ps' again:
+
+				$ ps -ef | fzf --bind 'ctrl-r:reload(ps -ef)' --header 'Press CTRL-R to reload'
+
+		Ex 5: - Small example using 'find' -
+			This example fetches the selected file from 'fzf' interactive session and uses 'nvim'
+			to edit the selected file:
+
+				1) Select an input:
+					$ INPUT=$(find ./source/ | fzf)
+
+				2) Pass it as argument to NVIM:
+					$ nvim -- ${INPUT}
+
+				3(Alternate) One-line:
+					$ INPUT=$(find ./source/ | fzf) && nvim -- ${INPUT}
+
+		Ex 6: - Using 'fd' in place of 'find'; using 'chafa' for file previewing,
+		and xnviewmp for post-selecting:
+			$ fd | fzf --preview 'chafa --stretch --view-size 56x42 -f kitty {}'
+				or
+			$ fd | fzf --preview 'chafa --stretch --view-size 56x42 -f kitty {}' --bind 'execute:xnviewmp {}'
+				or
+			$ fd | fzf --preview 'chafa --stretch --view-size 56x42 -f kitty {}' --bind 'enter:execute:(xnviewmp {} > /dev/null 2>&1 &)'
+
+		Note: --view-size may have to be adjusted manually.
+
+
+		Ex 7: - Selecting media filetypes only -
+
+			These examples uses 'find' for fetching all 'file' type data and executes 'file' tool
+			with the --mime-type argument, then pipes it to 'rg'(ripgrep) for fetching
+			image, video and audio filetypes only, then uses chafa for previewing in 'fzf' and
+			'xnviewmp' for editing the selected option:
+
+			Note: 'xnviewmp', 'find', 'file', 'rg', 'chafa' and 'litty' must all be installed
+			on your system.
+
+			A) EXAMPLE 7.1:
+				$ find . -type f -exec file --mime-type {} + | rg '(image/|video/|audio/)' | rg -iPo '.*(?=:)' | fzf 
+			B) EXAMPLE 7.2:	
+				$ find_data=$(find . -type f -exec file --mime-type {} + | rg '(image/|video/|audio/)' | rg -iPo ".*(?=:)") && echo ${find_data} | fzf --preview 'chafa --stretch --view-size 56x42 -f kitty {}' --bind 'enter:execute:(xnviewmp {} > /dev/null 2>&1 &)'
+
+			C) EXAMPLE 7.3:
+				$ find . -type f -exec file --mime-type {} + | rg '(image/|video/|audio/)' | rg -iPo ".*(?=:)" | fzf --preview 'chafa --stretch --view-size 56x42 -f kitty {}' --bind 'enter:execute:(xnviewmp {} > /dev/null 2>&1 &)'
+
+
+		Ex 8: - Creating a Menu Select with 'fzf' - 
+
+				$ printf "1. Hello\n2. Goodbye\n\n3. Exit" |
+				   fzf --height '~100%' --reverse --header 'Select one' \
+				       --bind 'enter:transform:[[ -n {} ]] &&
+						 echo accept ||
+						 echo "change-header:Invalid selection"'
+---------------
+---------------
+---------------
+---------------
+---------------
+ZOXIDE, A SMARTER CD COMMAND
+	It's a smarter cd command for your terminal, keeps track of the directories you use the most and uses
+	algorithm to navigate to the best match.
+	
+	 SETTING UP ZOXIDE 
+		After installing, zoxide can be setup on a per-user basis.
+		The following instruction will setup 'z' and 'zi' aliases,
+
+		VERY IMPORTANT: 
+			The 'zi' alias will only work when 'fzf' (fuzzy finder) is also installed
+			on the system.
+
+		A) For ZSH User:
+			$ zoxide init zsh >> ~/.zshrc
+		
+		B) For BASH User:
+			$ zoxide init bash >> ~/.bashrc
+
+		Note - you must run source to load the script:
+			$ source ~/.zshrc
+				or
+			$ source ~/.bashrc
+			
+	
+	HOW TO USE ZOXIDE
+		Everytime you change directories using the 'z' aliases, zioxide will add that directory
+		to it's storage database, this directory can now be fuzzy queried by it's name alone instead
+		by either using 'z' or it's interactive session alias 'zi':
+			
+			1) Changing directory and Adding it to the database
+				$ z ~/path/to/very/long/directoryAZZ
+
+			2) Fuzzy Querying Directory:
+				The result of the fuzzy query is an actual directory change:
+					$ z directoryAZZ
+						or
+					$ z AZZ
+
+				note: both will change directory to ~/path/to/very/long/directoryAZZ
+
+			3) Initializing interactive session:
+				Interactive session can be useful when more than one directory exist
+			under the same name, query-string or simply for listing all available stored 
+			directories:
+					$ zi
+						or
+					$ zi directory
+
+				note: the 2nd form will list all directories that contain 'directory' string.
+
+			4) Remove directory from database:
+				$ zoxide remove ~/path/to/very/long/directoryAZZ
+
+			5) Add or increase directory rank:
+				$ zoxide add ~/path/to/very/long/directoryAZZ
+
+			6) Querying without the alias:
+				$ zoxide query directoryAZZ
+				
+
 ---------------
 ---------------
 ---------------
