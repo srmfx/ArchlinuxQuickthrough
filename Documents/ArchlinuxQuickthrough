@@ -1160,6 +1160,7 @@ USE LICENSE:
 			EXECUTING FILES ONE BY ONE BEFORE QUERY IS COMPLETED
 			FINDING FILE TYPE OF EACH FILE QUERIED
 			QUERYING ALL FILES OF TYPE TEXT, THEN STRIPPING OUT THE MIME TYPE INFORMATION
+			QUERYING IMAGE, VIDEO, AUDIO FILE TYPES ONLY | FASTER REGEX USING PROPER REGEX | RIPGREP EXAMPLE
 			EXECUTING COMMAND ON ALL FILES, USING COMMANDS THAT DON'T HAVE RECURSIVE OPTIONS
 
 	SETTING BASH TO 'VI' MODE | VI, VIM, NVIM
@@ -49464,10 +49465,21 @@ FD, THE ALTERNATIVE 'FIND' COMMAND
 				or
 			$ fd --type f -x file --mime-type | rg '(text/)' | rg -iPo ".*(?=:)" | less
 
+		QUERYING IMAGE, VIDEO, AUDIO FILE TYPES ONLY | FASTER REGEX USING PROPER REGEX | RIPGREP EXAMPLE
+			By using proper regex form, it's possible to speed up specific string search by telling
+			'ripgrep' exactly where to extract the information from either the beginning or the
+			end of the text and ignoring all other possible options:
+
+			$ fd --type f -x file --mime-type {} + | rg -iPo '^.*(?=(image/|video/|audio/).*$)'  | rg -Po "^.*(?=:)"
+				or
+			$ fd --type f -x file --mime-type | rg -iPo '^.*(?=(image/|video/|audio/).*$)'  | rg -Po "^.*(?=:)"
+
 		EXECUTING COMMAND ON ALL FILES, USING COMMANDS THAT DON'T HAVE RECURSIVE OPTIONS
 			$ fd -x stat
 				or
 			$ fd -x stat > /tmp/stat\ files
+
+| rg -iPo '^.*(?=(image/|video/|audio/).*$)'  | rg -Po "^.*(?=:)"
 
 
 ---------------
