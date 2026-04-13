@@ -1137,6 +1137,21 @@ USE LICENSE:
 --MISCALENEOUS A:
 	YAZI, THE COMMANDLINE FILE EXPLORER
 		SETTING UP DEFAULT PROGRAMS ON LINUX
+		YAZI THRASH CAN LOCATION
+		YAZI SHELL WARPER
+			ALTERNATE OPTION TO YAZI SHELL WARPER
+		YAZI HOTKEYS
+			YAZI MISC KEYS
+			YAZI PLUGIN EXTENSION KEYS
+			YAZI BASIC CONTROL KEYS
+				YAZI FILE MANIPULATION KEYS
+				YAZI LINE MODE KEYS
+				YAZI SEARCH CONTROL KEYS
+				YAZI BASIC CHANGE DIRECTORY CONTROL KEYS
+		YAZI SORT DATA CONTROL KEYS
+		YAZI COPY CONTROL KEYS
+		YAZI TASK MANAGEMENT KEYS
+		YAZI TAB MANAGEMENT KEYS
 
 	ALTERNATIVE COMMANDS TO 'LESS' TOOL
 
@@ -49274,8 +49289,8 @@ CUSTOMIZING GTK | GTK CUSTOMIZATION
 ---------------
 ---------------
 YAZI, THE COMMANDLINE FILE EXPLORER
-	Yazi supports 'vi' keys by default, colors and icons; it also suports 'vi' command-mode for runing shell and
-	other commands.
+	Yazi supports 'vi' keys by default, colors, icons and it also suports 'vi' normal and selection mode,
+	besides being able to run shell commands both in the foreground and as background processes.
 
 	It uses 'xdg' for detecting which programs should be open for which file types, more specifically
 	'xdg-mime' for mime-types.
@@ -49290,6 +49305,173 @@ YAZI, THE COMMANDLINE FILE EXPLORER
 		Github:
 			https://github.com/magnus-ISU/selectdefaultapplication		#Older(more known, more stable).
 			https://github.com/THShafi170/selectdefaultapplication-Qt6	#Newer(less known, less stable).
+
+	YAZI THRASH CAN LOCATION
+		Yazi follows the FreeDesktop.org Trash specification, storing deleted files in ~/.local/share/Trash/ ;
+		data can be permanently deleted using 'D' hotkey instead of 'd'.
+
+	YAZI SHELL WARPER
+		Optionally add this to your shell configuration file for setting up yazi's shell warper.
+
+		FOR ZSH USERS - SYSTEM WIDE CONFIG -:
+			[file: /etc/zsh/zshrc ]
+				function y() {
+					local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+					command yazi "$@" --cwd-file="$tmp"
+					IFS= read -r -d '' cwd < "$tmp"
+					[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+					rm -f -- "$tmp"
+				}
+			[/file]
+
+		ALTERNATE OPTION TO YAZI SHELL WARPER
+			If you don't desire this script, you can just press ':' and run 'zsh' or any shell you want
+			from within 'yazi'.
+
+			When exiting the shell, you'll be back to yazi exactly where it was.
+
+			When using 'konsole' as your terminal emulator, ctrl+shift+t will open a new 'tab' using
+			the current working directory into the newly created tab, so you can go back to 'yazi'
+			without losing the shell work by typing 'exit'.
+
+	YAZI HOTKEYS
+		q		#QUIT YAZI.
+		Q		#QUIT YAZI WITHOUT OUTPUTTING CWD-FILE.
+		~ or F1		#HELP MENU.
+
+		YAZI MISC KEYS
+			.		#Toggle hidden file visibility.
+
+		YAZI PLUGIN EXTENSION KEYS
+			Z		#Change directories via ZOXIDE.
+			z		#Change directories or file via FZF.
+			s		#Search via 'fd'.
+			S		#Search via 'rg'(ripgrep search).
+			CTRL+S		#Cancel the ongoing search.
+
+		YAZI BASIC CONTROL KEYS
+			o		#Open/Execute file with default application set by the operating system.
+			O		#Interactively Open/Execute file from a list of available programs.
+					Note: 'enter' key can do the same trick here.
+
+			h and l		#Change directory to 'parent' and 'selected directory' respectively.
+			H and L		#Change directory to 'Previous' and 'Next' using directory change history.
+			j and k		#Move cursor down and up, respectively.
+			ctrl + u	#Move cursor 50% up
+			ctrl + d	#Move cursor 50% down
+			ctrl + f	#Move cursor 100% down
+			ctrl + f	#Move cursor 100% up
+			G		#Move cursor to the end of the page.
+			gg		#Move cursor to the start.
+			v		#Change to Visual Mode.
+			V		#Unselect Visual Mode/Change back from visual mode.
+			J and K		#Scroll UP or DOWN on the Preview TAB.
+
+			YAZI FILE MANIPULATION KEYS
+				tab		#Spot file, show some minor metadata.
+
+				space		#Select File, press again to 'unselect'.
+						Note 1: Selection and Yank are two different things.
+						Note 2: Selection can only be used for 'deletion' and 'renaming'
+						Note 3: Yanking can be used for 'copy & pasting', 'symlink' and
+						'hard link' creation.
+
+							A) EXAMPLE: - How to select files individually - 
+								1 - Select files using 'space'
+								2 - (Optional) Press 'esc' to cancel selection.
+								
+							B) EXAMPLE: - Batch selection using visual mode -
+								1 - Press 'v' to go into 'visual mode'
+								2 - Select files with arrows or 'j' and 'k'
+								3 - Press 'ESC' to confirm selection.
+								4 - (Optional) Press 'esc' to cancel selection.
+
+				a		#Create file or directory; end name with '/' for directory.
+				r		#Rename selected file(s)
+				d		#Delete Selected file(s), sending it to ~/.local/share/Thrash
+				D		#PERMANENTLY - Delete Selected file(s), with no means to recover.
+
+				y		#Yank/Copy selected file(s):
+							B) EXAMPLE: - How to Yank Files -
+								1 - Select files using 'space'
+								2 - Yank by pressing 'y'
+							
+							A) EXAMPLE: - How to Yank files using visual mode -
+								1 - Go into visual mode by pressing 'v'
+								2 - Select files AND press 'esc' key
+								3 - (Optional) - Select more files if you want,
+								by doing the same thing step #1 and step #2.
+								4 - Press 'y' to yank the files.
+							
+				x		#Yank/Cut selected file(s).
+
+				Y		#Cancel the Yank Status
+				X		#Cancel the Yank Status
+				p		#Paste Yanked files.
+				P		#Paste and Overwrite files if they already exist.
+
+				-		#Create symlink(absolute path) in current directory
+						for all yanked files/dirs.
+
+				_		#Create symlink(relative path) in current directory
+						for all yanked files/dirs.
+
+				CTRL + '-'	#Creates a Hard Link in current directory using all yanked files.
+
+			YAZI LINE MODE KEYS
+				ms		#Linemode 'size: displays data size.
+				mm		#Linemode 'modification date': displays modification time.
+				mp		#Linemode 'permissions': displays permission set.
+				mo		#Linemode 'ownership': displays ownership.
+				mb		#Linemode 'birth date': displays birth time/creation time.
+				mn		#Linemode 'none': displays nothing.
+
+			YAZI SEARCH CONTROL KEYS
+				f		#Filter by file/dir name
+				/		#Smart Filter by file/dir name(Search Ahead/Look Ahead).
+				?		#Smart Filter by file/dir name(Search Behind/Look Behind).
+				n		#(Smart Filter Control) Move to next found object.
+				N		#(Smart Filter Control) Move to previous found object.
+
+			YAZI BASIC CHANGE DIRECTORY CONTROL KEYS
+				gh		#Change to User Home Directory(go home!).
+				gc		#Change to ~/.config directory(go config!).
+				gd		#Change to ~/Downloads direcotry(go download!).
+				g<space-bar>	#Interactive Directory Change.
+				gf		#Follow Symlink/Softlink.
+
+		YAZI SORT DATA CONTROL KEYS
+			esc		#Clears filter after applying one.
+			,S		#Sort by size and type, descending order.
+			,s		#Sort by size and type, ascending order.
+			,N		#Sort normally, descending order.
+			,n		#Sort normally, ascending order.
+			,A		#Sort alphabetically, descending order.
+			,a		#Sort alphabetically, ascending order.
+			,E		#Sort by Extension/Type, descending order.
+			,e		#Sort by Extension/Type, ascending order.
+			,M		#Sort by Modification Time, descending order.
+			,m		#Sort by Modification Time, ascending order.
+			,B		#Sort by Birth/Creation Time, descending order.
+			,b		#Sort by Birth/Creation Time, descending order.
+
+		YAZI COPY CONTROL KEYS
+			cd		#Copy current Path to clipboard.
+			cc		#Copy on cursor object(dir/file)Path to clipboard.
+			cf		#Copy filename only(no paths) to clipboard.
+			cn		#Copy filename, without type extension, to clipboard.
+
+		YAZI TASK MANAGEMENT KEYS
+			w		#Opens Task Manager
+			:		#Opens shell window for foreground process execution
+			;		#Opens shell window for background process execution
+
+		YAZI TAB MANAGEMENT KEYS
+			t		#Create New Tab
+			CTRL+C		#Close Tab
+			[ and ]		#Change to Previous and Next Tab
+			{ and }		#Move Tab to Left or Right
+			0 to 9		#Change to the desired tab number 
 
 ---------------
 ---------------
