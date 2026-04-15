@@ -1135,9 +1135,16 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS A:
+	FISH, A VERY MODERN COMMANDLINE SHELL
+		FISH CONFIGURATION FILE
+			SYSTEM-WIDE CONFIGURATION FILE:
+			USER CONFIGURATION FILE
+		FISH HISTORY FILE
+
 	YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 		YASH EDITING MODE
 		YASH CONFIGURATION FILES
+		YASH HISTORY FILE
 		MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH
 
 	YAZI, THE COMMANDLINE FILE EXPLORER
@@ -1660,6 +1667,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -013
+		FISH, A VERY MODERN COMMANDLINE SHELL
 		YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 		YAZI, THE COMMANDLINE FILE EXPLORER
 			SETTING UP DEFAULT PROGRAMS ON LINUX
@@ -49294,6 +49302,23 @@ CUSTOMIZING GTK | GTK CUSTOMIZATION
 ---------------
 ---------------
 ---------------
+FISH, A VERY MODERN COMMANDLINE SHELL
+	A Very modern commandline shell that works out-of-box without requiring extra plugins.
+
+	FISH CONFIGURATION FILES
+		SYSTEM-WIDE CONFIGURATION FILE:
+			/etc/fish/config.fish
+
+		USER CONFIGURATION FILE:
+			~/.config/fish/config.fish
+
+	FISH HISTORY FILE
+		~/.local/share/fish/fish_history
+---------------
+---------------
+---------------
+---------------
+---------------
 YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 	A Minimal, posix-compliant commandline shell written in C with default support to 
 	tab completion.
@@ -49334,6 +49359,16 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 			A) ~/.yashrc
 			B) ~/.yash_profile
 	
+	YASH HISTORY FILE
+		Two locations are used for yash command history:
+
+			A) When the $XDG_DATA_HOME is set, should usually default to:
+				~/.local/share/yash/history
+
+			B) When no $XDG_DATA_HOME is set, always fallsback to:
+				~/.yash_history
+
+
 	MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH
 		This script gives support to zoxide(zi and z aliases) by turning them into a function,
 		since the original "aliases" only work when calling functions/methods that are only compatible
