@@ -1136,6 +1136,7 @@ USE LICENSE:
 
 --MISCALENEOUS A:
 	YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
+		YASH EDITING MODE
 		YASH CONFIGURATION FILES
 		MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH
 
@@ -49311,6 +49312,22 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 		Command line prediction based on command history
 
 		source: https://magicant.github.io/yash/
+
+	YASH EDITING MODE
+		When using yash with 'set -o vi' option, you can edit commands in vi's text editor:
+			1) run yash first:
+				$ yash
+
+			2) Enable vi mode:
+				$ set -o vi
+
+			3) Type any command you want, ex:
+				$ rm /tmp/a test
+
+			4) Press 'esc' to go into command-mode, 
+			then press 'v' for launching the 'vi' editor.
+				
+		Note: Other shells like 'bash' also support 'vi' mode and 'vi' editing mode described here.
 
 	YASH CONFIGURATION FILES
 		Configuration files are located in:
