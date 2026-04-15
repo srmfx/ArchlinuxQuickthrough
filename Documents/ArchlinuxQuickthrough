@@ -1135,6 +1135,10 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS A:
+	YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
+		YASH CONFIGURATION FILES
+		MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH
+
 	YAZI, THE COMMANDLINE FILE EXPLORER
 		SETTING UP DEFAULT PROGRAMS ON LINUX
 		YAZI THRASH CAN LOCATION
@@ -1655,6 +1659,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -013
+		YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 		YAZI, THE COMMANDLINE FILE EXPLORER
 			SETTING UP DEFAULT PROGRAMS ON LINUX
 
@@ -49283,6 +49288,168 @@ CUSTOMIZING GTK | GTK CUSTOMIZATION
 	NOTE: You can also apply or change these settings on a per-program basis by making a warper.
 		READ MORE ON FOR AN EXAMPLE: 
 			SETTING UP WRAPER FOR 'RM', 'SUDO' AND 'RUN0' COMMAND
+---------------
+---------------
+---------------
+---------------
+---------------
+YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
+	A Minimal, posix-compliant commandline shell written in C with default support to 
+	tab completion.
+
+	Yash is intended the be the most POSIX-compliant shell available, features support for prompt customization,
+	tab completion and a full 'vi' mode(when using 'set -o vi').
+
+	Here's a full list of supported features:
+		Global aliases
+		Arrays
+		Socket redirection, pipeline redirection, and process redirection
+		Brace expansion and extended globbing
+		Fractional numbers in arithmetic expansion
+		Prompt command and command-not-found handler
+		Command line completion with predefined completion scripts for more than 100 commands
+		Command line prediction based on command history
+
+		source: https://magicant.github.io/yash/
+
+	YASH CONFIGURATION FILES
+		Configuration files are located in:
+			A) ~/.yashrc
+			B) ~/.yash_profile
+	
+	MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH
+		This script gives support to zoxide(zi and z aliases) by turning them into a function,
+		since the original "aliases" only work when calling functions/methods that are only compatible
+		with bash and zsh. This script also sets 'vi' mode to the shell.
+
+		Requires having 'jq' and 'direnv' installed;
+		optionally 'zoxide', 'eza', 'yay', 'man' and 'pass' can also be installed.
+		
+
+		A) Note: 'eza', 'yay', 'man' are only referred in the script for either adding or allowing
+		colors and custom colors.
+		
+		B) Note: 'pass-mount' is a script of mine that i'm currently working on for myself,
+		add a comment-line for removing it. I'm only leaving this file here for a reference
+		to myself.
+
+		[file: ~/.yashrc ]
+			##### Sample Yashrc #####
+			# This is a sample initialization script for yash. Copy this file to
+			# $XDG_CONFIG_HOME/yash/rc or ~/.yashrc
+			# and add your favorite customization to it.
+
+
+			# Firstly, load the common customization script.
+			# If you don't like settings applied in this script, remove this line.
+			. --autoload --no-alias initialization/common
+
+			set +o posixly-correct
+			set -o vi
+
+			# These are additional aliases that are not defined in the common script.
+			# Uncomment to enable them.
+			#alias g='grep'
+			#alias l='$PAGER'
+			#alias --global L='|$PAGER'
+			#alias --global N='>/dev/null 2>&1' N1='>/dev/null' N2='2>/dev/null'
+
+			# Uncomment if you want to clear the screen with Ctrl-L.
+			#bindkey --emacs '\^L' clear-and-redraw-all
+			bindkey --vi-insert '\^L' clear-and-redraw-all
+			bindkey --vi-command '\^L' clear-and-redraw-all
+
+			# Uncomment to enable direnv support. ('jq' and 'direnv' required)
+			_update_direnv() {
+			  eval "$(
+			    direnv export json |
+			    jq -r 'to_entries | .[] |
+			    if .value == null then
+			      @sh "unset \(.key)"
+			    else
+			      @sh "export \(.key)=\(.value)"
+			    end'
+			  )"
+			}
+			_update_direnv
+
+			YASH_AFTER_CD=("$YASH_AFTER_CD" '_update_direnv')
+
+			#CUSTOM PROMPT:
+			COLUMNS="$(stty size | cut -d' ' -f2)"
+			POST_PROMPT_COMMAND=("printf \"%${COLUMNS}s\n\" \"$(date)\"")
+
+			# And add your own customization below.
+
+			# vim: set et sw=2 sts=2 tw=78 ft=sh:
+
+			#CUSTOM FUNCTIONS:
+
+			function z {
+				cd "$(zoxide query ${@})";
+			}
+
+			function zi {
+				cd "$(zoxide query -i ${@})";
+			}
+
+			#Add custom colors to man page
+			function man {
+				# Saves current settings in environment variables
+				#PR_LESS_TERMCAP_mb=${LESS_TERMPCAP_mb}
+				#PR_LESS_TERMCAP_md=${LESS_TERMPCAP_md}
+				#PR_LESS_TERMCAP_me=${LESS_TERMPCAP_me}
+				#PR_LESS_TERMCAP_se=${LESS_TERMPCAP_se}
+				#PR_LESS_TERMCAP_so=${LESS_TERMPCAP_so}
+				#PR_LESS_TERMCAP_ue=${LESS_TERMPCAP_ue}
+				#PR_LESS_TERMCAP_us=${LESS_TERMPCAP_us}
+				#PR_GROFF_NO_SGR=${GROFF_NO_SGR}
+
+				# Set new colors before running man pages
+				export LESS_TERMCAP_mb=$'\e[01;31m'
+				export LESS_TERMCAP_md=$'\e[01;31m'
+				export LESS_TERMCAP_me=$'\e[0m'
+				export LESS_TERMCAP_se=$'\e[0m'
+				export LESS_TERMCAP_so=$'\e[43;93m'
+				export LESS_TERMCAP_ue=$'\e[0m'
+				export LESS_TERMCAP_us=$'\e[4;93m'
+				GROFF_NO_SGR=1                  # mandatory for some modern groff versions
+
+				# Running man pages
+				command man "$@"
+
+				# Restoring previous values if there were any
+				LESS_TERMCAP_mb=${PR_LESS_TERMPCAP_mb}
+				LESS_TERMCAP_md=${PR_LESS_TERMPCAP_md}
+				LESS_TERMCAP_me=${PR_LESS_TERMPCAP_me}
+				LESS_TERMCAP_se=${PR_LESS_TERMPCAP_se}
+				LESS_TERMCAP_so=${PR_LESS_TERMPCAP_so}
+				LESS_TERMCAP_ue=${PR_LESS_TERMPCAP_ue}
+				LESS_TERMCAP_us=${PR_LESS_TERMPCAP_us}
+				GROFF_NO_SGR=${PR_GROFF_NO_SGR}
+
+				# Unsetting variables used for saving and restoring the previous settings
+				unset -v PR_LESS_TERMCAP_mb
+				unset -v PR_LESS_TERMCAP_md
+				unset -v PR_LESS_TERMCAP_me
+				unset -v PR_LESS_TERMCAP_se
+				unset -v PR_LESS_TERMCAP_so
+				unset -v PR_LESS_TERMCAP_ue
+				unset -v PR_LESS_TERMCAP_us
+				unset -v PR_GROFF_NO_SGR
+			}
+
+			#CUSTOM ALIAS:
+			alias eza='eza --icons=always --color=always';
+			alias yay='yay --color=always';
+			alias pass-clear="echo RELOADAGENT | gpg-connect-agent > /dev/null 2>&1";
+			alias pass-get="pass -c"
+
+
+			export GDK_SCALE=0.9
+			export GDK_DPI_SCALE=0.9
+			export GTK_THEME=Adwaita:dark
+		[/file]
 ---------------
 ---------------
 ---------------
