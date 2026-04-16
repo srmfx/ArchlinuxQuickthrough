@@ -1144,6 +1144,8 @@ USE LICENSE:
 	YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 		YASH EDITING MODE
 		YASH CONFIGURATION FILES
+			SYSTEM WIDE CONFIGURATION FILE
+			LOCAL USER CONFIGURATION FILES
 		YASH HISTORY FILE
 		MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH
 
@@ -49355,7 +49357,11 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 		Note: Other shells like 'bash' also support 'vi' mode and 'vi' editing mode described here.
 
 	YASH CONFIGURATION FILES
-		Configuration files are located in:
+		SYSTEM WIDE CONFIGURATION FILE
+			This configuration file is used by default when no local user configuration file is available:
+				A) /usr/share/yash/initialization/sample
+				
+		LOCAL USER CONFIGURATION FILES
 			A) ~/.yashrc
 			B) ~/.yash_profile
 	
@@ -49471,14 +49477,14 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 				command man "$@"
 
 				# Restoring previous values if there were any
-				LESS_TERMCAP_mb=${PR_LESS_TERMPCAP_mb}
-				LESS_TERMCAP_md=${PR_LESS_TERMPCAP_md}
-				LESS_TERMCAP_me=${PR_LESS_TERMPCAP_me}
-				LESS_TERMCAP_se=${PR_LESS_TERMPCAP_se}
-				LESS_TERMCAP_so=${PR_LESS_TERMPCAP_so}
-				LESS_TERMCAP_ue=${PR_LESS_TERMPCAP_ue}
-				LESS_TERMCAP_us=${PR_LESS_TERMPCAP_us}
-				GROFF_NO_SGR=${PR_GROFF_NO_SGR}
+				#LESS_TERMCAP_mb=${PR_LESS_TERMPCAP_mb}
+				#LESS_TERMCAP_md=${PR_LESS_TERMPCAP_md}
+				#LESS_TERMCAP_me=${PR_LESS_TERMPCAP_me}
+				#LESS_TERMCAP_se=${PR_LESS_TERMPCAP_se}
+				#LESS_TERMCAP_so=${PR_LESS_TERMPCAP_so}
+				#LESS_TERMCAP_ue=${PR_LESS_TERMPCAP_ue}
+				#LESS_TERMCAP_us=${PR_LESS_TERMPCAP_us}
+				#GROFF_NO_SGR=${PR_GROFF_NO_SGR}
 
 				# Unsetting variables used for saving and restoring the previous settings
 				unset -v PR_LESS_TERMCAP_mb
