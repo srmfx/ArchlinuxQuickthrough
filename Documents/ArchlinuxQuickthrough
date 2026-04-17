@@ -1382,6 +1382,10 @@ USE LICENSE:
 	CREATING OTP AUTHENTICATION FOR GDRIVE
 	MANAGING GPG KEYS
 		CREATING GPG KEYS
+			HOW TO GENERATE SSH KEY FROM A GPG SUBKEY
+			LISTING SUBKEYS ID-FINGERPRINT
+				LISTING PUBLIC KEYS AND SUBKEYS
+				LISTING SECRET KEYS AND SUBKEYS
 		EDITING GPG KEYS
 		DELETING A PUBLIC GPG KEY
 		DELETING A SECRET GPG KEY
@@ -1669,6 +1673,11 @@ New Syntax(2023):
 ====================================================================================================
 
 -013
+		CREATING GPG KEYS -> minor update
+			HOW TO GENERATE SSH KEY FROM A GPG SUBKEY
+			LISTING SUBKEYS ID-FINGERPRINT
+				LISTING SECRET KEYS AND SUBKEYS
+
 		FISH, A VERY MODERN COMMANDLINE SHELL
 		YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 		YAZI, THE COMMANDLINE FILE EXPLORER
@@ -7798,6 +7807,32 @@ gpg --full-gen-key
 		#gpg --full-generate-key
 
 
+gpg --expert --edit-key <YOUR_KEY_ID>
+	#Initiates an Interactive Session that allows creating subkeys based on a given existing key
+	ex:
+		$ gpg --expert --edit-key ABSDO12309481ABSJA
+		$ addkey
+
+		A) Note: addkey allows to create subkeys with Authenticate, Sign or Encrypt modes.
+		turning the subkey into a shareable key.
+
+		HOW TO GENERATE SSH KEY FROM A GPG SUBKEY
+			It's possible to create/export SSH KEY using an 'Authenticate' only subkey,
+			using either ECC or RSA:
+				gpg --export-ssh-key <YOUR_SUBKEY_ID>
+
+		LISTING SUBKEYS ID-FINGERPRINT
+			LISTING PUBLIC KEYS AND SUBKEYS
+				gpg --list-keys --keyid-format=long
+					or
+				gpg --list-keys --with-keygrip
+
+			LISTING SECRET KEYS AND SUBKEYS
+				gpg --list-secret-keys --keyid-format=long
+					or
+				gpg --list-secret-keys --with-keygrip
+
+
 --EDITING GPG KEYS
 gpg --edit-key
 	#Present a menu which enables you to do most of the key management related tasks!
@@ -7818,12 +7853,13 @@ gpg --check-signs
 
 
 --DELETING A PUBLIC GPG KEY
-gpg --delete-keys < keyname | username >
+gpg --delete-public-and-secret-keys <keyname>
+gpg --delete-keys <keyname>
 gpg --delete-keys --yes
 	#Deletes all keys owned by the user
 
 --DELETING A SECRET GPG KEY
-gpg --delete-secret-keys <keyname | username>
+gpg --delete-secret-keys <keyname>
 
 --DELETING SECRET AND PUBLIC GPG KEY
 gpg --delete-secret-and-public-key <keyname | username> 
