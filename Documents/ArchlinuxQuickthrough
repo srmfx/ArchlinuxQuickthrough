@@ -1673,6 +1673,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -013
+		MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH -> minor update
 		CREATING GPG KEYS -> minor update
 			HOW TO GENERATE SSH KEY FROM A GPG SUBKEY
 			LISTING SUBKEYS ID-FINGERPRINT
@@ -49414,7 +49415,9 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 	MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH
 		This script gives support to zoxide(zi and z aliases) by turning them into a function,
 		since the original "aliases" only work when calling functions/methods that are only compatible
-		with bash and zsh. This script also sets 'vi' mode to the shell.
+		with bash and zsh; This script also sets 'vi' mode to the shell and adds some minor basic git
+		functionality to yash's PROMPT_COMMAND for showing branch name and a counter for
+		files that have been either modified or not added to the staging area.
 
 		Requires having 'jq' and 'direnv' installed;
 		optionally 'zoxide', 'eza', 'yay', 'man' and 'pass' can also be installed.
@@ -49469,9 +49472,64 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 
 			YASH_AFTER_CD=("$YASH_AFTER_CD" '_update_direnv')
 
-			#CUSTOM PROMPT:
+			# COLUMN COUNT
 			COLUMNS="$(stty size | cut -d' ' -f2)"
-			POST_PROMPT_COMMAND=("printf \"%${COLUMNS}s\n\" \"$(date)\"")
+
+			# POST_PROMPT_COLUMN COUNTS AVAILABLE EMPTY COLUMNS FOR POST_PROMPT_COMMAND
+			POST_PROMPT_COLUMN=${COLUMNS};
+			POST_PROMPT_STR="";
+
+			# CUSTOM FUNCTIONS FOR POST_PROMPT_COMMAND:
+			function custom_print_date() {
+				date_str=$(date);
+				printf "%${COLUMNS}s\n" "${date_str}";
+			}
+
+			#START -- GIT FUNCTIONS
+			function tell_git_dir() {
+				str_out="git";
+				printf "%${COLUMNS}s\n" "${str_out}";
+			}
+
+			function show_git_status() {
+				cv_git_str="";
+				separator_v=""
+				non_stagging_files_count="$(git status --porcelain | wc -l)";
+				if [[ ${?} != 1 ]]; then
+					if [[ ${non_stagging_files_count} != 0 ]]; then
+						cv_git_str="status: ?${non_stagging_files_count}"
+						separator_v=" | "
+					fi
+				fi
+
+				branch_name_v="$(git branch --show-current)";
+				if [[ ${?} != 1 ]]; then
+					cv_git_str="${cv_git_str}${separator_v}";
+					cv_git_str="${cv_git_str}branch: ${branch_name_v}"
+				fi
+				
+				cv_git_str="[ ${cv_git_str} ]";
+
+				printf "%s\n" "${cv_git_str}";
+			}
+
+			function custom_git() {
+				if [[ -e "./.git" ]]; then
+					#tell_git_dir;
+					show_git_status;
+				fi
+			}
+			#END -- GIT FUNCTIONS
+
+			# How to use POST_PROMPT_COMMAND and PROMPT_COMMAND:
+			#
+			# Example: 	POST_PROMPT_COMMAND=("custom_print_date; another_function1; another_function2...");
+			# 			or
+			#		PROMPT_COMMAND("${PROMPT_COMMAND[@]}; custom_print_date; another_function1...");
+			#
+
+			#POST_PROMPT_COMMAND=("custom_print_date; custom_git;");
+			PROMPT_COMMAND=("${PROMPT_COMMAND[@]}; custom_print_date; custom_git");
 
 			# And add your own customization below.
 
@@ -49537,7 +49595,7 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 			alias eza='eza --icons=always --color=always';
 			alias yay='yay --color=always';
 			alias pass-clear="echo RELOADAGENT | gpg-connect-agent > /dev/null 2>&1";
-			alias pass-get="pass -c"
+			alias pass-get="pass -c";
 
 
 			export GDK_SCALE=0.9
