@@ -49481,7 +49481,7 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 
 			# CUSTOM FUNCTIONS FOR POST_PROMPT_COMMAND:
 			function custom_print_date() {
-				date_str=$(date);
+				date_str="$(date --rfc-3339 s)";
 				printf "%${COLUMNS}s\n" "${date_str}";
 			}
 
