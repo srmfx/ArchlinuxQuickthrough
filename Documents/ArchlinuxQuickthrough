@@ -7854,7 +7854,7 @@ gpg --check-signs
 
 
 --DELETING A PUBLIC GPG KEY
-gpg --delete-public-and-secret-keys <keyname>
+gpg --delete-secret-and-public-keys <keyname>
 gpg --delete-keys <keyname>
 gpg --delete-keys --yes
 	#Deletes all keys owned by the user
@@ -49473,7 +49473,7 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 			YASH_AFTER_CD=("$YASH_AFTER_CD" '_update_direnv')
 
 			# COLUMN COUNT
-			COLUMNS="$(stty size | cut -d' ' -f2)"
+			COLUMNS="$(stty size | cut -d' ' -f2)";
 
 			# POST_PROMPT_COLUMN COUNTS AVAILABLE EMPTY COLUMNS FOR POST_PROMPT_COMMAND
 			POST_PROMPT_COLUMN=${COLUMNS};
