@@ -1491,6 +1491,7 @@ USE LICENSE:
 			REGULAR EXPRESSIONS / REGEX ON NVIM
 
 	GIT TUTORIAL 2020
+		WORKING AREA, STAGING AREA, REPOSITORY AREA, HEAD
 		SOMETHING ABOUT GIT COMMIT AND GIT PHYSICAL STORAGE METHOD
 			DELTA ENCODING
 			GIT DELTA ENCODING
@@ -1508,6 +1509,12 @@ USE LICENSE:
 			CLEANING REFERENCE LOGS
 			HOW TO UNDO A GIT RESET
 			OPTIMIZING GIT REPOSITORY
+			CHANGING THE MESSAGE OF A COMMIT THAT YOU'VE ALREADY PUSHED TO YOUR REMOTE BRANCH
+			DOWNLOADING THE LATEST METADATA AND COMMITS FROM THE REMOTE REPOSITORY WITHOUT MERGING THEM INTO THE LOCAL WORKING AREA
+			COMPARING LOCAL REPOSITORY TO REMOTE REPOSITORY | COMPARING DIFFERENCES BETWEEN LOCAL BRANCH WITH REMOTE BRANCH
+			CHECKING TOTAL DISK SIZE OF A LOCAL GIT REPOSITORY
+			CLEANING A GIT REPOSITORY | CLEANING GIT UNUSED HISTORY
+			LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH'
 	TUTORIAL AWESOME-WM
 	TUTORIAL DWM / I3-WM 2020
 	NEW QEMU TUTORIAL 2020.2-T
@@ -1672,7 +1679,19 @@ New Syntax(2023):
 ========================================S-CHANGELOG=================================================
 ====================================================================================================
 
+-014
+
+		WORKING AREA, STAGING AREA, REPOSITORY AREA, HEAD -> minor update
+		CHANGING THE MESSAGE OF A COMMIT THAT YOU'VE ALREADY PUSHED TO YOUR REMOTE BRANCH
+		DOWNLOADING THE LATEST METADATA AND COMMITS FROM THE REMOTE REPOSITORY WITHOUT MERGING THEM INTO THE LOCAL WORKING AREA
+		COMPARING LOCAL REPOSITORY TO REMOTE REPOSITORY | COMPARING DIFFERENCES BETWEEN LOCAL BRANCH WITH REMOTE BRANCH
+		CHECKING TOTAL DISK SIZE OF A LOCAL GIT REPOSITORY
+		CLEANING A GIT REPOSITORY | CLEANING GIT UNUSED HISTORY
+		LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH'
+
+
 -013
+
 		MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH -> minor update
 		CREATING GPG KEYS -> minor update
 			HOW TO GENERATE SSH KEY FROM A GPG SUBKEY
@@ -5262,6 +5281,15 @@ File Update/Insertion/Removal (also, 'git add' and 'git rm') inside the MASTER B
 you from switching to other branches, until modifications are actually COMMITED - that's unless you're
 in other branches.
 
+	VERY IMPORTANT:
+		Using "git add ." will regularly add all data, but ignore hidden files and directory entries;
+		Using "git add *" will not add hidden files/directories neither.
+		Using "git add .*" will add hidden files ONLY.
+		Using "git add ./{*,.*}" will add both, but will undesirably add .git folder to the staging area.
+		
+		The problem happens due to how the shell interpreter expand those characters.
+		To avoid problems with shell expansion, use 'git add --all' or 'git add -A'.
+
 VERY IMPORTANT: Take note that GIT uses a global buffer for implementing non-commited changes made to files called 
 INDEX, so when you move between branches/heads, you're taking the INDEX to whatever branches you are moving from/to,
 until you 'git commit -m "Commit Name"' those changes, only then it turns these changes from global
@@ -5279,7 +5307,7 @@ it's own repo and it's own working area. VCS - Versionning Control Software only
 and each user has it's own working area.
 
 Git was made by Linus Torvalds
-read more about Checking WORKING AREA, STAGING AREA, HEAD
+read more about Checking WORKING AREA, STAGING AREA, REPOSITORY AREA:
 
 VERY IMPORTANT(2023): Staging Area are the files being staged by GIT! The Working Area is the Working Directory. ex.: when one uses 'git add <file>' it will add files/directory to the staging area.
 
@@ -5287,10 +5315,10 @@ VERY IMPORTANT(2023): Staging Area are the files being staged by GIT! The Workin
 -----------------
 BEFORE YOU CONTINUE:
 	On linux, you can get easy git documentation by typing: 
-		$man git-log
+		$ man git-log
 
 	^ this will allow you check manual pages on git log command, which would be the same as doing: 
-		$git help log
+		$ git help log
 
 
 There's also a good GIT GUI Client called git-tower: https://www.git-tower.com/
@@ -5303,26 +5331,36 @@ EXERCISES SOLUTION:
 		manual: https://www.benmarshall.me/git-rebase/
 			https://git-scm.com/docs/git-rebase
 -----------------
-Working Area, Staging Area, Head Area:
-seus repositórios locais consistem em três "árvores" mantidas pelo git. a primeira delas é sua Working 
-Directory que contém os arquivos vigentes. a segunda Index que funciona como uma área temporária e 
-finalmente a HEAD que aponta para o último commit (confirmação) que você fez.
+WORKING AREA, STAGING AREA, REPOSITORY AREA, HEAD:
 
-
-Working Area, Staging Area, Repository:
-
-	The Working Area:
+	The Working Area / Working Tree / Working Directory / Work Area, Work Tree, Work Directory:
 		It's the Area that currently holds all your physical files you're currently working with in the current branch.
+		This is an area managed by 'git' and 'git' also makes it possible to link multiple working areas
+		into a single repository, thus allowing the programmer/developer to work on different branches
+		at the same time.
 
-	The Staging Area:
-		It's a Memory Buffer Area that holds all file modifications/insertions you've done 
-	so at the moment. Moving to a different branch will also move the Staging Area with the same
-	modified/inserted files from the branch before. Which will need to be either commited or dropped.
+
+	The Staging Area / The INDEX / The Cache :
+		It's a "Draft"/Cache Area that holds all file modifications/insertions you've done 
+		at the working area. 
 
 
 	The Repository Area:
-		Whenever you type 'git commit -m "MyCommit"' you're applying the changes in the staging
-	area to the the Repo. -- NEEDS TO CHECK
+		The database where Git stores snapshots (commits) of those changes permanently.
+		it stores all commit history, branches, tags, and configuration files.
+
+		Whenever you type 'git commit -m "MyCommit"' you're applying the changes stored on the staging
+		area into the repository area as a commit.
+
+		This is usually the .git directory created after 'git init' is used to create a local repository.
+
+	The HEAD:
+		The HEAD is a pointer that represents your current Working Directory, it tells git which branch or commit
+		the programmer/developer is currently working on.
+
+		When using 'git checkout', 'git switch' or when using 'git branch' for
+		creating and moving to the newly created branch, the HEAD will point to that
+		new working area/working directory.
 
 To summon it up, this is how it goes:
 	GIT ADD will add new files created in the 'Working Area' to the 'Staging Area'
@@ -5335,7 +5373,7 @@ To summon it up, this is how it goes:
 	AFTER they've ALREADY been commited to the Repository Area
 
 
-Example: typing 'git diff' will show all diferences between the Working Area and the Staging Area
+Example: typing 'git diff' will show all diferences between the Working Area and the Staging Area(The Index)
 	 'git diff --staged' will show differences between The Staging Area and the Repo Area.
 	 'git diff <id1> <id2>' will show differences between Different Repos 
 
@@ -5429,14 +5467,21 @@ git init    #Initilizaes empty Git repository in .git/
 		    ex.: ~/MyGitProject/      by typing 'git init' makes it starts a new repo on it
 					      on a hidden .git folder
 
-git add <filename>	       #This command updates the INDEX using the current content found in the working tree
+git add <filename>		#This command updates the INDEX using the current content found in the working tree
 				^ before commiting those changes.
-			       #A 2nd 'git add' to an already added file, allows to save unmodified
-			         ^ files onto the repo.
-git add *		       #Recursively adds all files to the INDEX(Staging Area)
-git add .		       #Same as above 
-git add Documentation/\*.txt   #Adds all .txt files under that directory to the INDEX(Staging Area)
-git add git-*.txt	       #Adds all files that start with git- and ends with .txt to the INDEX(Staging Area)
+				#A 2nd 'git add' to an already added file, allows to save unmodified
+				^ files onto the repo.
+
+git add --all			#Adds all data to staging area including hidden files and hidden directories.
+	or
+git add -A
+
+git add -i			#Adds files interactively
+git add *			#Recursively adds all files to the INDEX(Staging Area)
+				(WARNING: Doesn't add hidden files nor directories).
+git add .			#Same as above(WARNING: Doesn't adds hidden files or directories)
+git add Documentation/\*.txt	#Adds all .txt files under that directory to the INDEX(Staging Area)
+git add git-*.txt		#Adds all files that start with git- and ends with .txt to the INDEX(Staging Area)
 		(note.: all files under the Staging Area will need to be commited)
 
 git restore --staged B.txt     #Removes B.txt from the Staging Area
@@ -5510,12 +5555,16 @@ git reflog	       #Shows all commits, INCLUDING branch merge commits - VERY IMPO
 
 git reflog             #Shows all Heads
 
-git branch	       #Shows all branches
+git branch	       			#Shows all branches
 git branch <branch_name>		#Creates a new branch on current HEAD.
 git branch -c <new_branch>		#Creates a new branch BY CLONING the current branch. 
 git branch -m <new_branch_name>		#Renames the current branch to a new name.
 git branch -d <branch_name>		#Deletes Branch / Removes Branch
 git branch -d -f <branch_name>		#Force Deletes Branch in case of issues.	
+git checkout --orphan <new_branch>		#Creates an empty branch with all current working directory files
+git switch --orphan <new branch>		#Creates an empty orphan branch with no relation to any other branch.
+						^ VERY IMPORTANT: This branch can't merge any other branches and
+						vice-versa!
 
 git restore --source <branch_name> -- <filename> 	#Restores/Retrieves/Copy a single file from another branch
 git checkout -b <branch> <commit_id> #Creates branch from current commit or commit_id
@@ -5558,6 +5607,11 @@ git commit <filename> -m "Message"  #Commits changes to a given file.
 					^ ex.: git commit ./source/Main<tab><tab>
 					^ will auto-complete to: ./source/MainComponentes/StaggedFile.cpp
 
+
+git add --all			#Adds all data to staging area including hidden files and hidden directories.
+	or
+git add -A
+
 git add -f 			    #Adds file by force to staging area.
 				    ^ VERY USEFUL/VERY IMPORTANT: normally files aren't added with 'git add' 
 				    if they're on the .gitignore list, so this is where it's useful.
@@ -5584,13 +5638,20 @@ man git-stash
 		http://git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages
 
 
+git ls-files			# Lists all tracked files in the current repository and branch
+git count-objects -vH		# Counts Total Disk Space Consumed by tracked files and all branches in a git repository
+git status --ignored		# Lists all ignored files in .gitignore
 git status -uall --ignored  	#Lists both ignored and untracked files
 				^ VERY USEFUL/VERY IMPORTANT: Use this before doing any of the 'git clean' commands
 				to avoid permanent data loss.
 
 git rm <filename> 	    #removes a file from being Tracked AND DELETES IT SAFELY
-git rm -f <filename>        #forcefully removes a file from being checked AND DELETES IT
-git rm --cached <filename>  #removes a file from being checked, retainning the original file
+git rm -f <filename>        #forcefully removes a file from the staging area and DELETES IT from the current
+			    working directory.(WARNING)
+
+git rm --cached <filename>  #removes a file from the staging area, retainning the original file in the
+			    working area, without deletion.
+
 			    ^remove a file from being tracked with --cached flag,  will also require 
 			    file to be physically removed.
 
@@ -5634,6 +5695,10 @@ git checkout <branch>	    #Sets HEAD into given branch
 git checkout <commit_id>   		  #Goes back to the previous commit changes!
 git checkout -b <new branch> <commit_id>  #Turns all current work into a new Branch without commiting
 git branch -d <branch>			  #Deletes Branch / Removes Branch
+git checkout --orphan <new_branch>		#Creates an empty branch with all current working directory files
+git switch --orphan <new branch>		#Creates an empty orphan branch with no relation to any other branch.
+						^ VERY IMPORTANT: This branch can't merge any other branches and
+						vice-versa!
 
 git revert <commit_id>		#Pulls out any modification made by a given commit in such a way that it would be like
 				if the commit has never happened. Avoid using this in public/remote repos.
@@ -5709,25 +5774,45 @@ git stash pop <ID_NUMB>     #Applies the given stash for commiting in the curren
 			    ex.: 
 			    		git stash pop stash@{2}
 
-git stash apply <ID_NUMB>   #SAME AS ABOVE, but DOES NOT remove stash from the list, useful if you want to apply
-			    same changes to another branch.
+git stash apply <ID_NUMB>	#SAME AS ABOVE, but DOES NOT remove stash from the list, useful if you want to apply
+				same changes to another branch.
 
-git stash drop <ID_NUMB>   #Removes a given stash
-git stash clear		    #Removes all stored stashes, WARNING: irreversible
+git stash drop <ID_NUMB>	#Removes a given stash
+git stash clear			#Removes all stored stashes, WARNING: irreversible
 			
 ---
 
-git diff stash		    #Checks difference between Working Area and Stash
-git difftool stash	    #Same as bove, but lists file differences side-by-side, vim/nvim style
+git diff <branch>		#Check difference between current working area and the staging area(the index)
 
-git branch				    #Lists all branches in existance
-git branch <branchname>			    #Creates a new branch
-git branch <branchname> <old_branch>	    #Creates new branch from old_branch commits
-git branch -d <branchname>		    #Deletes a branch
+git diff <local_branch> <local_branch2>		#Check differences between a local branch and another local branch.
+git diff <local_branch> <remote_branch>		#Check difference between a local branch with a remote branch
+						EXAMPLE: - Fetching an existing remote branch and comparing -
+							1) Fetching remote branch
+								$ git fetch gitlab
+
+							2) Comparing  Local with remote branch:
+								$ git diff master remotes/gitlab/master
+
+git diff stash			#Checks difference between Working Area and Stash
+git difftool stash		#Same as bove, but lists file differences side-by-side, vim/nvim style
+
+git diff --staged		#Checks differences between Staging area(The INDEX) and the HEAD Commit.
+	or
+git diff --cached		#Same as above.
+
+git diff HEAD			#Checks difference between the Working Area and the HEAD commit.
+
+
+git branch					#Lists all branches in existance
+git branch <branchname>				#Creates a new branch
+git branch <branchname> <old_branch>		#Creates new branch from old_branch commits
+git branch -d <branchname>			#Deletes a branch
 git branch -df <branchname>			#Force deletes a branch
-git switch <branchname>			    #Switches to a different branch
-git switch --orphan <new branch>	    #Creates an empty orphan branch with no relation to any other branch.
-					    ^ VERY IMPORTANT: This branch can't merge any other branches and vice-versa!
+git switch <branchname>				#Switches to a different branch
+git checkout --orphan <new_branch>		#Creates an empty branch with all current working directory files
+git switch --orphan <new branch>		#Creates an empty orphan branch with no relation to any other branch.
+						^ VERY IMPORTANT: This branch can't merge any other branches and
+						vice-versa!
 
 git push <remote-name> <local-branch-name>:<remote-branch-name>		#Creates new branch on remote repository based on an
 									^ already existing local branch.
@@ -5737,6 +5822,22 @@ git push <remote-name> <local-branch-name>:<remote-branch-name>		#Creates new br
 									already exists!
 
 									ex.: git push projectmram shareware:shareware
+
+git push --force --set-upstream gitlab master	#Links the current local branch to a remote branch named 'master' and
+						then pushes the data into the given named branch.
+						Note: this allows more clean and simple 'git push' command where only
+						the name of the remote repository is needed for doing a given push.
+						ex: - pushing from master branch into remote master branch -
+							$ git push <remote_name>
+
+							Note: without --set-upstream, the user has to type <branch_name>
+								$ git push <remote_name> <branch_name>
+						
+						VERY IMPORTANT:
+							When both doing --set-upstream and the given branch doesn't
+							exists on the remote repository, then the branch will
+							automatically be created by the remote git repository.
+						
 
 git remote show [repository_name]		#Checks if a git repository is up to date, both remotely and locally.
 
@@ -5749,6 +5850,8 @@ git push [repository_name] <remote_branch>			#Pushes current branch to remote br
 git push --force origin				#Force pushes current branch to remote
 						Note: Useful when cleaning commit history on non-public branches.
 
+git push --force --set-upstream gitlab master	#FOR MORE INFO: READ ABOVE THE SAME COMMAND.
+
 git reset HEAD [filename|branchname]  		#Undoes file or branch deletion
 				       
 git checkout <branchname>	     		#Switches current branch to <branchname>
@@ -5758,10 +5861,20 @@ git checkout -b <branchname> <old_branchname> 	#Creates a new branch called new_
 						  ^ and switches to it.
 git checkout --orphan <new_branch_name>		#Creates an orphan empty branch, containning no commits nor log history.
 
-git diff					    #Shows difference between Working Area and Current Branch.
-git difftool					    #ALTERNATE OPTION, but lists file differences side-by-side, vim/nvim style
+git diff 					#Check difference between current working area and the staging area(the index)
+
+git difftool					#ALTERNATE OPTION, but lists file differences side-by-side, vim/nvim style
+
+git diff <local_branch> <remote_branch>			#Check difference between a local branch with a remote branch
+							ex: - Fetching an existing remote branch and comparing -
+								1) Fetching remote branch
+									$ git fetch gitlab
+
+								2) Comparing  Local with remote branch:
+									$ git diff master remotes/gitlab/master
+
 git diff --name-only				    #Same as above, only displays filenames that had been changed.
-git diff <branch origem> <branch destino>	    #Shows difference between two different branches.
+git diff <branch origem> <branch destine>	    #Shows difference between two different branches.
 git diff stash					    #Shows difference between Working Area and Stash.
 git diff <branch_id>				    #Shows difference between Working Area and given branch_id.
 git diff <filename>				    #Shows difference for a given file between Working Area and Current Branch. 
@@ -5888,7 +6001,9 @@ To fix this, you can either remove the file by hand from the staged area, or do 
 	$ git rm -r --cached .
 
 3) Re-add all files again to staging area, this time taking .gitignore in consideration:
-	$ git add .
+	$ git add -A
+		or
+	$ git add --all
 
 4) Commit untracked files change:
 	$ git commit -m "Fixed untracked files"
@@ -5897,7 +6012,7 @@ Here is the complete script:
 	$ git commit -a -m "Committing everything"
 
 	$ git rm -r --cached .
-	$ git add .
+	$ git add --all 
 	$ git commit -m "fixed untracked files"
 
 --------------------------
@@ -5907,12 +6022,69 @@ CHANGING THE MESSAGE OF A COMMIT THAT YOU'VE ALREADY PUSHED TO YOUR REMOTE BRANC
 If you've already pushed your commit up to your remote branch, then - after amending your commit locally (as described above) - you'll also need to force push the commit with:
 
 git push <remote> <branch> --force
-# Or
+	Or
 git push <remote> <branch> -f
 
 WARNING: force-pushing will overwrite the remote branch with the state of your local one. If there are commits on the remote branch that you don't have in your local branch, you will lose those commits.
 
 WARNING: be cautious about amending commits that you have already shared with other people. Amending commits essentially rewrites them to have different SHA IDs, which poses a problem if other people have copies of the old commit that you've rewritten. Anyone who has a copy of the old commit will need to synchronize their work with your newly re-written commit, which can sometimes be difficult, so make sure you coordinate with others when attempting to rewrite shared commit history, or just avoid rewriting shared commits altogether.
+--------------------------
+--------------------------
+DOWNLOADING THE LATEST METADATA AND COMMITS FROM THE REMOTE REPOSITORY WITHOUT MERGING THEM INTO THE LOCAL WORKING AREA
+	$ git fetch <remote>
+
+		Example:
+			$ git fetch origin
+				or
+			$ git fetch gitlab
+--------------------------
+--------------------------
+COMPARING LOCAL REPOSITORY TO REMOTE REPOSITORY | COMPARING DIFFERENCES BETWEEN LOCAL BRANCH WITH REMOTE BRANCH
+
+	1) Fetch and update the repository reference in the local repository:
+		$ git fetch <remote>
+
+			Example:
+				$ git fetch origin
+					or
+				$ git fetch gitlab
+
+	2) Comparing  Local with remote branch:
+		$ git diff master remotes/gitlab/master
+--------------------------
+--------------------------
+CHECKING TOTAL DISK SIZE OF A LOCAL GIT REPOSITORY
+	$ git count-objects -vH
+	
+--------------------------
+--------------------------
+CLEANING A GIT REPOSITORY | CLEANING GIT UNUSED HISTORY
+	Very Important: All data not added to the staging area, commited or .gitignore file will be wiped out.
+		$ git gc --prune=now
+
+
+--------------------------
+--------------------------
+LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH'
+	Links the current local branch to a remote branch named 'master' and then pushes the data into
+	the given named branch.
+
+	Note: this allows more clean and simple 'git push' command since only the name of the remote repository is
+	needed for a given push.
+
+		$ git push --force --set-upstream gitlab master	
+
+		example: - pushing from master branch into remote master branch -
+			$ git push <remote_name>
+
+			Note: without --set-upstream, the user has to type <branch_name>
+				$ git push <remote_name> <branch_name>
+
+
+	VERY IMPORTANT:
+		When both doing --set-upstream and the given branch doesn't
+		exists on the remote repository, then the branch will automatically be
+		created by the remote git repository.
 --------------------------
 --------------------------
 ADVANCED GIT:
@@ -6290,6 +6462,9 @@ CLEANING COMMIT HISTORY FROM MAIN BRANCH
 				Even under the same name, git will complain about new upstream branch not being set.
 					$ git push --set-upstream origin main 
 
+				Note: If the branch you are pushing does not yet exist on the configured remote 'origin',
+				then this command will create a new branch on the remote repository.
+
 			1.9 - (Optional) If you really don't want to keep the history around you can completely 
 			throw away the branch created on step #1.1f:
 				$ git branch -df <branch_name_from_step_1>
@@ -6325,13 +6500,18 @@ CLEANING REFERENCE LOGS
 		$ git reflog expire --expire=90.days.ago --expire-unreachable=now --all
 
 HOW TO UNDO A GIT RESET
-	1) Display git reference log and find the reset commit
-		$ git reflog
+	These instructions undoes unwanted or accidental git-reset commands:
 
-	2) Reset the repository to that specific commit
-		$ git reset --hard <commit_number>
-			or
-		$ git reset --hard HEAD@{1}
+		1) Display git reference log and find the reset commit
+			$ git reflog
+
+		2) Reset the repository to that specific commit
+			$ git reset --hard <commit_number>
+				or
+			$ git reset --hard HEAD@{1}
+
+		3)(OPTIONAL) Pushing changes to remote repository:
+			$ git push --force
 	
 	NOTE:  For undoing changes in a shared or public repository, use git-revert instead of git-reset.
 
@@ -16044,9 +16224,9 @@ C) Now initialize git repository:
 
 D) Add all files to the staging area:
 	
-	1 - git add .
+	1 - git add --all
 		or 
-	    git add *
+	    git add -A
 
 E) Make your first commit:
 
@@ -38298,7 +38478,7 @@ SOME BROOT FILE EXPLORER
 				--SYNTAX:
 					git diff <branch1> <branch2> -- <file>
 						or
-					git diff <branch1> <commit_id -- <file>
+					git diff <branch1> <commit_id> -- <file>
 
 				--EXAMPLE - Comparing files from different branches / commits - :
 					$ git diff new_pull working_branch -- Microsoft/config-wsl
