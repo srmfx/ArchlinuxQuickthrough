@@ -1503,6 +1503,9 @@ USE LICENSE:
 		ADVANCED GIT
 		GIT OAUTH TOKEN | VERY IMPORTANT 2023
 		GIT GPG - SIGNING GITHUB COMMIT LOCALLY AND REMOTELY | VERY IMPORTANT(2024):
+		GIT WORKTREES
+			CREATING SIBLING WORKTREE
+			CREATING NESTED WORKTREE
 		GIT TROUBLESHOOTING
 			CLEANING COMMIT HISTORY - THE EASIER WAY
 			CLEANING COMMIT HISTORY FROM MAIN BRANCH
@@ -1514,7 +1517,10 @@ USE LICENSE:
 			COMPARING LOCAL REPOSITORY TO REMOTE REPOSITORY | COMPARING DIFFERENCES BETWEEN LOCAL BRANCH WITH REMOTE BRANCH
 			CHECKING TOTAL DISK SIZE OF A LOCAL GIT REPOSITORY
 			CLEANING A GIT REPOSITORY | CLEANING GIT UNUSED HISTORY
-			LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH'
+			LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH' | CREATING NEW BRANCH ON REMOTE REPOSITORY
+			QUICKLY REWRITE GIT REPOSITORY HISTORY | REWRITTING GIT HISTORY | ERASING FILES FROM ALL COMMITS AND BRANCHES
+			GIT MERGING A SINGLE FILE FROM ANOTHER BRANCH
+
 	TUTORIAL AWESOME-WM
 	TUTORIAL DWM / I3-WM 2020
 	NEW QEMU TUTORIAL 2020.2-T
@@ -1680,18 +1686,21 @@ New Syntax(2023):
 ====================================================================================================
 
 -014
-
+		GIT WORKTREES
+			CREATING SIBLING WORKTREE
+			CREATING NESTED WORKTREE
+		GIT MERGING A SINGLE FILE FROM ANOTHER BRANCH
+		QUICKLY REWRITE GIT REPOSITORY HISTORY | REWRITTING GIT HISTORY | ERASING FILES FROM ALL COMMITS AND BRANCHES
 		WORKING AREA, STAGING AREA, REPOSITORY AREA, HEAD -> minor update
 		CHANGING THE MESSAGE OF A COMMIT THAT YOU'VE ALREADY PUSHED TO YOUR REMOTE BRANCH
 		DOWNLOADING THE LATEST METADATA AND COMMITS FROM THE REMOTE REPOSITORY WITHOUT MERGING THEM INTO THE LOCAL WORKING AREA
 		COMPARING LOCAL REPOSITORY TO REMOTE REPOSITORY | COMPARING DIFFERENCES BETWEEN LOCAL BRANCH WITH REMOTE BRANCH
 		CHECKING TOTAL DISK SIZE OF A LOCAL GIT REPOSITORY
 		CLEANING A GIT REPOSITORY | CLEANING GIT UNUSED HISTORY
-		LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH'
+		LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH' | CREATING NEW BRANCH ON REMOTE REPOSITORY
 
 
 -013
-
 		MY CUSTOM RUNTIME CONFIGURATION FILE FOR YASH -> minor update
 		CREATING GPG KEYS -> minor update
 			HOW TO GENERATE SSH KEY FROM A GPG SUBKEY
@@ -5690,6 +5699,12 @@ git checkout -- <filename>  #Discard changes from being made in the commit AND U
 			    setting them to their original previous state 
 			    ^- Use in case File has been Modified/Updated
 				Checkout only works for undoing changes in the staging area.
+
+git checkout <branch> -- <filename/dirname>		#Fetches file from the given branch and copies into current
+							branch.
+git checkout --patch <branch> <filename/dirname>	#Does a Selective Merging by fetching a single file/dir from
+							the given branch.
+
 git checkout <branch>	    #Sets HEAD into given branch
 
 git checkout <commit_id>   		  #Goes back to the previous commit changes!
@@ -5837,6 +5852,8 @@ git push --force --set-upstream gitlab master	#Links the current local branch to
 							When both doing --set-upstream and the given branch doesn't
 							exists on the remote repository, then the branch will
 							automatically be created by the remote git repository.
+
+							Note, this will also create a new branch in the remote repo.
 						
 
 git remote show [repository_name]		#Checks if a git repository is up to date, both remotely and locally.
@@ -6065,7 +6082,7 @@ CLEANING A GIT REPOSITORY | CLEANING GIT UNUSED HISTORY
 
 --------------------------
 --------------------------
-LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH'
+LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH' | CREATING NEW BRANCH ON REMOTE REPOSITORY
 	Links the current local branch to a remote branch named 'master' and then pushes the data into
 	the given named branch.
 
@@ -6085,6 +6102,38 @@ LINKING CURRENT LOCAL BRANCH TO REMOTE BRANCH FOR 'GIT PUSH'
 		When both doing --set-upstream and the given branch doesn't
 		exists on the remote repository, then the branch will automatically be
 		created by the remote git repository.
+--------------------------
+--------------------------
+QUICKLY REWRITE GIT REPOSITORY HISTORY | REWRITTING GIT HISTORY | ERASING FILES FROM ALL COMMITS AND BRANCHES
+	The package 'git-filter-repo' works as a replacement for filter-branch.
+	It allows the developer to quickly get rid of data from all branches and commits by quickly erasing
+	it from the entire git repository.
+
+		Syntax:
+			$ git filter-repo --path <path/to/remove> --invert-paths
+
+		Practical Example:
+			$ git filter-repo --path folder-to-remove/ --invert-paths
+
+	VERY IMPORTANT:
+		Make sure to create a local backup copy before using this command as it's irreversible and affects
+		all branches, history and commits!
+
+	source: https://github.com/newren/git-filter-repo | package author: Antonio Rojas <arojas@archlinux.org>
+
+--------------------------
+--------------------------
+GIT MERGING A SINGLE FILE FROM ANOTHER BRANCH
+	Either pick Method A or B, not both.
+	Method A will allow you to selectively patch which parts of a file you want to be merged.
+	Method B will fetch the entire file.
+
+	Method A: - Selective Merging a single file/dir from the given branch - 
+		$ git checkout --patch <branch> <filename/dirname>	
+
+	Method B: - Fetches file from the given branch and copies into current branch - 
+		$ git checkout <branch> -- <filename/dirname>		
+
 --------------------------
 --------------------------
 ADVANCED GIT:
@@ -6405,6 +6454,86 @@ git reflog example:
 *				4(Optional) - Read more on GITHUB OAUTH AUTHENTICATION:
 *					read topic: GIT OAUTH TOKEN | VERY IMPORTANT 2023
 
+
+------
+------
+------
+------
+GIT WORKTREES
+	CREATING SIBLING WORKTREE
+		A Sibling Worktree can be created in the same PARENT directory as the repository.
+		example:
+			1) Change directory into project's main repository:
+				$ cd ~/Project/Main\ Repository
+
+			2) Create Sibling Worktree
+				$ worktree add ../<path/to/worktree> <branch>
+
+				Practical Example:
+					$ worktree add ../testing testing
+
+			3) Change directory to Sibling Worktree
+				$ cd ~/Project/testing
+
+	CREATING NESTED WORKTREE
+		A Nested worktree can be created within the the working directory if a branch.
+		For this to work, it's necessary to create a .worktree directory where other branches
+		can freely become a worktree directory and finally adding this directory to the .gitignore file.
+
+			1) Checkout into the desired branch where you want to create a worktree:
+				$ git checkout master
+
+			2)(OPTIONAL) Create a .gitignore file if it doesn't already exists:
+				$ touch .gitignore
+
+			3) Create the .worktree directory:
+				$ mkdir .worktree
+
+			4) Add the worktree directory to the .gitignore file
+				[file: .gitignore ]
+					.worktree/
+				[/file]
+
+			5)(OPTIONAL) Add and then commit the changes if .gitignore was now just created:
+				$ git add .gitignore
+				$ git commit -m "Creating new file" .gitignore
+
+			6) Create the worktree for a given existing branch:
+				Syntax:
+					$ git worktree <local-directory> branch
+			
+				Practical Example:
+					$ git worktree ./.worktree/testing testing
+			
+			7) Merging .gitignore for other branches:
+				Any branch(es) that need merging into master will now complain
+				about the existing .worktree directory and it's existing sub-directories.
+
+				To avoid this issue, make sure to merge the .gitignore file
+				and then patching/selectively-merging it:
+					$ git checkout --patch <branch> -- <filename/dirname>	
+					
+					Practical Example:
+						$ git checkout testing;
+						$ git checkout --patch master -- .gitignore
+						$ git commit -m "Merging master" .gitignore
+
+
+				FOR MORE INFO, READ MORE ON:
+					GIT MERGING A SINGLE FILE FROM ANOTHER BRANCH
+
+			8 - Complete! You can now have simultaneous access to different branches
+			Check these other commands:
+				$ git worktree list				#Lists currently active worktrees
+										created in the current branch.
+
+				$ git worktree remove <path/to/worktree>	#Removes worktree
+				$ git worktree prune				#Prunes metadata for a worktree
+										that has been MANUALLY REMOVED.
+				$ tldr git-worktree
+
+------
+------
 GIT TROUBLESHOOTING 
 ------
 CLEANING COMMIT HISTORY - THE EASIER WAY
