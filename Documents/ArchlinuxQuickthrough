@@ -1504,8 +1504,10 @@ USE LICENSE:
 		GIT OAUTH TOKEN | VERY IMPORTANT 2023
 		GIT GPG - SIGNING GITHUB COMMIT LOCALLY AND REMOTELY | VERY IMPORTANT(2024):
 		GIT WORKTREES
+			ABOUT WORKTREE CONFIGURATIONS
 			CREATING SIBLING WORKTREE
 			CREATING NESTED WORKTREE
+			KEEP TRACKING OF A NESTED WORKTREE DIRECTORY
 		GIT TROUBLESHOOTING
 			CLEANING COMMIT HISTORY - THE EASIER WAY
 			CLEANING COMMIT HISTORY FROM MAIN BRANCH
@@ -1687,8 +1689,10 @@ New Syntax(2023):
 
 -014
 		GIT WORKTREES
+			ABOUT WORKTREE CONFIGURATIONS
 			CREATING SIBLING WORKTREE
 			CREATING NESTED WORKTREE
+			KEEP TRACKING OF A NESTED WORKTREE DIRECTORY
 		GIT MERGING A SINGLE FILE FROM ANOTHER BRANCH
 		QUICKLY REWRITE GIT REPOSITORY HISTORY | REWRITTING GIT HISTORY | ERASING FILES FROM ALL COMMITS AND BRANCHES
 		WORKING AREA, STAGING AREA, REPOSITORY AREA, HEAD -> minor update
@@ -6460,6 +6464,20 @@ git reflog example:
 ------
 ------
 GIT WORKTREES
+	Worktrees allow the developer to work on multiple different branches at the same time in
+	on either the working directory or a sibling directory.
+
+	VERY IMPORTANT: - ABOUT WORKTREE CONFIGURATIONS -
+		Worktree configurations can not be pushed to remote repositories and therefore can not be shared
+		unless deployment scripts are created for this exact task.
+
+		It's however possible to create a .gitkeep file for tracking an empty '.worktree' directory
+		for all branches. 
+			
+			READ MORE ON:
+				KEEP TRACKING OF A NESTED WORKTREE DIRECTORY
+
+
 	CREATING SIBLING WORKTREE
 		A Sibling Worktree can be created in the same PARENT directory as the repository.
 		example:
@@ -6532,6 +6550,29 @@ GIT WORKTREES
 										that has been MANUALLY REMOVED.
 				$ tldr git-worktree
 
+		KEEP TRACKING OF A NESTED WORKTREE DIRECTORY
+			Note: this example is meant for nested worktrees.
+	
+		1) Change directory into project's repository:
+			$ cd ~/Project/Main\ Repository
+
+		2) Create .worktree directory
+			$ mkdir ./.worktree
+
+		3) Create a .gitkeep file inside the worktree directory:
+			$ touch ./.worktree/.gitkeep
+
+		4) Add ./.gitkeep to the project's tracking area:
+			$ git add -f .worktree/.gitkeep
+
+			NOTE: -f is used here since .gitignore MUST contain .worktree/ directory
+			on the ignore list.
+
+		5) Create a commit:
+			$ git commit -m "Adding .worktree/ directory" .worktree/.gitkeep
+		
+		6) Complete! This is merely here to simplify worktree creation for other users and branches
+		who merge into the main Repository's branch. This can ease up script creation.
 ------
 ------
 GIT TROUBLESHOOTING 
