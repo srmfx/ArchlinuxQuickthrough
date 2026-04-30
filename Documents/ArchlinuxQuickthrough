@@ -1135,6 +1135,23 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS A:
+	SESH - TERMINAL MULTIPLEXER
+		CREATING A TMUX SESSION USING SESH
+		USING SESSION PICKER FOR SESH
+		DETACHING FROM TMUX
+		RE-ATTACHING TMUX SESSIONS USING SESH
+
+	TMUX - TERMINAL MULTIPLEXER
+		TMUX MANAGEMENT
+			CREATING A TMUX SESSION
+			LISTING FULL LIST OF COMMANDS
+			LISTING EXISTING SESSIONS
+			DETACHING FROM TMUX
+			RE-ATTACHING TMUX SESSIONS USING SESH
+			OTHER TMUX COMMANDS
+		MOST USED TMUX HOTKEYS
+		TMUX HOTKEYS
+
 	FISH, A VERY MODERN COMMANDLINE SHELL
 		FISH CONFIGURATION FILE
 			SYSTEM-WIDE CONFIGURATION FILE:
@@ -1688,6 +1705,8 @@ New Syntax(2023):
 ====================================================================================================
 
 -014
+		SESH - TERMINAL MULTIPLEXER
+		TMUX - TERMINAL MULTIPLEXER
 		GIT WORKTREES
 			ABOUT WORKTREE CONFIGURATIONS
 			CREATING SIBLING WORKTREE
@@ -6460,6 +6479,294 @@ git reflog example:
 
 
 ------
+------
+------
+------
+SESH - TERMINAL MULTIPLEXER
+	SESH is a commandline interface tool that enhances TMUX by allowing easy management of multiple TMUX Sessions.
+	It also uses 'zoxide' and 'fzf'(fuzzy finder) to easily create and connect to sessions.
+	
+	SESH searches on zoxide database entries and uses 'fzf' for allowing easy TMUX Session selection
+	and management.
+
+	Allows for fast switching and management between projects and code directories.
+
+		READ MORE ON TO LEARN ABOUT TMUX:
+			TMUX - TERMINAL MULTIPLEXER
+	
+	CREATING A TMUX SESSION USING SESH
+		This will use the current path as a new session:
+			$ sesh connect <path/to/directory>
+
+		Note: 'sesh' will automatically rename sessions to the <path/to/directory> given above,
+		whereas 'tmux' will not give any name.
+
+	USING SESSION PICKER FOR SESH
+		Sesh will launch it's interactive picker for creating a TMUX session.
+
+		$ sesh picker
+
+		Note: Picking a directory where a session has already been created for will result in error.
+		use 'tmux' to normally re-attach to pre-existing sessions.
+	
+	DETACHING FROM TMUX
+		Detachment is done within a instantiated session:
+
+		1) Detaching:
+			ctrl + b, d
+
+	
+	RE-ATTACHING TMUX SESSIONS USING SESH
+		Simply use tmux to list and re-attach to existing sessions:
+		
+		1)(OPTIONAL) Listing Tmux Sessions:
+			$ tmux ls
+
+		2) Re-attach to existing session:
+			$ tmux -a
+
+		3) List available sessions and windows from within tmux:
+			ctrl + b, w
+
+		
+
+------
+------
+------
+------
+TMUX - TERMINAL MULTIPLEXER
+	TMUX is a window and session manager for the terminal.
+	It allows to create and manage mulitple sessions and multiple windows and panes
+	and keep all processes within running even after TMUX is closed as long as the session(s)
+	have not been killed.
+
+	Tmux was designed with surviving terminal disconnection / network drops in mind,
+	making it ideal for SSH Connection It acts as a "shield" for your terminal session,
+	keeping processes running and keeping your work intact even if your network connection
+	drops or your computer goes to sleep.
+
+	Unlike other programs, when losing connection to a SSH Server from a SSH Client,
+	TMUX will keep all processes running in the background on the server side,
+	thus allowing a session re-attachment when connection is retrieved.
+	(normally, all programs are killed after the user disconnects from an SSH Server).
+
+	When an SSH session disconnects, the server's shell sends a SIGHUP (Hangup)
+	signal to all active child processes, but TMUX keeps it persistent.
+
+	TMUX also allow acessing sessions from different locations at the same time.
+
+	TMUX MANAGEMENT
+		CREATING A TMUX SESSION
+			$ tmux new <session-name>
+
+		LISTING FULL LIST OF COMMANDS
+			$ tmux list-commands
+		
+		LISTING EXISTING SESSIONS
+			$ tmux ls
+
+		RE-ATTACHING TO AN EXISTING SESSION
+			$ tmux a
+
+		DETACHING FROM TMUX
+			Detachment is done within a instantiated session:
+
+			1) Detaching:
+				ctrl + b, d
+
+		
+		RE-ATTACHING TMUX SESSIONS USING SESH
+			Simply use tmux to list and re-attach to existing sessions:
+			
+			1)(OPTIONAL) Listing Tmux Sessions:
+				$ tmux ls
+
+			2) Re-attach to existing session:
+				$ tmux -a
+
+			3) List available sessions and windows from within tmux:
+				ctrl + b, w
+
+		OTHER TMUX COMMANDS
+			$ last-pane [-deZ] [-t target-window]
+				or
+			$ lastp
+			----
+			$ last-window [-t target-session]
+				or
+			$ last
+			----
+			$ link-window [-abdk] [-s src-window] [-t dst-window]
+				or
+			$ linkw 
+			----
+			$ list-buffers [-F format] [-f filter]
+				or
+			$ lsb
+			----
+			$ list-clients [-F format] [-f filter] [-t target-session]
+				or
+			$ lsc
+			----
+			$ list-commands [-F format] [command]
+				or
+			$ lscm
+			----
+			$ list-keys [-1aN] [-P prefix-string] [-T key-table] [key]
+				or
+			$ lsk
+			----
+			$ list-panes [-as] [-F format] [-f filter] [-t target-window]
+				or
+			$ lsp
+			----
+			$ list-sessions [-F format] [-f filter]
+				or
+			$ ls
+			----
+			$ list-windows [-a] [-F format] [-f filter] [-t target-session]
+				or
+			$ lsw
+
+	MOST USED TMUX HOTKEYS
+		All Hotkeys must be prefixed with 'CTRL+B', unless stated otherwise:
+
+			MAIN
+				C		#Customization Configuration Options.
+				/		#Describe Keybinding.
+						Note: VERY Usefull. 
+				page-up		#Enter COPY MODE and SCROLL UP all the way.
+				[		#Enter COPY MODE.
+
+			WINDOW
+				?		#List Key Bindings.
+				c		#Create a new window.
+				w		#Choose a Window from a List
+				'		#Prompt Window Select / Interactive Window Selection.
+				0..1		#Select Window.
+				.		#Changes current window index to a new different index.
+				&		#Kill current window(Shuts down TMUX Session if it's the last window remainning)
+				,		#Rename current window
+
+			PANE
+				z		#Zooms in/out the active pane - Makes current pane the main screen
+						when multiple panes exist.
+
+				%		#Split Window Horizontally(Uses the same window) - Creates new pane.
+				"		#Split Window Vertically(Uses the same window) - Creates new pane.
+				arrow_keys <left/right/up/down>			#Moves/Changes to different pane.
+				arrow_keys <left/right/up/down>			#Moves/Changes current pane to a different pane.
+				alt + arrow_keys <left/right/up/down>		#Resize Pane up by 5 on the given direction
+
+				!		#Break Current Pane into a new Window / Creates new window from current pane
+						Note: Doesn't create new window if there are no panes to move.
+				space_bar	#Select Next Layout Arrangement
+				ctrl+o		#Rotate through the panes
+				alt+o		#Rotate throught the panes in Reverse.
+
+
+			SESSION
+				( or )		#Switch to next TMUX Session(must have been created first).
+				s		#Choose session from a list.
+				$		#Renames current session.
+				
+				
+			CLIENT
+				d		#Quit TMUX by Detaching the current client (Doesn't kills session)
+						Note: Closes down tmux without killing/shutting down the TMUX session.
+						session can be re-opened later with:
+							$ tmux -a
+				ctrl+z		#Suspend the current Client (Doesn't kills session).
+
+				note: Quitting using the 'exit' command on shell will kill the tmux session if
+				you're in the last available window.
+
+
+	TMUX HOTKEYS
+		All Hotkeys must be prefixed with 'CTRL+B', unless stated otherwise:
+
+		MAIN	
+			?		#List Key Bindings.
+			:		#TMUX Prompt Command.
+			c		#Create a new window.
+			w		#Choose a Window from a List
+			$		#Rename current session.
+			C		#Customization Configuration Options.
+			r		#Redraw current client.
+			~		#Show Messages.
+			/		#Describe Keybinding.
+					Note: VERY Usefull. 
+			page-up		#Enter COPY MODE and SCROLL UP all the way.
+			[		#Enter COPY MODE.
+
+			ctrl+b		#Sends the prefix key.
+
+		CLIENT
+			d		#Quit TMUX by Detaching the current client
+					Note: Closes down tmux without killing/shutting down the TMUX session.
+					session can be re-opened later with:
+						$ tmux -a
+
+			D		#Choose and detach a client from the list.
+			L		#Switches to the last client
+			ctrl+z		#Suspend the current Client (Doesn't kills session).
+
+			note: Quitting using the 'exit' command on shell will kill the tmux session if
+			you're in the last available window.
+
+
+
+		BUFFER
+			-		#Delete the most recent paste buffer.
+			=		#Choose a paste buffer from a list.
+			]		#Paste the most recent paste buffer.
+
+		WINDOW / PANE
+			A Single Window can contain panes that can be split vertically/horizontally.
+
+				PANE CONTROLS
+					z		#Zooms in/out the active pane - Makes current pane the main screen
+							when multiple panes exist.
+					>		#Display Pane Menu
+					x		#Kills the active pane
+					!		#Break Pane into a new Window / Creates new window from current pane
+							Note: Doesn't create new window if there are no panes to move.
+					arrow_keys <left/right/up/down>		#Moves/Changes to different pane.
+
+					;		#Moves/Changes to previous active pane.
+					%		#Split Window Horizontally(Uses the same window) - Creates new pane.
+					"		#Split Window Vertically(Uses the same window) - Creates new pane.
+					E		#Spread panes out evenly
+
+					{ .. }		#Swaps active pane with the pane above or below
+					m		#Mark/Unmark the Current Pane
+					M		#Clear the Marked Pane
+					alt+arrow_keys <left/right/up/down>	#Resize Pane up by 5 on the given direction
+					ctrl+arrow_keys <left/right/up/down>	#Resize Pane on the given direction.
+					space_bar	#Select Next Layout Arrangement
+					ctrl+o		#Rotate through the panes
+					alt+o		#Rotate throught the panes in Reverse.
+
+
+				WINDOW CONTROLS
+					c		#Create a new window
+					<		#Display Window Menu.
+					w		#Choose a Window from a List
+					'		#Prompt Window Select / Interactive Window Selection.
+					0..1		#Select Window.
+					.		#Changes current window index to a new different index.
+
+					&		#Kill current window(Shuts down TMUX Session if
+							using the last window).
+					,		#Rename current window
+
+		SESSION
+			( or )		#Switch to next TMUX Session.
+			s		#Choose session from a list.
+			$		#Renames current session.
+
+		MISC
+			t		#Show a clock.
 ------
 ------
 ------
