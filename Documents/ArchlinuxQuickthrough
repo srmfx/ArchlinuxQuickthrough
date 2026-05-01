@@ -1146,9 +1146,17 @@ USE LICENSE:
 			CREATING A TMUX SESSION
 			LISTING FULL LIST OF COMMANDS
 			LISTING EXISTING SESSIONS
+			LISTING KEY BINDINGS
 			DETACHING FROM TMUX
 			RE-ATTACHING TMUX SESSIONS USING SESH
 			OTHER TMUX COMMANDS
+			TMUX CUSTOM SETTINGS
+				ENABLING TMUX VI/VIM MODE | CHANGING TMUX COPY MODE
+				CUSTOM COLORED STATUS BAR
+				CUSTOM COLORED WINDOWS
+					CHANGING BACKGROUND COLOR PER WINDOW
+					CHANGING BACKGROUND COLOR PER PANE
+				TMUX CONFIGURATION FILE
 		MOST USED TMUX HOTKEYS
 		TMUX HOTKEYS
 
@@ -6526,7 +6534,11 @@ SESH - TERMINAL MULTIPLEXER
 			$ tmux -a
 
 		3) List available sessions and windows from within tmux:
-			ctrl + b, w
+			Listing Available sessions and windows:
+				ctrl + b, w
+
+			Listing availabe sessions only:
+				ctrl + b, s
 
 		
 
@@ -6555,6 +6567,11 @@ TMUX - TERMINAL MULTIPLEXER
 
 	TMUX also allow acessing sessions from different locations at the same time.
 
+	NOTE:
+		Use 'sesh' for automatic session naming and tmux session management.
+		READ MORE ON:
+			SESH - TERMINAL MULTIPLEXER
+
 	TMUX MANAGEMENT
 		CREATING A TMUX SESSION
 			$ tmux new <session-name>
@@ -6565,8 +6582,40 @@ TMUX - TERMINAL MULTIPLEXER
 		LISTING EXISTING SESSIONS
 			$ tmux ls
 
+		LISTING KEY BINDINGS
+			The list-keys command has to be used alongside a pager tool or else it'll fail displaying
+			in a readable format.
+
+			This will list key-bindings and commands associated for each key-bind with a brief
+			description of what each of them does.
+
+				$ tmux list-keys | less
+					or
+				$ tmux list-keys | moor
+					or
+				$ tmux list-keys | lnav
+					or
+				$ tmux list-keys | bat
+
+
+				NOTE: 
+					Regarding key combinations, 'M-c' means: alt + 'c':
+						C-: Control key.
+						M-: Meta/Alt key.
+						S-: Shift key.
+
+					It's possible to combine some or all of them together, 
+					such as in C-M-x for Ctrl+Alt+x.
+
+					The SHIFT key can be simplified from using 'S-a' to just 'A'.
+					Another example would be using 'S-[' to just '{'.
+
 		RE-ATTACHING TO AN EXISTING SESSION
 			$ tmux a
+				or
+			$ tmux attach
+				or
+			$ tmux attach-session
 
 		DETACHING FROM TMUX
 			Detachment is done within a instantiated session:
@@ -6574,7 +6623,6 @@ TMUX - TERMINAL MULTIPLEXER
 			1) Detaching:
 				ctrl + b, d
 
-		
 		RE-ATTACHING TMUX SESSIONS USING SESH
 			Simply use tmux to list and re-attach to existing sessions:
 			
@@ -6582,12 +6630,20 @@ TMUX - TERMINAL MULTIPLEXER
 				$ tmux ls
 
 			2) Re-attach to existing session:
-				$ tmux -a
+				$ tmux a
 
 			3) List available sessions and windows from within tmux:
-				ctrl + b, w
+				Listing Available sessions and windows:
+					ctrl + b, w
+
+				Listing availabe sessions only:
+					ctrl + b, s
 
 		OTHER TMUX COMMANDS
+			Tmux man page will describe all of these commands in details at the
+			section 'CLIENTS AND SESSIONS', you can access it using:
+				$ man tmux
+
 			$ last-pane [-deZ] [-t target-window]
 				or
 			$ lastp
@@ -6627,21 +6683,102 @@ TMUX - TERMINAL MULTIPLEXER
 			$ list-windows [-a] [-F format] [-f filter] [-t target-session]
 				or
 			$ lsw
+	
+	TMUX CUSTOM SETTINGS
+		ENABLING TMUX VI/VIM MODE | CHANGING TMUX COPY MODE
+			tmux copy mode is used for scrolling up/down inside terminal
+			and also yanking(copy & pasting) text.
+
+			Add the following line on the following file if you want to enable
+			VI/VIM Mode for tmux:
+
+				[file: ~/.tmux.conf ]
+					setw -g mode-keys vi
+				[/file]
+
+				VERY IMPORTANT:
+					You'll still be using either "ctrl+b, [" or "ctrl+b, PAGE-UP"
+					to enter copy-mode.
+
+					HOWEVER, exiting copy mode/visual mode will change from
+					pressing 'ESC' to pressing the 'q' key.
+
+		CUSTOM COLORED STATUS BAR
+			This will change the color of the status bar
+				$ tmux set-option -g status-style bg=black
+
+			Some valid colors are:
+				green, yellow, brown, red, blue, black.
+
+		CUSTOM COLORED WINDOWS
+			Custom background colors can be set both on a per window or on a per pane basis:
+
+				CHANGING BACKGROUND COLOR PER WINDOW
+					$ tmux set -w window-style bg=black
+						or
+					$ tmux set-option -w window-style bg=black
+			
+				CHANGING BACKGROUND COLOR PER PANE
+					$ tmux set -pt:.0 window-style bg=blue
+						or
+					$ tmux set-option -pt:.0 window-style bg=blue
+
+					Note: When applying color on panes, it'll disable color appliance
+					on a per window basis.
+
+		TMUX CONFIGURATION FILE
+			Custom settings can also be set under TMUX's configuration file.
+
+			In this example, the first line will set a default status-color to blue
+			when launching tmux; the 2nd line sets up a key bind for changing the status bar color
+			to dark:
+
+				[file: ~/.tmux.conf ]
+					set-option -g set -w window-style bg=black
+					set-option -g status-style bg=blue
+					bind-key C set-option -g status-style bg=black
+				[/file]
+			
+				NOTE: 
+					Regarding key combinations, 'M-c' means: alt + 'c':
+						C-: Control key.
+						M-: Meta/Alt key.
+						S-: Shift key.
+
+					It's possible to combine some or all of them together, 
+					such as in C-M-x for Ctrl+Alt+x.
+
+					The SHIFT key can be simplified from using 'S-a' to just 'A'.
+					Another example would be using 'S-[' to just '{'.
+
 
 	MOST USED TMUX HOTKEYS
-		All Hotkeys must be prefixed with 'CTRL+B', unless stated otherwise:
+		All Hotkeys must be prefixed with 'ctrl+b', unless stated otherwise:
 
 			MAIN
+				ctrl+b		#Sends the prefix key / Prefix Key for using hotkeys listed here
+				?		#List Key Bindings.
 				C		#Customization Configuration Options.
 				/		#Describe Keybinding.
 						Note: VERY Usefull. 
 				page-up		#Enter COPY MODE and SCROLL UP all the way.
+						NOTE: - Regarding Copy Mode -
+							Copy Mode is exactly as vim's visual mode.
+							It can be used for scrolling up/down and selecting text.
+
+							It's possible to use VI/VIM's style in TMUX,
+							read more on:
+								ENABLING TMUX VI/VIM MODE | CHANGING TMUX COPY MODE
+
 				[		#Enter COPY MODE.
+				ESC		#Escape COPY MODE after entering it.
+				q		#Escape COPY MODE/VISUAL MODE when using tmux's VI/VIM Mode.
 
 			WINDOW
-				?		#List Key Bindings.
-				c		#Create a new window.
 				w		#Choose a Window from a List
+						Note: this will also list sessions alongside the windows list.
+
+				c		#Create a new window.
 				'		#Prompt Window Select / Interactive Window Selection.
 				0..1		#Select Window.
 				.		#Changes current window index to a new different index.
@@ -6651,6 +6788,7 @@ TMUX - TERMINAL MULTIPLEXER
 			PANE
 				z		#Zooms in/out the active pane - Makes current pane the main screen
 						when multiple panes exist.
+				{ or }		#Swaps Pane with the most recent active pane.
 
 				%		#Split Window Horizontally(Uses the same window) - Creates new pane.
 				"		#Split Window Vertically(Uses the same window) - Creates new pane.
@@ -6660,14 +6798,15 @@ TMUX - TERMINAL MULTIPLEXER
 
 				!		#Break Current Pane into a new Window / Creates new window from current pane
 						Note: Doesn't create new window if there are no panes to move.
+
 				space_bar	#Select Next Layout Arrangement
 				ctrl+o		#Rotate through the panes
 				alt+o		#Rotate throught the panes in Reverse.
 
 
 			SESSION
-				( or )		#Switch to next TMUX Session(must have been created first).
 				s		#Choose session from a list.
+				( or )		#Switch to next TMUX Session(must have been created first).
 				$		#Renames current session.
 				
 				
@@ -6683,9 +6822,10 @@ TMUX - TERMINAL MULTIPLEXER
 
 
 	TMUX HOTKEYS
-		All Hotkeys must be prefixed with 'CTRL+B', unless stated otherwise:
+		All Hotkeys must be prefixed with 'ctrl+b', unless stated otherwise:
 
 		MAIN	
+			ctrl+b		#Sends the prefix key / Prefix Key for using hotkeys listed here
 			?		#List Key Bindings.
 			:		#TMUX Prompt Command.
 			c		#Create a new window.
@@ -6698,8 +6838,9 @@ TMUX - TERMINAL MULTIPLEXER
 					Note: VERY Usefull. 
 			page-up		#Enter COPY MODE and SCROLL UP all the way.
 			[		#Enter COPY MODE.
+			ESC		#Escape COPY MODE after entering it.
+			q		#Escape COPY MODE/VISUAL MODE when using tmux's VI/VIM Mode.
 
-			ctrl+b		#Sends the prefix key.
 
 		CLIENT
 			d		#Quit TMUX by Detaching the current client
@@ -6728,6 +6869,7 @@ TMUX - TERMINAL MULTIPLEXER
 					z		#Zooms in/out the active pane - Makes current pane the main screen
 							when multiple panes exist.
 					>		#Display Pane Menu
+					{ or }		#Swaps Pane with the most recent active pane.
 					x		#Kills the active pane
 					!		#Break Pane into a new Window / Creates new window from current pane
 							Note: Doesn't create new window if there are no panes to move.
