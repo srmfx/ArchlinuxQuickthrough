@@ -1142,6 +1142,7 @@ USE LICENSE:
 		RE-ATTACHING TMUX SESSIONS USING SESH
 
 	TMUX - TERMINAL MULTIPLEXER
+		AUTOMATICALLY RELOADING NVIM FILES ON A TMUX SESSION
 		TMUX MANAGEMENT
 			CREATING A TMUX SESSION
 			LISTING FULL LIST OF COMMANDS
@@ -1222,6 +1223,11 @@ USE LICENSE:
 		SETTING BASH --POSIX 'VI' MODE AS SYSTEM WIDE CONFIGURATION
 
 	FZF, FUZZY FINDER COMMAND
+		TELEVISION, A VERY GOOD ALTERNATIVE TO 'FZF'
+			PRACTICAL 'TELEVISION' EXAMPLE
+			SOME 'TELEVISION' COMMANDS
+			CREATING YOUR OWN CUSTOM CHANNELS
+				CHANNEL FOR RECENTLY MODIFIED FILES
 		PRACTICAL FZF EXAMPLES
 
 	ZOXIDE, A SMARTER CD COMMAND
@@ -1713,6 +1719,8 @@ New Syntax(2023):
 ====================================================================================================
 
 -014
+		FZF, FUZZY FINDER COMMAND -> minor update
+			TELEVISION, A VERY GOOD ALTERNATIVE TO 'FZF'
 		SESH - TERMINAL MULTIPLEXER
 		TMUX - TERMINAL MULTIPLEXER
 		GIT WORKTREES
@@ -6572,6 +6580,31 @@ TMUX - TERMINAL MULTIPLEXER
 		READ MORE ON:
 			SESH - TERMINAL MULTIPLEXER
 
+	AUTOMATICALLY RELOADING NVIM FILES ON A TMUX SESSION
+		VERY IMPORTANT: When working with TMUX using same files on vim in different
+		TMUX windows or sessions, it's important to save them before changing to 
+		other sessions containning/running the same vim files.
+
+		Note: this will allow your files to be auto-reloaded upon being saved in a different
+		window/session either inside or outside TMUX.
+
+		Normally, only step #1 is required, only follow step #2 if step-#1 alone doesn't work:
+
+		1) Enable tmux focus events:
+			[file: ~/.tmux.conf ]
+				set -g focus-events on
+			[/file]
+
+		1)(OPTIONAL) Add 'set autoread' and 'autocmd' command below to nvim's initi.vim file:
+		Note: only use this if step #1 doesn't work alone.
+
+			[file: ~/.config/nvim/init.vim ]
+				colorscheme murphy
+				set fileencodings=utf8,cp936,gb18030,big5,ansi
+				set autoread
+				autocmd FocusGained {pattern=("\*"),command:="checktime"}
+			[/file]
+
 	TMUX MANAGEMENT
 		CREATING A TMUX SESSION
 			$ tmux new <session-name>
@@ -6775,6 +6808,7 @@ TMUX - TERMINAL MULTIPLEXER
 				q		#Escape COPY MODE/VISUAL MODE when using tmux's VI/VIM Mode.
 
 			WINDOW
+				,		#Rename current window
 				w		#Choose a Window from a List
 						Note: this will also list sessions alongside the windows list.
 
@@ -6783,7 +6817,6 @@ TMUX - TERMINAL MULTIPLEXER
 				0..1		#Select Window.
 				.		#Changes current window index to a new different index.
 				&		#Kill current window(Shuts down TMUX Session if it's the last window remainning)
-				,		#Rename current window
 
 			PANE
 				z		#Zooms in/out the active pane - Makes current pane the main screen
@@ -6805,9 +6838,12 @@ TMUX - TERMINAL MULTIPLEXER
 
 
 			SESSION
+				$		#Renames current session.
 				s		#Choose session from a list.
 				( or )		#Switch to next TMUX Session(must have been created first).
-				$		#Renames current session.
+				:new -s <session_name>	#Creates a new session.
+							From commandline:
+								$ tmux new -s session_name
 				
 				
 			CLIENT
@@ -50272,10 +50308,10 @@ YASH, MINIMAL POSIX-COMPLIANT COMMANDLINE SHELL
 			YASH_AFTER_CD=("$YASH_AFTER_CD" '_update_direnv')
 
 			# COLUMN COUNT
-			COLUMNS="$(stty size | cut -d' ' -f2)";
+			COLUMNS="$(stty size | cut -d' ' -f2)"
 
 			# POST_PROMPT_COLUMN COUNTS AVAILABLE EMPTY COLUMNS FOR POST_PROMPT_COMMAND
-			POST_PROMPT_COLUMN=${COLUMNS};
+			POST_PROMPT_COLUMN=$((${COLUMNS}-1));
 			POST_PROMPT_STR="";
 
 			# CUSTOM FUNCTIONS FOR POST_PROMPT_COMMAND:
@@ -50830,6 +50866,143 @@ SETTING BASH TO 'VI' MODE | VI, VIM, NVIM
 ---------------
 FZF, FUZZY FINDER COMMAND
 	An interactive filter program for any kind of list; files, command history, processes, hostnames, bookmarks, git commits, etc. It implements a "fuzzy" matching algorithm, so you can quickly type in patterns with omitted characters and still get the results you want.
+
+	TELEVISION, A VERY GOOD ALTERNATIVE TO 'FZF'
+		source: https://github.com/alexpasmantier/television
+			https://alexpasmantier.github.io/television/getting-started/quickstart/
+			https://alexpasmantier.github.io/television/getting-started/first-channel
+
+		'television' is a very fast, portable and hackable fuzzy finder, it works pretty much like 'fzf', but
+		works more like an addon with features for automatically listing all git repositories and changing
+		directories into it.
+
+
+		PRACTICAL 'TELEVISION' EXAMPLE
+			ex1: - updating available channels list - 
+				Downloads the latest collection of channel prototypes from github
+				and saves them to the local configuration directory
+					$ tv update-channels
+
+			ex2: - searching for all git repository in the local channels list -
+				$ tv git-repos
+
+		SOME 'TELEVISION' COMMANDS
+			# Custom source command
+				$ tv --source-command "find . -name '*.rs'"
+
+			# With preview
+				$ tv --source-command "fd -t f" --preview-command "bat -n --color=always '{}'"
+
+			# Adjust preview size
+				$ tv --source-command "ls -la" --preview-command "file '{}'" --preview-size 70
+
+			# Open selected file in editor
+				$ vim $(tv files)
+
+			# Change to selected directory
+				$ cd $(tv dirs)
+
+			# Copy selected file
+				$ cp $(tv files) /destination/
+
+		CREATING YOUR OWN CUSTOM CHANNELS
+			source: https://alexpasmantier.github.io/television/getting-started/first-channel
+
+			1) Create a channel directory in your home user:
+				$ mkdir -p ~/.config/television/cable
+
+			2) Create a channel file:
+				touch ~/.config/television/cable/tldr.toml
+
+			3) Add these lines to your channel file:
+				[file: ~/.config/television/cable/tldr.toml ]
+					[metadata]
+					name = "tldr"  # Actual identifier command
+					description = "Browse and preview TLDR help pages"
+					requirements = ["tldr"]
+
+					[source]
+					command = "tldr --list"
+
+					[preview]
+					command = "tldr '{}'"
+
+					[ui]
+					preview_panel = { size = 60}  # % width for preview
+
+					[keybindings]
+					shortcut = "f3"  #Press F3 anywhere to switch to this channel
+					ctrl-e = "actions:open"
+
+					[actions.open]
+					description = "Open TLDR page in pager"
+					command = "tldr '{}' | less"
+					mode = "fork"
+				[/file]
+
+				* Syntax info: 
+					metadata:
+						name:
+							This is the ACTUAL identifier command used to
+							invoke the channel. Ex: 
+								$ tv tldr
+
+						description:
+							Shown in the remote control and help.
+
+						requirements:
+							Lists required binaries - tv checks these exist at
+							runtime and warns if missing.
+					source:
+						command:
+							The shell command that produces searchable entries.
+
+					preview:
+						command:
+							Command used in the preview window.
+							The {} is a placeholder that gets replaced
+							with the selected entry, just like in 'fzf'.
+					ui:
+						preview_panel:
+							The width size of the preview window in percentage.
+							Large value will sit horizontally throught the whole screen,
+							making the source window not visible.
+
+					keybindings:
+						ctrl-e:
+							Defines the action open for the keybind ctrl+e.
+
+						shortcut:
+							Press F3 anywhere to switch to this channel
+
+					actions.open:
+						description:
+							Described the action taken when 'openning'.
+
+						command:
+							Command taken when 'openning'.
+
+						mode:
+							'Fork' runs the given command and returns
+							to 'tv' when finished.
+						
+							'execute' replaces the running 'tv' process with
+							the command (doesn't return).
+ 
+
+			CHANNEL FOR RECENTLY MODIFIED FILES
+				[file: ~/.config/television/cable/recent_files.toml ]
+					[metadata]
+					name = "recent_files"
+					description = "Recently modified files"
+					requirements = ["fd"]
+
+					[source]
+					command = "fd -t f --changed-within 7d"
+
+					[preview]
+					command = "bat -n --color=always '{}'"
+				[/file]
 
 	PRACTICAL FZF EXAMPLES
 		Ex 1: - Using fzf's selected data preview  for .cpp files using 'moor' for previewing - 
