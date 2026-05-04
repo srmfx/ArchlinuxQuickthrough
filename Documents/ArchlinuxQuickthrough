@@ -6595,7 +6595,7 @@ TMUX - TERMINAL MULTIPLEXER
 				set -g focus-events on
 			[/file]
 
-		1)(OPTIONAL) Add 'set autoread' and 'autocmd' command below to nvim's initi.vim file:
+		2)(OPTIONAL) Add 'set autoread' and 'autocmd' command below to nvim's initi.vim file:
 		Note: only use this if step #1 doesn't work alone.
 
 			[file: ~/.config/nvim/init.vim ]
