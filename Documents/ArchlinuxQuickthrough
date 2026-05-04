@@ -1144,9 +1144,26 @@ USE LICENSE:
 	TMUX - TERMINAL MULTIPLEXER
 		AUTOMATICALLY RELOADING NVIM FILES ON A TMUX SESSION
 		TMUX MANAGEMENT
+			ABOUT TMUX COMMAND MODE
+			STARTING A TMUX SERVER
+			SOME TMUX KILL COMMANDS
+				KILLING A TMUX PANE
+				KILLING A TMUX WINDOW
+				KILLING A SESSION
+				KILLING A TMUX SERVER
+			ATTACHING TO EXISTING TMUX SESSION
+				ATTACHING SESSION FROM WITHIN TMUX
+					ATTACHING TO EXISTING SESSION
+				ATTACHING TO MOST RECENT SESSION
+				ATTACHING TO A NAMED TMUX SESSION
 			CREATING A TMUX SESSION
 			LISTING FULL LIST OF COMMANDS
-			LISTING EXISTING SESSIONS
+			FINDING DOCUMENT CONTENT ON ALL WINDOWS
+			LISTING EXISTING SESSIONS AND CLIENTS
+				LISTING EXISTING TMUX CLIENTS
+				LISTING EXISTING TMUX PANES
+			FINDING WINDOW BY NAME
+				FINDING DOCUMENT CONTENT ON ALL WINDOWS
 			LISTING KEY BINDINGS
 			DETACHING FROM TMUX
 			RE-ATTACHING TMUX SESSIONS USING SESH
@@ -6606,14 +6623,138 @@ TMUX - TERMINAL MULTIPLEXER
 			[/file]
 
 	TMUX MANAGEMENT
+		ABOUT TMUX COMMAND MODE
+			tmux commands can be done both on the terminal or within tmux's command mode.
+			To use tmux's prompt command mode, press 'ctrl+b, :'(short form: C-b, :)
+
+				ex:
+					$ tmux attach-session -t <session-name>
+						or
+					:attach-session -t <session-name>
+						or
+					:a -t <session-name>
+
+
+		STARTING A TMUX SERVER
+			$ tmux start-server
+				or
+			$ tmux start
+		
+		SOME TMUX KILL COMMANDS
+			KILLING A TMUX PANE
+				Kills the most recent used pane:
+					$ tmux kill-pane -a
+						or
+					$ tmux killp -a
+						or
+					:killp -a
+
+				Kills a named pane:
+					$ tmux kill-pane -t <pane-name>
+
+			KILLING A TMUX WINDOW
+				Kills the most recent used window:
+					$ tmux kill-window -a
+						or
+					$ tmux killw -a
+						or
+					:killw -a
+				
+				Kills a named window:
+					$ tmux kill-window -t <window-name>
+
+			KILLING A SESSION
+				Kills the most recent used session:
+					$ tmux kill-session -a
+
+				Kills named session:
+					$ tmux kill-session -t <session-name>
+
+			KILLING A TMUX SERVER
+				Kills the entire tmux server, along with all sessions, windows and panes.
+					$ tmux kill-server
+						or
+					:tmux kill-server
+
 		CREATING A TMUX SESSION
+			$ tmux new-session <session-name>
+				or
 			$ tmux new <session-name>
+				or
+			:new <session-name>
+
+		ATTACHING TO EXISTING TMUX SESSION
+			ATTACHING SESSION FROM WITHIN TMUX
+				ATTACHING TO EXISTING SESSION
+					:attach-session -t <session-name>
+
+			ATTACHING TO MOST RECENT SESSION
+				$ tmux attach-session
+					or
+				$ tmux attach
+					or
+				$ tmux a
+
+			ATTACHING TO A NAMED TMUX SESSION
+				$ tmux attach-session -t <session-name>
+					or
+				$ tmux a -t <session_name>
+
+				Note: you can type either 'tmux ls' on the terminal or press ctrl+b, w (short form: C-b w),
+				within a tmux session for listing all session and windows by names.
+
 
 		LISTING FULL LIST OF COMMANDS
 			$ tmux list-commands
 		
-		LISTING EXISTING SESSIONS
+		LISTING EXISTING SESSIONS AND CLIENTS
+			$ tmux list-sessions
+				or
 			$ tmux ls
+
+			LISTING EXISTING TMUX CLIENTS
+				Will list every /dev/pts that contains a running instance of tmux:
+					$ tmux list-clients
+						or
+					$ tmux lsc
+
+			LISTING EXISTING TMUX ACTIVE WINDOWS
+				Will list every active window for each existing session:
+
+				$ tmux list-windows
+					or
+				$ tmux lsw
+
+			LISTING EXISTING TMUX PANES
+				Will list every existing pane:
+					$ tmux list-panes
+						or
+					$ tmux lsp
+
+		FINDING WINDOW BY NAME
+			$ tmux find-window -i <window_title/window_name>
+				or
+			$ tmux findw -i <window_title/window_name>
+			
+			options:
+				-i will perform a case insensitive search.
+				-r performs regex searc.
+				-C search content inside windows.
+				-N matches only the window name.
+				-T matches only the window title.
+				-Z zooms on the found window.
+
+				Default is -CNT.
+
+			FINDING DOCUMENT CONTENT ON ALL WINDOWS
+				1) Output the contents into the terminal buffer:
+					$ cat ~/Document.txt
+
+				2) Use tmux to search for contents only:
+					$ tmux findw -iC <content_string> 
+						or
+					:findw -iC <content_string>
+
 
 		LISTING KEY BINDINGS
 			The list-keys command has to be used alongside a pager tool or else it'll fail displaying
