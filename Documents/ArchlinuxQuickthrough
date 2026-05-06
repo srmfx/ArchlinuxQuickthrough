@@ -1146,17 +1146,21 @@ USE LICENSE:
 		TMUX MANAGEMENT
 			ABOUT TMUX COMMAND MODE
 			STARTING A TMUX SERVER
+				RELOADING TMUX CONFIGURATION FILES ON-THE-FLY
 			SOME TMUX KILL COMMANDS
 				KILLING A TMUX PANE
 				KILLING A TMUX WINDOW
 				KILLING A SESSION
 				KILLING A TMUX SERVER
+			CREATING A TMUX SESSION
+				ADVANCED SESSION CREATION ON TMUX
+				CREATE GROUP SESSION ON TMUX
+				CHANGING BETWEEN EXISTING SESSIONS
 			ATTACHING TO EXISTING TMUX SESSION
 				ATTACHING SESSION FROM WITHIN TMUX
 					ATTACHING TO EXISTING SESSION
 				ATTACHING TO MOST RECENT SESSION
 				ATTACHING TO A NAMED TMUX SESSION
-			CREATING A TMUX SESSION
 			LISTING FULL LIST OF COMMANDS
 			FINDING DOCUMENT CONTENT ON ALL WINDOWS
 			LISTING EXISTING SESSIONS AND CLIENTS
@@ -1168,6 +1172,8 @@ USE LICENSE:
 			DETACHING FROM TMUX
 			RE-ATTACHING TMUX SESSIONS USING SESH
 			OTHER TMUX COMMANDS
+			TMUX GRAPHICS FORMAT SUPPORT
+				ENABLE MEDIA PREVIEW FOR YAZI UNDER TMUX
 			TMUX CUSTOM SETTINGS
 				ENABLING TMUX VI/VIM MODE | CHANGING TMUX COPY MODE
 				CUSTOM COLORED STATUS BAR
@@ -1175,6 +1181,7 @@ USE LICENSE:
 					CHANGING BACKGROUND COLOR PER WINDOW
 					CHANGING BACKGROUND COLOR PER PANE
 				TMUX CONFIGURATION FILE
+				MY CUSTOM TMUX CONFIGURATION
 		MOST USED TMUX HOTKEYS
 		TMUX HOTKEYS
 
@@ -1194,6 +1201,9 @@ USE LICENSE:
 
 	YAZI, THE COMMANDLINE FILE EXPLORER
 		SETTING UP DEFAULT PROGRAMS ON LINUX
+		YAZI CONFIGURATION FILE
+		ENABLING MEDIA PLAY AND MEDIA PREVIEW ON YAZI
+			ENABLE MEDIA PREVIEW FOR YAZI UNDER TMUX
 		YAZI THRASH CAN LOCATION
 		YAZI SHELL WARPER
 			ALTERNATE OPTION TO YAZI SHELL WARPER
@@ -6612,6 +6622,9 @@ TMUX - TERMINAL MULTIPLEXER
 				set -g focus-events on
 			[/file]
 
+		2)(OPTIONAL) If already running tmux session(s), then reload ~/.tmux.conf:
+			$ tmux source-file ~/.tmux.conf
+
 		2)(OPTIONAL) Add 'set autoread' and 'autocmd' command below to nvim's initi.vim file:
 		Note: only use this if step #1 doesn't work alone.
 
@@ -6640,6 +6653,20 @@ TMUX - TERMINAL MULTIPLEXER
 				or
 			$ tmux start
 		
+		RELOADING TMUX CONFIGURATION FILES ON-THE-FLY
+			It's possible to reload configuration files without killing the server,
+			although some configurations may take place only after restarting the server:
+
+				$ tmux source-file ~/.tmux.conf
+					or
+				:source-file ~/.tmux.conf
+
+				A) Note: ~/.tmux.conf will be loaded/reloaded
+				automatically upon tmux launch without using the given command above.
+
+				B) Note: - Killing server:
+					$ tmux kill-server
+
 		SOME TMUX KILL COMMANDS
 			KILLING A TMUX PANE
 				Kills the most recent used pane:
@@ -6682,6 +6709,34 @@ TMUX - TERMINAL MULTIPLEXER
 			$ tmux new <session-name>
 				or
 			:new <session-name>
+
+			ADVANCED SESSION CREATION ON TMUX
+				$ tmux new-session [-c <path>] -s <new_session_name>
+					or
+				$ tmux new [-c <path>] -s <new_session_name>
+					or
+				:new-session [-c <path>] -s <new_session_name>
+					or
+				:new [-c <path>] -s <new_session_name>
+
+			CREATE GROUP SESSION ON TMUX
+				Creating group session is only possible on top of another existing session.
+				Group session allows same window to be shared among different sessions,
+				allowing each different session to use an active window or pane of it's own
+				from the list of windows/panes that belong to the <target_session> without
+				having to recreate them on a different session.
+
+					$ tmux new -t <target_session> -s <new_session_name>
+
+			CHANGING BETWEEN EXISTING SESSIONS
+				ctrl+b, w		#Hotkey for listing every window/session.
+				ctrl+b, s		#Hotkey for listing every session.
+
+				$ tmux -t <target_session>		#Commandline command
+
+				:attach-session -t <target_session>	#TMUX Command Mode
+					or
+				:a -t <target_session>
 
 		ATTACHING TO EXISTING TMUX SESSION
 			ATTACHING SESSION FROM WITHIN TMUX
@@ -6858,6 +6913,25 @@ TMUX - TERMINAL MULTIPLEXER
 				or
 			$ lsw
 	
+
+	TMUX GRAPHICS FORMAT SUPPORT
+		Install 'kitty' and 'ueberzugpp' for Graphics Format Support on the terminal.
+		Supporting utilities will automatically use either one or the other
+		when available. 
+
+		Some specific programs and terminals may require changing their configuration files.
+
+		Commandline Programs that rely on on Graphics Format Support will not work when
+		running under TMUX like ranger, vifm, yazi, etc.
+
+		ENABLE MEDIA PREVIEW FOR YAZI UNDER TMUX
+			Add these to your .tmux configuration file:
+				[file: ~/.tmux.conf ]
+					set -g allow-passthrough on
+					set -ga update-environment TERM
+					set -ga update-environment TERM_PROGRAM
+				[/file]
+
 	TMUX CUSTOM SETTINGS
 		ENABLING TMUX VI/VIM MODE | CHANGING TMUX COPY MODE
 			tmux copy mode is used for scrolling up/down inside terminal
@@ -6925,6 +6999,15 @@ TMUX - TERMINAL MULTIPLEXER
 					The SHIFT key can be simplified from using 'S-a' to just 'A'.
 					Another example would be using 'S-[' to just '{'.
 
+
+		MY CUSTOM TMUX CONFIGURATION
+			[file: ~/.tmux.conf ]
+				setw -g mode-keys vi
+				set -g focus-events on
+				set -g allow-passthrough on
+				set -ga update-environment TERM
+				set -ga update-environment TERM_PROGRAM
+			[/file]
 
 	MOST USED TMUX HOTKEYS
 		All Hotkeys must be prefixed with 'ctrl+b', unless stated otherwise:
@@ -50600,6 +50683,37 @@ YAZI, THE COMMANDLINE FILE EXPLORER
 		Github:
 			https://github.com/magnus-ISU/selectdefaultapplication		#Older(more known, more stable).
 			https://github.com/THShafi170/selectdefaultapplication-Qt6	#Newer(less known, less stable).
+
+	YAZI CONFIGURATION FILE
+		Yazi's configuration has to be user created on path ~/.config/yazi/yazi.toml :
+			$ yaz=~/.config/yazi/
+			$ mkdir -p "${yaz}"
+			$ touch "${yaz}"/yazi.toml
+
+	ENABLING MEDIA PLAY AND MEDIA PREVIEW ON YAZI
+		These configuration settings makes 'mplayer' the default video/audio player by
+		switching yazi's default 'unblocking' behavior to 'blocking'.
+
+		[file: ~/.config/yazi/yazi.toml ]
+			[opener]
+			play = [
+			    { run = 'mplayer "$@"', block = true, orphan = true, desc = "Play", for = "unix" }
+			]
+
+			[open]
+			rules = [
+			    { name = "*/", use = ["edit", "open", "reveal"] },
+			    { mime = "audio/*", use = "play" },
+			    { mime = "video/*", use = "play" },
+			    { mime = "video/x-matroska", use = "play" }
+			]
+		[/file]
+
+		Note: If running 'yazi' under tmux, you'll have to install a compatible graphics format support
+		and enable passthrough on tmux, also make sure your terminal supports using these graphics format.
+			READ MORE ON:
+				TMUX GRAPHICS FORMAT SUPPORT
+					ENABLE MEDIA PREVIEW FOR YAZI UNDER TMUX
 
 	YAZI THRASH CAN LOCATION
 		Yazi follows the FreeDesktop.org Trash specification, storing deleted files in ~/.local/share/Trash/ ;
