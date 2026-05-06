@@ -6925,6 +6925,9 @@ TMUX - TERMINAL MULTIPLEXER
 		running under TMUX like ranger, vifm, yazi, etc.
 
 		ENABLE MEDIA PREVIEW FOR YAZI UNDER TMUX
+			NOTE: The settings below might be completely optional.
+			It's advised to test first after installing 'kitty' and 'ueberzugpp'.
+
 			Add these to your .tmux configuration file:
 				[file: ~/.tmux.conf ]
 					set -g allow-passthrough on
