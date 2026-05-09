@@ -1156,11 +1156,15 @@ USE LICENSE:
 				ADVANCED SESSION CREATION ON TMUX
 				CREATE GROUP SESSION ON TMUX
 				CHANGING BETWEEN EXISTING SESSIONS
+			CREATING A NEW WINDOW ON TMUX
+				STARTING A PROGRAM ON WINDOWS CREATION
+				STARTING A PROGRAM ON WINDOWS SPLIT
 			ATTACHING TO EXISTING TMUX SESSION
 				ATTACHING SESSION FROM WITHIN TMUX
 					ATTACHING TO EXISTING SESSION
 				ATTACHING TO MOST RECENT SESSION
 				ATTACHING TO A NAMED TMUX SESSION
+			MOVING CURRENT WINDOW TO A DIFFERENT SESSION
 			LISTING FULL LIST OF COMMANDS
 			FINDING DOCUMENT CONTENT ON ALL WINDOWS
 			LISTING EXISTING SESSIONS AND CLIENTS
@@ -6704,11 +6708,11 @@ TMUX - TERMINAL MULTIPLEXER
 					:tmux kill-server
 
 		CREATING A TMUX SESSION
-			$ tmux new-session <session-name>
+			$ tmux new-session -s <session-name>
 				or
-			$ tmux new <session-name>
+			$ tmux new -s <session-name>
 				or
-			:new <session-name>
+			:new -s <session-name>
 
 			ADVANCED SESSION CREATION ON TMUX
 				$ tmux new-session [-c <path>] -s <new_session_name>
@@ -6738,6 +6742,30 @@ TMUX - TERMINAL MULTIPLEXER
 					or
 				:a -t <target_session>
 
+		CREATING A NEW WINDOW ON TMUX
+			$ tmux new-window
+				or
+			:new-window
+
+			STARTING A PROGRAM ON WINDOWS CREATION
+				Running programs within tmux like this is considerably faster than launching
+				programs manually on the terminal.
+				
+				$ tmux new-window /usr/bin/<program-name>
+					or
+				:new-window /usr/bin/<program-name>
+
+			STARTING A PROGRAM ON WINDOWS SPLIT
+				Running programs within tmux like this is considerably faster than launching
+				programs manually on the terminal.
+				
+				$ tmux split-window /usr/bin/<program-name>
+					or
+				:split-window /usr/bin/<program-name>
+
+				A) Note: passing -v or -h as argument allows to split current window
+				horizontally/vertically. defaults to vertical if no arg is passed.
+
 		ATTACHING TO EXISTING TMUX SESSION
 			ATTACHING SESSION FROM WITHIN TMUX
 				ATTACHING TO EXISTING SESSION
@@ -6758,6 +6786,12 @@ TMUX - TERMINAL MULTIPLEXER
 				Note: you can type either 'tmux ls' on the terminal or press ctrl+b, w (short form: C-b w),
 				within a tmux session for listing all session and windows by names.
 
+
+
+		MOVING CURRENT WINDOW TO A DIFFERENT SESSION
+			$ tmux move-window -t <session_name>
+				or
+			:move-window -t <session_name>
 
 		LISTING FULL LIST OF COMMANDS
 			$ tmux list-commands
@@ -7007,9 +7041,7 @@ TMUX - TERMINAL MULTIPLEXER
 			[file: ~/.tmux.conf ]
 				setw -g mode-keys vi
 				set -g focus-events on
-				set -g allow-passthrough on
-				set -ga update-environment TERM
-				set -ga update-environment TERM_PROGRAM
+				set -sg escape-time 10
 			[/file]
 
 	MOST USED TMUX HOTKEYS
