@@ -1157,6 +1157,8 @@ USE LICENSE:
 				CREATE GROUP SESSION ON TMUX
 				CHANGING BETWEEN EXISTING SESSIONS
 			CREATING A NEW WINDOW ON TMUX
+				CREATING A NAMED WINDOW
+				CREATING A NAMED WINDOW ON A DIFFERENT SESSION
 				STARTING A PROGRAM ON WINDOWS CREATION
 				STARTING A PROGRAM ON WINDOWS SPLIT
 			ATTACHING TO EXISTING TMUX SESSION
@@ -1164,11 +1166,18 @@ USE LICENSE:
 					ATTACHING TO EXISTING SESSION
 				ATTACHING TO MOST RECENT SESSION
 				ATTACHING TO A NAMED TMUX SESSION
-			MOVING CURRENT WINDOW TO A DIFFERENT SESSION
+			MOVING AND SWAPPING WINDOWS
+				MOVING CURRENT WINDOW TO A NEW INDEX
+				MOVING CURRENT WINDOW TO A DIFFERENT SESSION
+				SWAPPING CURRENT WINDOW WITH A DIFFERENT WINDOW
+				SWAPPING CURRENT WINDOW WITH A WINDOW ON A DIFFERENT SESSION
+				SWAPPING A GIVEN WINDOW WITH ANOTHER DIFFERENT WINDOW
 			LINKING A WINDOW TO A DIFFERENT SESSION
 				LINKING A WINDOW FROM A DIFFERENT SESSION INTO AN EXISTING KNOWN SESSION
 				UNLINKING CURRENT WINDOW
-			LISTING FULL LIST OF COMMANDS
+			JOINNING AND BREAKING PANES 
+				BREAKING PANE AWAY BACK INTO A WINDOW
+			DISPLAYING FULL LIST OF COMMANDS
 			FINDING DOCUMENT CONTENT ON ALL WINDOWS
 			LISTING EXISTING SESSIONS AND CLIENTS
 				LISTING EXISTING TMUX CLIENTS
@@ -6746,9 +6755,24 @@ TMUX - TERMINAL MULTIPLEXER
 				:a -t <target_session>
 
 		CREATING A NEW WINDOW ON TMUX
-			$ tmux new-window
-				or
-			:new-window
+			This willcreate a new window
+				$ tmux new-window
+					or
+				:new-window
+					or
+				:neww
+
+			CREATING A NAMED WINDOW
+				:new-window -n <name>
+					or
+				:neww -n <name>
+
+			CREATING A NAMED WINDOW ON A DIFFERENT SESSION
+				Session must already exist.
+
+				:new-window -n <name> -t <session-name>
+					or
+				:neww -n <name> -t <session-name>
 
 			STARTING A PROGRAM ON WINDOWS CREATION
 				Running programs within tmux like this is considerably faster than launching
@@ -6790,17 +6814,36 @@ TMUX - TERMINAL MULTIPLEXER
 				within a tmux session for listing all session and windows by names.
 
 
+		MOVING AND SWAPPING WINDOWS
+			MOVING WINDOWS TO A NEW INDEX
+				The new window-index must not exist:
+					:move-window -t :<new-window-index>
+						or
+					:movew -t :<new-window-index>
+						or
+					:movew -t <new-window-index>
 
-		MOVING CURRENT WINDOW TO A DIFFERENT SESSION
-			$ tmux move-window -t <session-name>
-				or
-			:move-window -t <session_name>
+			MOVING CURRENT WINDOW TO A DIFFERENT SESSION
+				:move-window -t <session_name>
+					or
+				:move-window -t <session_name>:<new-window-index>
+					or
+				:movew -t <session_name>:
+
+			SWAPPING CURRENT WINDOW WITH A DIFFERENT WINDOW
+				The window-index must exist:
+					:swap-window -t <window-index>
+
+			SWAPPING CURRENT WINDOW WITH A WINDOW ON A DIFFERENT SESSION
+				:swap-window -t <session-name>:<window-index>
+			
+			SWAPPING A GIVEN WINDOW WITH ANOTHER DIFFERENT WINDOW
+				This will swap source and destination window.
+					:swap-window -s <source-session-name>:<source-window-index> -t <dest-session-name>:<dest-window-index>
 
 		LINKING A WINDOW TO A DIFFERENT SESSION
 			This will create a new window in the current session by linking it with an existing
 			window from a different session:
-				$ tmux link-window -s <source-session-name>:<source-window-index>
-					or
 				:link-window -s <source-session-name>:<source-window-index>
 					or
 				:linkw -s <source-session-name>:<source-window-index>
@@ -6841,8 +6884,42 @@ TMUX - TERMINAL MULTIPLEXER
 				Note: Using 'kill-session' will not close the source-window nor it's section
 				only if and when the linked window belongs to a different session.
 
+		JOINNING AND BREAKING PANES 
+			This joins a given source window into a pane in the current window:
+				$ tmux join-pane -s <source-session-name>:<source-window-index>
+					or
+				:join-pane -s <source-session-name>:<source-window-index>
+					or
+				:joinp -s <source-session-name>:<source-window-index>
 
-		LISTING FULL LIST OF COMMANDS
+				A) Note: Joinning panes together will destroy linked windows,
+				requiring 'link-window' to be manually used again after
+				breaking a pane.
+
+				B) Note: Joinning panes will also "destroy" the existing source-window in both
+				current session and/or a different session, transforming it into a pane in
+				the current window.
+
+				C) Note: Joinning panes will also destroy the name of the source-window.
+				this means the user will have to manually rename the pane after breaking it back
+				into a window.
+
+				D) Note: Using 'C-b,z' (short for: ctrl+b, z) will zoom in the panel into full-screen,
+				using it again will zoom out of it.
+
+				E) Note: Using 'C-b,space-bar' (short for: ctrl+b, space-bar) will re-arrange
+				all panes in a different layout.
+
+			BREAKING PANE AWAY BACK INTO A WINDOW
+				Breaks current pane back into it's full window form:
+					:break-pane
+						or
+					C-b,!	(Ctrl+B, !)
+
+				A) Note: In case the window was sourced from a different session when creating the pane,
+				this command doesn't restore the pane back into sourced-session.
+
+		DISPLAYING FULL LIST OF COMMANDS
 			$ tmux list-commands
 		
 		LISTING EXISTING SESSIONS AND CLIENTS
