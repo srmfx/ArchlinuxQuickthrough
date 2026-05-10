@@ -1165,6 +1165,9 @@ USE LICENSE:
 				ATTACHING TO MOST RECENT SESSION
 				ATTACHING TO A NAMED TMUX SESSION
 			MOVING CURRENT WINDOW TO A DIFFERENT SESSION
+			LINKING A WINDOW TO A DIFFERENT SESSION
+				LINKING A WINDOW FROM A DIFFERENT SESSION INTO AN EXISTING KNOWN SESSION
+				UNLINKING CURRENT WINDOW
 			LISTING FULL LIST OF COMMANDS
 			FINDING DOCUMENT CONTENT ON ALL WINDOWS
 			LISTING EXISTING SESSIONS AND CLIENTS
@@ -6781,7 +6784,7 @@ TMUX - TERMINAL MULTIPLEXER
 			ATTACHING TO A NAMED TMUX SESSION
 				$ tmux attach-session -t <session-name>
 					or
-				$ tmux a -t <session_name>
+				$ tmux a -t <session-name>
 
 				Note: you can type either 'tmux ls' on the terminal or press ctrl+b, w (short form: C-b w),
 				within a tmux session for listing all session and windows by names.
@@ -6789,9 +6792,55 @@ TMUX - TERMINAL MULTIPLEXER
 
 
 		MOVING CURRENT WINDOW TO A DIFFERENT SESSION
-			$ tmux move-window -t <session_name>
+			$ tmux move-window -t <session-name>
 				or
 			:move-window -t <session_name>
+
+		LINKING A WINDOW TO A DIFFERENT SESSION
+			This will create a new window in the current session by linking it with an existing
+			window from a different session:
+				$ tmux link-window -s <source-session-name>:<source-window-index>
+					or
+				:link-window -s <source-session-name>:<source-window-index>
+					or
+				:linkw -s <source-session-name>:<source-window-index>
+
+				EXAMPLE:
+					:linkw -s SESSION_A:1
+
+			Note: Windows Linking is important when you want to manage existing windows
+			in a different session while keeping them synced, separating them in a different 'workspace'
+			by creating new session(s) for them.
+
+
+			LINKING A WINDOW FROM A DIFFERENT SESSION INTO AN EXISTING KNOWN SESSION
+				This will create a new window into an ALREADY EXISTING session:
+					$ tmux link-window -s <source-session-name>:<source-window-index> -t <dest-session-name>:<dest-window-index>
+
+						or
+					:link-window -s <source-session-name>:<source-window-index> -t <dest-session-name>:<dest-window-index>
+						or
+					:linkw -s <source-session-name>:<source-window-index> -t <dest-session-name>:<dest-window-index>
+
+				EXAMPLE:
+					:linkw -s SESSION_A:1 -t EXISTING_TARGET_SESSION
+						or
+					:linkw -s SESSION_A:1 -t EXISTING_TARGET_SESSION:4
+
+					Note: on the 2nd example, window-index '4' must not exist.
+
+
+			UNLINKING CURRENT WINDOW
+				Since closing the linked window will cause the source window to be closed as well,
+				a command for unlinkw is necessary for closing it without shutting it down:
+				from it's source:
+					$ tmux unlinkw
+						or
+					:unlinkw
+
+				Note: Using 'kill-session' will not close the source-window nor it's section
+				only if and when the linked window belongs to a different session.
+
 
 		LISTING FULL LIST OF COMMANDS
 			$ tmux list-commands
@@ -7094,6 +7143,7 @@ TMUX - TERMINAL MULTIPLEXER
 				space_bar	#Select Next Layout Arrangement
 				ctrl+o		#Rotate through the panes
 				alt+o		#Rotate throught the panes in Reverse.
+				x		#Kills pane.(kills window if no panes are available)
 
 
 			SESSION
