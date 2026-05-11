@@ -1166,6 +1166,9 @@ USE LICENSE:
 					ATTACHING TO EXISTING SESSION
 				ATTACHING TO MOST RECENT SESSION
 				ATTACHING TO A NAMED TMUX SESSION
+			CHANGING CURRENT SESSION AND WINDOW
+				CHANGING CURRENT SESSION BY USING IT'S NAME
+				CHANGING CURRENT WINDOW BY USING IT'S NAME
 			MOVING AND SWAPPING WINDOWS
 				MOVING CURRENT WINDOW TO A NEW INDEX
 				MOVING CURRENT WINDOW TO A DIFFERENT SESSION
@@ -1178,12 +1181,11 @@ USE LICENSE:
 			JOINNING AND BREAKING PANES 
 				BREAKING PANE AWAY BACK INTO A WINDOW
 			DISPLAYING FULL LIST OF COMMANDS
-			FINDING DOCUMENT CONTENT ON ALL WINDOWS
 			LISTING EXISTING SESSIONS AND CLIENTS
 				LISTING EXISTING TMUX CLIENTS
 				LISTING EXISTING TMUX PANES
 			FINDING WINDOW BY NAME
-				FINDING DOCUMENT CONTENT ON ALL WINDOWS
+				FINDING DOCUMENT CONTENT ON ALL EXISTING WINDOWS
 			LISTING KEY BINDINGS
 			DETACHING FROM TMUX
 			RE-ATTACHING TMUX SESSIONS USING SESH
@@ -1197,6 +1199,7 @@ USE LICENSE:
 					CHANGING BACKGROUND COLOR PER WINDOW
 					CHANGING BACKGROUND COLOR PER PANE
 				TMUX CONFIGURATION FILE
+					TMUX SESSION INITIALIZATION EXAMPLE
 				MY CUSTOM TMUX CONFIGURATION
 		MOST USED TMUX HOTKEYS
 		TMUX HOTKEYS
@@ -6814,6 +6817,54 @@ TMUX - TERMINAL MULTIPLEXER
 				within a tmux session for listing all session and windows by names.
 
 
+		CHANGING CURRENT SESSION AND WINDOW
+			Some quick commands:
+				:choose-tree
+					or
+				C-b, w (Short for: ctrl+b, w)
+					or
+				C-b, s (Short for: ctrl+b, s)
+
+			CHANGING CURRENT SESSION BY USING IT'S NAME
+				:switch-client -t <session-name>
+					or
+				:switchc -t <session-name>
+
+				:attach-session -t <session-name>
+					or
+				:a -t <session-name>
+
+				A) Note: both 'switch-client' and 'attach-session' have the same meaning
+				when ran under an already existing tmux session. Both will change current session
+				to the given target session passed when using -t.
+
+				B) Note: When running outside the tmux client, 'attach-session' will attach the terminal
+				to the existant tmux instance by using the given named session; if no args are passed,
+				it'll then attach to the most recent used session. 'switch-client' in the other hand, will
+				change the current session to another named given session.
+
+			CHANGING CURRENT WINDOW BY USING IT'S NAME
+				These commands can only change to windows located on current session:
+					:select-window -t <window-name>
+						or
+					:selectw -t <window-name>
+
+					Example: - Changing current window to a window named 'Worktree A' -
+						:selectw -t "Worktree A"
+							or
+						:selectw -t Worktree\ A
+							or
+						:selectw -t Workt*
+
+				Note: It's possible to use 'findw' for finding windows in different sessions:
+					$ findw -Ni <Window name>
+
+					-N: Performs a search on windows name only.
+					-i: Case insensitive search.
+
+					READ MORE ON:
+						FINDING WINDOW BY NAME
+
 		MOVING AND SWAPPING WINDOWS
 			MOVING WINDOWS TO A NEW INDEX
 				The new window-index must not exist:
@@ -6923,15 +6974,28 @@ TMUX - TERMINAL MULTIPLEXER
 			$ tmux list-commands
 		
 		LISTING EXISTING SESSIONS AND CLIENTS
-			$ tmux list-sessions
-				or
-			$ tmux ls
+			These commands will list sessions and windows:
+				$ tmux list-sessions
+					or
+				$ tmux ls
+					or
+				:list-sessions
+					or
+				:ls
+					or
+				:choose-tree
+					or
+				ctrl+b, w
+					or
+				ctrl+b, s
 
 			LISTING EXISTING TMUX CLIENTS
 				Will list every /dev/pts that contains a running instance of tmux:
 					$ tmux list-clients
 						or
 					$ tmux lsc
+						or
+					:lsc
 
 			LISTING EXISTING TMUX ACTIVE WINDOWS
 				Will list every active window for each existing session:
@@ -6939,17 +7003,25 @@ TMUX - TERMINAL MULTIPLEXER
 				$ tmux list-windows
 					or
 				$ tmux lsw
+					or
+				:lsw
 
 			LISTING EXISTING TMUX PANES
 				Will list every existing pane:
 					$ tmux list-panes
 						or
 					$ tmux lsp
+						or
+					:lsp
 
 		FINDING WINDOW BY NAME
 			$ tmux find-window -i <window_title/window_name>
 				or
 			$ tmux findw -i <window_title/window_name>
+				or
+			:findw
+				or
+			ctrl+b, f (short form: C-b, f)
 			
 			options:
 				-i will perform a case insensitive search.
@@ -6961,7 +7033,7 @@ TMUX - TERMINAL MULTIPLEXER
 
 				Default is -CNT.
 
-			FINDING DOCUMENT CONTENT ON ALL WINDOWS
+			FINDING DOCUMENT CONTENT ON ALL EXISTING WINDOWS
 				1) Output the contents into the terminal buffer:
 					$ cat ~/Document.txt
 
@@ -7163,6 +7235,17 @@ TMUX - TERMINAL MULTIPLEXER
 					Another example would be using 'S-[' to just '{'.
 
 
+			TMUX SESSION INITIALIZATION EXAMPLE
+				[file: ~/.tmux.conf ]
+					new -s NVIM -n Window\ Name\ 0 /bin/nvim -S ~/session.nvim
+					neww -n Window\ Name\ 1 /bin/nvim -S ~/session.nvim
+					neww -n Window\ Name\ 2 /bin/nvim  -S ~/session.nvim
+					new -s PROGRAMS -n Program\ B /bin/sudo -iu user_a program_b
+					new -s TERM
+					new -s PROJECTS
+					new -s "TEST AREA"
+				[/file]
+
 		MY CUSTOM TMUX CONFIGURATION
 			[file: ~/.tmux.conf ]
 				setw -g mode-keys vi
@@ -7194,6 +7277,7 @@ TMUX - TERMINAL MULTIPLEXER
 
 			WINDOW
 				,		#Rename current window
+				f		#Choose a window by typing it's name
 				w		#Choose a Window from a List
 						Note: this will also list sessions alongside the windows list.
 
