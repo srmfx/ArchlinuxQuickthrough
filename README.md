@@ -1,14 +1,14 @@
-# ArchlinuxQuickthrough
-This is a quickthrough for archlinux/linux troubleshooting
+# The ArchlinuxQRG - A Non-Official Archlinux Quick Reference Guide (QRG)
+This is a Quick Reference Guide (QRG) meant for Archlinux users who might be looking to learn a bit of linux or troubleshooting problems in it. Non-archlinux users are welcome as long as they know what to do by themselves.
 
-These were mainly annotations from back when I was studying archlinux on my own before I even joined University.
-When I joined University, I kept using and learning archlinux at my own pace and I kept doing this so even after I finished uni.
+This guide started as mere annotations from back when I was studying Archlinux on my own before I even joined University. After I joined University, I kept using and learning Archlinux at my own pace and kept doing this so even after I finished uni.
 
-Because of that, some of the stuff in here is very very old and I haven't had the time to double check everything is 101% correct. 
-Some tools and commands described may cause permanent damage to your linux distro or system.
+Because of this, some of the stuff in here might be very old and because of that I don't have the time to double check everything i've wrote is 101% correct. some other things might not work due to updates and changes in how programs & commands works.
 
-You need to be careful when using anything described in this document, read the 'USE LICENSE' carefully.
-You're on your own from this point forward.
+If misused, some tools and commands described may cause permanent damage to your linux distro or system.
+
+Be careful when using anything described in this document, read the 'USE LICENSE' carefully. Always double-check that the commands, programs and instructions mentioned are what you're really looking for
+and that they do exactly what you want.
 
 
 ## USE LICENSE
