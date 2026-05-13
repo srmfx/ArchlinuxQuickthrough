@@ -7260,9 +7260,10 @@ TMUX - TERMINAL MULTIPLEXER
 
 		MY CUSTOM TMUX CONFIGURATION
 			[file: ~/.tmux.conf ]
+				set -sg escape-time 10
 				setw -g mode-keys vi
 				set -g focus-events on
-				set -sg escape-time 10
+				set -g mouse on
 			[/file]
 
 	MOST USED TMUX HOTKEYS
