@@ -31,7 +31,7 @@ PERSONAL NOTE:
 	Always double-check that the commands, programs and instructions mentioned are what you're
 	really looking for and that they do exactly what you want.
 
-	{ Author-github: https://github.com/srmfx/ || Github Page: https://github.com/srmfx/TheArchlinuxQRG}
+	{ Author-github: https://github.com/srmfx/ || Github Page: https://github.com/srmfx/TheArchlinuxQRG }
 	{ Author-gitlab: https://gitlab.com/srmf   || Gitlab Page: https://gitlab.com/linux-contents/TheArchlinuxQRG }
 
 
@@ -348,6 +348,7 @@ USE LICENSE:
 						BASIC DAR EXAMPLES
 							ADDING DATA TO DAR ARCHIVE
 								USING DAR ARCHIVING WITHOUT COMPRESSION
+								ADDING DATA POINTED BY A SYMLINK OR SOFTLINK TO DAR ARCHIVE
 								GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
 								USING STANDARD DAR COMPRESSION
 									USING DAR WITH LZ4 COMPRESSION
@@ -366,6 +367,8 @@ USE LICENSE:
 							MERGING DIFFERENT DAR ARCHIVES
 								MERGING TWO DIFFERENT DAR ARCHIVES
 								MERGING A THIRD DAR ARCHIVE
+							CREATING INCREMENTAL BACKUPS USING DAR
+								EXTRACTING INCREMENTAL BACKUPS USING DAR
 							MAKING CHANGES TO AN EXISTING DAR ARCHIVE
 								CHANGING COMPRESSION ALGORITHM FROM EXISTING DAR ARCHIVE
 								CHANGING ENCRYPTION ALGORITHM AND PASSWORD FROM EXISTING DAR ARCHIVE
@@ -382,6 +385,7 @@ USE LICENSE:
 								COMPARING ARCHIVE WITH DATA ON THE FILESYSTEM
 							EXTRACTING DATA FROM DAR ARCHIVE
 								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
+								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO DIFFERENT FOLDER
 								EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 								EXTRACTING DAR ARCHIVE USING PASSWORD
 						SOME DAR LINKS
@@ -1142,6 +1146,7 @@ USE LICENSE:
 				ALLOWING SCRIPTS TO BE EXECUTED BY POWERSHELL
 
 	---TROUBLESHOOTING WINDOWS
+		GPU HARDWARE ACCELERATION CRASHES | WSL CRASHING INTERMITENTLY
 		HOW TO FIX USB DEVICE NOT DETECTED
 		RE-ENABLING WINDOWS AUTO-UPDATE
 		ENABLING VOICE RECOGNITION ON WINDOWS
@@ -1171,6 +1176,9 @@ USE LICENSE:
 			CREATING A NEW WINDOW ON TMUX
 				CREATING A NAMED WINDOW
 				CREATING A NAMED WINDOW ON A DIFFERENT SESSION
+				CREATING A NAMED WINDOW OR SESSION USING A DIFFERENT PATH
+					CREATING WINDOW USING A DIFFERENT PATH
+					CREATING SESSION USING A DIFFERENT PATH
 				STARTING A PROGRAM ON WINDOWS CREATION
 				STARTING A PROGRAM ON WINDOWS SPLIT
 			ATTACHING TO EXISTING TMUX SESSION
@@ -1777,6 +1785,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -014
+		GPU HARDWARE ACCELERATION CRASHES | WSL CRASHING INTERMITENTLY
 		FZF, FUZZY FINDER COMMAND -> minor update
 			TELEVISION, A VERY GOOD ALTERNATIVE TO 'FZF'
 		SESH - TERMINAL MULTIPLEXER
@@ -6788,6 +6797,13 @@ TMUX - TERMINAL MULTIPLEXER
 				:new-window -n <name> -t <session-name>
 					or
 				:neww -n <name> -t <session-name>
+
+			CREATING A NAMED WINDOW OR SESSION USING A DIFFERENT PATH
+				CREATING WINDOW USING A DIFFERENT PATH
+					:neww -n <name> -c <path>
+
+				CREATING SESSION USING A DIFFERENT PATH
+					:new -n <name> -c <path>
 
 			STARTING A PROGRAM ON WINDOWS CREATION
 				Running programs within tmux like this is considerably faster than launching
@@ -35310,6 +35326,7 @@ when needed.
 				inside the archive. therefore, files like 'my archive.dar.zst' will not exist like it does in TAR and other archiving tools, unless
 				this is manually done by the user using compression tools on his own.
 
+
 				4 - When working with archiving of any kind, there's always the chance the system might hang, freeze, crash for unexpected reasons like
 				a power blackout during compression, decompression, encrypting, listing, etc; This may cause archive data structure to corrupt, leading 
 				data unrecoverable even if they've kept integrity inside the archive. Because of this, it's important to isolate the archive catalogue 
@@ -35590,13 +35607,37 @@ when needed.
 								or
 						$ dar -c - -g <data_to_archive> > ./<archive_filename>.1.dar
 
-					1.2 - GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
+
+					1.2 - ADDING DATA POINTED BY A SYMLINK OR SOFTLINK TO DAR ARCHIVE
+						Since dar doesn't have a built-in option for following/de-reference symlinks,
+						adding symlinked data requires thinkering:
+							$ dar -c MiscDocuments -g ./MiscDocuments -g "$(realpath --relative-to=. ./MiscDocuments/Faculdade/)"
+
+						A) Note: The example above adds two directories using -g,
+						the 1st one is a normal directory, the 2nd one is a softlink.
+
+						B) Note: 'realpath' is used to find the absolute path pointed by the symlink.
+
+						C) Note: Since DAR doesn't "support" the use of absolute paths out-of-box,
+						without resorting to using the -R argument, it's necessary to use --relative-to
+						argument to transform it back to relative path.
+
+						D) Note: Using -R could be dangerous as it will allow dar to re-write existing
+						system files if miss-handled upon extraction. Dar will simply use the absolute
+						path stored in the archive when extracting.
+
+						E) Note: Finding all symlinks/softlinks might be necessary in bigger folders,
+						use 'find <path> -type l'  for finding all symlinks.
+
+						G) Note: Replace absolute symlinks with relative symlinks when possible.
+
+					1.3 - GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
 						It's possible to choose between "md5", "sha1" and "sha512" algorithms. By default, no hash file is generated.
 					this option is available when creating, isolating catalogue, merging or repairing an archive.
 
 					NOTE: This is different than generating a hash file after the archive has been created,
 					in the case where the storage media is faulty - ex.: old hard disk - there's a chance that the archive may get corrupt
-					as soon as it is created; generating a hash file in this case will not allow you to test for data corruption.
+					as soon as it is created, therefore generating a hash file in this case will not allow to test for data corruption.
 						
 
 						$ dar --hash md5 -c <archive_filename_without_extension> -g <data_to_archive>
@@ -35606,30 +35647,30 @@ when needed.
 						NOTE: If multiple slices of a given size are created (-s <size> ) then a new hash will 
 						automatically be created per slice.
 
-						1.2.1 -- Practical example - Testing with a hash file --
+						1.3.1 -- Practical example - Testing with a hash file --
 
-							1.2.1.1 - Generate hash during archive creation
+							1.3.1.1 - Generate hash during archive creation
 								$ dar --hash md5 -c ./archive -g ./data\ to\ archive
 									or
 								$ dar -3 sha512 -c ./archive -g ./data\ to\ archive
 
-							1.2.1.2 - Testing the archive with the generated hash
+							1.3.1.2 - Testing the archive with the generated hash
 								$ md5sum -c archive.1.dar.md5
 									or
 								$ sha512sum -c archive.1.dar.sha512
 						
-						1.2.2 -- Practical example - Testing hash for multiple slices  -
+						1.3.2 -- Practical example - Testing hash for multiple slices  -
 							First, this will create an archive and slice it in sizes of 700 bytes,	
 							note that this will create as many files as needed. 
 
 							NOTE: In this example, The Data to be archived needs to be bigger than 700 bytes due to slices being created (-s ).
 
-							1.2.2.1 - Generate hash during archive creation
+							1.3.2.1 - Generate hash during archive creation
 								$ dar --hash md5 -c ./<archive_name_with_no_extension> -g ./<data_to_archive> -s 700
 									or
 								$ dar -3 sha512 -c ./<archive_name_with_no_extension> -g ./<data_to_archive> -s 700
 
-							1.2.2.2 - Testing all hashed slices
+							1.3.2.2 - Testing all hashed slices
 								$ md5sum -c ./<archive_name>*.md5 | grep -P -v 'OK' 
 									or
 								$ sha512sum -c ./<archive_name>*.sha512 | grep -P -v 'OK'
@@ -35648,7 +35689,7 @@ when needed.
 							INTEGRITY TEST FOR DAR ARCHIVE
 							COMPARING DAR ARCHIVES
 
-					1.3 - USING STANDARD DAR COMPRESSION
+					1.4 - USING STANDARD DAR COMPRESSION
 						'-m0' is used to compress files of all sizes.
 
 						NOTE: DAR uses level 9 gzip compression by default.
@@ -35656,39 +35697,78 @@ when needed.
 									or
 							$ dar -c - -g <data_to_archive> -m0 -z -g > ./<archive_filename>.1.dar
 
-						1.3.1 - USING DAR WITH ZSTD COMPRESSION
+						1.4.1 - USING DAR WITH ZSTD COMPRESSION
 							$ dar -c <archive_filename_without_extension> -m0 -zzstd:22 -g <data_to_archive> 
 									or
 							$ dar -c - -g <data_to_archive> -m0 -zzstd:22 -g > ./<archive_filename>.1.dar
 
-						1.3.2 - USING DAR WITH LZ4 COMPRESSION
+						1.4.2 - USING DAR WITH LZ4 COMPRESSION
 							$ dar -c <archive_filename_without_extension> -m0 -zlz4 -g <data_to_archive> 
 									or
 							$ dar -c - -g <data_to_archive> -m0 -zlz4 -g > ./<archive_filename>.1.dar
 
-					1.4 - USING MULTITHREADING DAR COMPRESSION 
-						Common Option(s) when Adding Data to Archive:
-							-m <size>	#Sets up a Minimum size for compression, files under this size will not be compressed.
+					1.5 - USING MULTITHREADING DAR COMPRESSION 
+							Syntax:
+								-G <compression_threads>
+									or
+								-G <crypto_threads>:<compression_threads>
+
+						Other Common Option(s) when Adding Data to Archive:
+							-z [algorithm:level:block-size]
+									#Setting <block-size> to zero will disable multi-threading
+									compression, since it'll enable the legacy 'block compression'.
+
+									Note: Files smaller than the <block-size> will be processed by a
+									single-thread. 240KIB is the default value when -G is specified.
+
+							-m <size>	#Sets up a Minimum size for compression, files under this size will not
+									be compressed.
+
 									Default value is '100' bytes.
 									example: - argument for not compressing files under 1MB - 
 										-m 1M
 
-						NOTE: -G and <block_size> must be passed when using multi-thread.
-						<block_size> defines how much data each thread will take care when compressing.
-						NOTE 2: -G, --multi-thread { <num_of_threads> | <crypto_threads>,<compression_threads> }
-						with this, it's possible to pass how many threads and/or also specify how many crypto and compression threads
-						you want.
+									note: this option is not directly related to multi-threading.
+
+						A) NOTE: <compression_threads> defines number of threads that are used
+						for compress/decompress. <crypto_threads> are the number of threads used
+						on the cipher/decipher process.
+
+						B) NOTE: It's possible to specify maximum number of threads by passing '-G $(nproc)' as argument
+						to DAR.
+						
+						C) NOTE: When -G is not specified WHEN CREATING AN ARCHIVE, dar will use the
+						legacy 'streaming compression' mode; Uncompressing those archives using multi-thread will not
+						be possible.
+						
+						D) NOTE: Multi-threading extraction is automatic for archives compressed with -G.
+						Archives not compressed with -G option do not benefit from any kind of multi-threading extraction.
+						
+						E) NOTE: Regarding compression(-z) block-size, when block-size is set to '0', dar will use
+						the legacy 'streaming compression'. When 'streaming compression' is leveraged,
+						dar will not use multi-threading for archiving. Legacy 'streaming compression' is used
+						whenever the default -z <block-size> is set to '0' or -G <compression_threads> is set to '1'.
+						Not setting any of the options(-z and -g) will also enable 'streaming compression' mode and thus
+						disable multi-threading.
+
+						F) NOTE: using -G for multi-threading compression only works when libdar was compiled
+						against libthreadar. Use 'dar -V' to check whether your version of dar supports multi-threading.
 
 						Syntax:
-							$ dar -c <archive_filename_without_extension> -m0 -G -zzstd:22:<block-size> -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -m0 -G $(nproc) -zzstd:22:<block-size> -g <data_to_archive> 
+
+						Basic Usage:
+							$ dar -c <archive_name> -g <data_to_be_archived> -G $(nproc) -zzstd
+								or
+							$ dar -c <archive_name> -g <data_to_be_archived> -G $(nproc) -zzstd::512k
 
 						Practical Example:
-							$ dar -c <archive_filename_without_extension> -m0 -G -zzstd:22:2M -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -m0 -G $(nproc) -zzstd:22:2M -g <data_to_archive> 
 
 						Practical Example 2:
-							$ dar -c <archive_filename_without_extension> -m0 -G3 -zzstd:22:2M -g <data_to_archive> 
+							$ dar -c <archive_filename_without_extension> -m0 -G3 $(nproc) -zzstd:22:2M -g <data_to_archive> 
 						
-					1.5 - CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
+					1.6 - CREATING DAR ARCHIVE WITH ENCRYPTION AND PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", 
 						"twofish", "serpent" and "camellia" for strong encryption and "scrambling" 
 						(alias "scram") for a very weak encryption.
@@ -35709,7 +35789,7 @@ when needed.
 							EXTRACTING DAR ARCHIVE USING PASSWORD
 
 
-						1.5.1 - USING A GPG KEY FOR ENCRYPTING A DAR ARCHIVE
+						1.6.1 - USING A GPG KEY FOR ENCRYPTING A DAR ARCHIVE
 							It's possible to use one or more GPG Keys to encrypt a dar archive.
 						Owning the secret(or private) key will be required for decryption.
 
@@ -35723,7 +35803,7 @@ when needed.
 						Practical Example - GPG Encryption by adding more than one directory:
 							# dar -zzstd -c ./archive_name -Kgnupg:blowfish:my_email@hotmail.com -g ./home/spamtla/.thunderbird -g ./home/spamtla/.cache/thunderbird
 
-							1.5.1.1 - EXTRACTING GPG ENCRYPTED ARCHIVE
+							1.6.1.1 - EXTRACTING GPG ENCRYPTED ARCHIVE
 								Extracting can be as simple as this:
 
 									# dar -x ./archive_name 
@@ -35731,7 +35811,7 @@ when needed.
 						Read More on:
 							MANAGING GPG KEYS
 
-					1.6 - SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
+					1.7 - SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
 						From 'man page': If the number is appended by k (or K), M, G, T, P, E, Z, Y, R or Q 
 						the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes, yottabytes, ronnabytes 
 						or quettabytes respectively. 
@@ -35746,19 +35826,19 @@ when needed.
 								or
 							$ dar -c./data\ archive -s2M -g./data\ folder/
 
-						1.6.1 - SPLITTING ALREADY CREATED ARCHIVE INTO DIFFERENT FILES
+						1.7.1 - SPLITTING ALREADY CREATED ARCHIVE INTO DIFFERENT FILES
 							If an archive has already been made it's possible to furhter split 
 						it into different files using this:
 
 							$ dar_xform -s 1000 archive.1.dar new_archive
 						
-						1.6.2 - JOINNING DIFFERENT FILES INTO A SINGLE ARCHIVE
+						1.7.2 - JOINNING DIFFERENT FILES INTO A SINGLE ARCHIVE
 							If an archive has been split into different files, it can be joined
 						back into a single file again:
 
 							$ dar_xform new_archive.1.dar new_backup
 
-						1.6.3 - PAUSING ARCHIVING PROCESS FOR EACH SLICE CREATED
+						1.7.3 - PAUSING ARCHIVING PROCESS FOR EACH SLICE CREATED
 							In dar, it's possible to pause archiving for each slice created using the '-p' argument.
 						This allows each slice to be copied into a different disk, before creating a new slice.
 
@@ -35769,7 +35849,7 @@ when needed.
 						Practical Example:
 							$ dar -c ./data\ archive -p -s 2M -g ./data\ folder/
 
-							1.6.2.1 - PAUSING ARCHIVING PROCESS AFTER A GIVEN NUMBER OF SLICES HAVE BEEN CREATED
+							1.7.2.1 - PAUSING ARCHIVING PROCESS AFTER A GIVEN NUMBER OF SLICES HAVE BEEN CREATED
 								This can be used for the same purpose; in this example, the archiving
 							will pause after 3 slices of 2MB have been created.
 
@@ -35777,7 +35857,7 @@ when needed.
 									or
 								$ dar -c ./data\ archive -p3 -s 2M -g ./data\ folder/
 
-					1.7 - ADDING/EXCLUDING DATA FROM DAR ARCHIVING USING A LISTING FILE
+					1.8 - ADDING/EXCLUDING DATA FROM DAR ARCHIVING USING A LISTING FILE
 						During archive creation, it's possible to add or exclude data using a text file for listing which data is included
 						or excluded from the archive during creation.
 
@@ -35883,25 +35963,58 @@ when needed.
 
 								$ dar -+ ./merged\ archive -A ./merged\ archive -@ ./archive\ 3
 
-				4) MAKING CHANGES TO AN EXISTING DAR ARCHIVE
+
+				4) CREATING INCREMENTAL BACKUPS USING DAR
+					Dar allows to create Incremental backups for saving time and disk space:
+						$ dar -c <incremental_backup> -g <path/to/backup> -A <original_archive>
+
+					VERY IMPORTANT: <path/to/backup> must exist within the <original_archive> or else
+					a complete new backup with no relation to the <original_archive> will be created.
+
+						A) Note: 'dar' will AUTOMATICALLY FIND files/dirs that have
+						been modified or created anew and only add the changes into the <incremental_backup>.
+
+						B) Note: The <original_archive> can still be extracted as is - when desired.
+
+						C) Note: Incremental backups will considerably save time and disk space.
+						When using cloud storage, only the modified data will be uploaded.
+
+					EXTRACTING INCREMENTAL BACKUPS USING DAR
+						Extracting incremental backups require extracting the <original_archive> first.
+						then after the <original_archive> is extracted, the <incremental_backup>
+						can be extracted right afterwards.
+
+						When more than one incremental backup exist, they'll need to be extracted
+						in succession to preserve the updated data in the same order they arrived.
+
+						EXAMPLE:
+							$ mkdir -p ./EXTRACTED\ DATA
+							$ dar -x <original_archive> -R ./EXTRACTED_DATA
+							$ dar -x incremental_backup-august.1.dar -R ./EXTRACTED\ DATA
+							$ dar -x incremental_backup-october.1.dar -R ./EXTRACTED\ DATA
+							$ dar -x incremental_backup-december.1.dar -R ./EXTRACTED\ DATA
+						
+						
+
+				5) MAKING CHANGES TO AN EXISTING DAR ARCHIVE
 					Common Options - VERY IMPORTANT -:
 						'-ak' can be used to keep files compressed using the same algorithm as the previous archive.
 
-					4.1 - CHANGING COMPRESSION ALGORITHM FROM EXISTING DAR ARCHIVE
+					5.1 - CHANGING COMPRESSION ALGORITHM FROM EXISTING DAR ARCHIVE
 						Syntax:
 							$ dar -+ ./<new_archive> -A <old_archive> -z<algorithm>
 
 						Practical Example:
 							$ dar -+ ./new\ archive -A ./old\ archive -zzstd
 
-					4.2 - CHANGING ENCRYPTION ALGORITHM AND PASSWORD FROM EXISTING DAR ARCHIVE
+					5.2 - CHANGING ENCRYPTION ALGORITHM AND PASSWORD FROM EXISTING DAR ARCHIVE
 						Syntax:
 							$ dar -+ ./<new_archive> -A <old_archive> -K<algorithm>:<password> -ak
 
 						Practical Example:
 							$ dar -+ ./new\ archive -A ./old\ archive -Kscram:asdf -ak
 
-					4.3 - CREATING BACKUP SLICES FROM AN EXISTING DAR ARCHIVE
+					5.3 - CREATING BACKUP SLICES FROM AN EXISTING DAR ARCHIVE
 						'DAR' can create slices from an existing dar file:
 
 							Syntax: 
@@ -35910,17 +36023,17 @@ when needed.
 							Practical Example:
 								$ dar -+ ./<new_archive> -A <old_archive> -s 1M -ak
 
-					4.4 - ADDING NEW FILES AND CONTENTS TO AN EXISTING DAR ARCHIVE
+					5.4 - ADDING NEW FILES AND CONTENTS TO AN EXISTING DAR ARCHIVE
 						For adding new files, you'll have to go through topic and sub-topics:
 							MERGING DIFFERENT DAR ARCHIVES
 								MERGING TWO DIFFERENT DAR ARCHIVES
 								MERGING A THIRD DAR ARCHIVE
 					
-					4.5 - MAKING OTHER TYPES OF CHANGES TO EXISTING DAR ARCHIVE
+					5.5 - MAKING OTHER TYPES OF CHANGES TO EXISTING DAR ARCHIVE
 						Most of the sub-topics covered in the topic right below can be applied to any already existing 'dar' archive:
-											ADDING DATA TO DAR ARCHIVE
+							ADDING DATA TO DAR ARCHIVE
 
-				5) INTEGRITY TEST FOR DAR ARCHIVE
+				6) INTEGRITY TEST FOR DAR ARCHIVE
 					This integrity test only tests the archive structure and not the contents of the archive:
 						$ dar -t ./<archive_filename>
 
@@ -35928,13 +36041,13 @@ when needed.
 							GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
 							COMPARING DAR ARCHIVES
 
-				6) REPAIRING A DAMAGED/CORRUPTED DAR ARCHIVE
+				7) REPAIRING A DAMAGED/CORRUPTED DAR ARCHIVE
 					DAR makes it possible to isolate the index catalogue from an archive, this allows 
 					for quick repairing the catalogue in case the archive gets damaged by a power 
 					blackout or system crash while you're accessing the archive for listing,
 					comparing, extracting or even copying/cloning the archive.
 
-						6.1) ISOLATING THE CATALOGUE
+						7.1) ISOLATING THE CATALOGUE
 							When the catalogue is damaged, you'll be unable to extract 
 							the archive or do any other available operations in it,
 							for this reason it's important to isolate the catalogue.
@@ -35945,7 +36058,7 @@ when needed.
 									or
 								$ dar - -A ./Dar\ Archive > ./Archive\ Catalogue.1.dar
 
-						6.2) REPAIRING DAR ARCHIVE
+						7.2) REPAIRING DAR ARCHIVE
 							Repairing the archive creates a complete new copy of it by 
 							completely overwritting the catalogue as the new repaired archive,
 							it doesn't removes the damaged archive nor replaces it: 
@@ -35954,21 +36067,21 @@ when needed.
 							After fixing the archive, the "Archive Catalogue" will be the
 							repaired archive.
 							
-							6.3) LISTING REPAIRED FILES FROM DAR ARCHIVE
+							7.3.1) LISTING REPAIRED FILES FROM DAR ARCHIVE
 								With the repaired archive in hands, you can now list to 
 								see which files have been saved by the repair:
 									$ dar -l ./Archive\ Catalogue
 
 								Files that have been "recovered" will have been tagged as 'Saved'.
 
-				7) COMPARING DAR ARCHIVES
+				8) COMPARING DAR ARCHIVES
 
-					7.1 - COMPARING TWO DIFFERENT DAR ARCHIVES
+					8.1 - COMPARING TWO DIFFERENT DAR ARCHIVES
 						This will compare 2 different archives, both must share the same catalogue.
 
 							$ dar -d ./Archive\ 1 -A ./Archive\ 2
 						
-					7.2 - COMPARING ARCHIVE DATA WITH DATA ON THE FILESYSTEM
+					8.2 - COMPARING ARCHIVE DATA WITH DATA ON THE FILESYSTEM
 						DAR also makes it possible to compare the archived data with the data located on the filesystem.
 						This will quickly test all files under the filesystem belonging to the dar archive.
 						
@@ -35990,8 +36103,11 @@ when needed.
 						GENERATING HASH FILE FOR DAR ARCHIVE DURING CREATION
 						INTEGRITY TEST FOR DAR ARCHIVE
 
-				8) EXTRACTING DATA FROM DAR ARCHIVE
+				9) EXTRACTING DATA FROM DAR ARCHIVE
 					Common Options to use when extracting (-x):
+						-w		#Supress all Interactive Warnings
+								Note: Useful for overwritting files when needed.
+
 						-k              #Do not remove files destroyed since the reference backup
 						-r              #Do not restore file older than those on filesystem
 						-f              #Do not restore directory structure
@@ -36007,18 +36123,29 @@ when needed.
 					Example: If your archive name is called 'archive.zst.1.dar', then you only need to pass 'archive.zst' for DAR.
 					you can list existing contents using the command on Step #2( $ dar -l )
 
-					8.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
+					9.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
 
 							Syntax:
 								$ dar -x ./<archive_filename>
 									or
-								$ dar -x./<archive_filename>
+								$ dar -w -x./<archive_filename>
 
 							Practical Example:
-								$ dar -x ./archive
+								$ dar -w -x ./archive
 
+					9.3 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO DIFFERENT FOLDER
+							Syntax:
+								$ dar -x ./<archive_filename> -R <destination_path>
+									or
+								$ dar -w -x./<archive_filename> -R <destination_path>
 
-					8.2 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
+							Practical Example:
+								$ mkdir ./destination
+								$ dar -wx ./archive  -R ./destination/
+
+							Note: <destination_path> must be created beforehand.
+
+					9.4 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 						NOTE: The <existing_dar_content> must exist within the DAR Archive passed as <filename>.dar .
 
 							Syntax:
@@ -36027,7 +36154,7 @@ when needed.
 							Practical Example:
 								$ dar -x ./archive -g ./existing_content
 
-					8.3 - EXTRACTING DAR ARCHIVE USING PASSWORD
+					9.5 - EXTRACTING DAR ARCHIVE USING PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
 						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
 
@@ -47969,6 +48096,12 @@ SOME BROOT FILE EXPLORER
 
 
 	---TROUBLESHOOTING WINDOWS
+		GPU HARDWARE ACCELERATION CRASHES | WSL CRASHING INTERMITENTLY
+			Some programs may cause WSL2 to crash and freeze,
+			Disabling GPU Acceleration within those programs that cause crash will solve the issue.
+		
+			The issue can arise from using Old GPU/Old GPU Drivers within WSL2.
+
 		HOW TO FIX USB DEVICE NOT DETECTED
 			Sometimes this issue can be easily fixed by disabling Power Savings for USB on Windows,
 		to do this follow the instructions:
@@ -48763,7 +48896,11 @@ RCLONE TUTORIAL
 		$ rclone config
 
 	MOUNTING WITH RCLONE 
-		$ rclone mount --daemon --vfs-cache-mode full Remote_Name: ./Pseudo-Directory
+		Syntax:
+			$ rclone mount -vv --daemon --vfs-cache-mode full <Remote_Name>: ./<Pseudo-Mount-Dir>
+
+		Practice:
+			$ rclone mount -vv --daemon --vfs-cache-mode full Google\ Drive\ username: ./Pseudo-Directory
 
 
 		A) Note: ./Pseudo-Directory must exist, so make sure you create it first.
@@ -48772,6 +48909,11 @@ RCLONE TUTORIAL
 		C) Note: '--vfs-cache-mode full' should cover most setups for free cloud storage drives.
 		D) Note: '--daemon' will allow rclone to run as a service(in the background) as opposed to running
 		it as a foreground process.
+		E) Note: -vv enables debug output mode.
+		It'll often advise you to save 'root_folder_id' in your rclone configuration file to
+		speed up mounting:
+			"/home/spamtla/.config/rclone/rclone.conf"
+
 
 		
 		RCLONE MOUNT CACHE MODES EXPLAINED
