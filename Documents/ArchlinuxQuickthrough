@@ -386,8 +386,10 @@ USE LICENSE:
 							EXTRACTING DATA FROM DAR ARCHIVE
 								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
 								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO DIFFERENT FOLDER
+								EXTRACTING ALL CONTENTS FROM DAR ARCHIVE WITHOUT REPLACING NEWER EXISTENT FILES
 								EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 								EXTRACTING DAR ARCHIVE USING PASSWORD
+							CREATING ARCHIVE DATABASE USING DAR_MANAGER
 						SOME DAR LINKS
 					7Z CHEAT SHEET
 						PROPERLY UNCOMPRESSING/DECOMPRESSING SEVERAL FILES USING '7Z' AND 'AWK'
@@ -36095,6 +36097,8 @@ when needed.
 						filesystem properties (User, group, permissions, FSA, EA, etc) or not as well as checking which files have been removed
 						or added/created in the filesystem.
 
+							# dar --diff ./Archive\ Name
+								or
 							# dar -d ./Archive\ Name
 								or
 							# dar -va -d ./Archive\ Name
@@ -36124,28 +36128,40 @@ when needed.
 					you can list existing contents using the command on Step #2( $ dar -l )
 
 					9.1 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO CURRENT FOLDER
+						Syntax:
+							$ dar -x ./<archive_filename>
+								or
+							$ dar -w -x./<archive_filename>
 
-							Syntax:
-								$ dar -x ./<archive_filename>
-									or
-								$ dar -w -x./<archive_filename>
+						Practical Example:
+							$ dar -w -x ./archive
 
-							Practical Example:
-								$ dar -w -x ./archive
 
 					9.3 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE INTO DIFFERENT FOLDER
+						Syntax:
+							$ dar -x ./<archive_filename> -R <destination_path>
+								or
+							$ dar -w -x./<archive_filename> -R <destination_path>
+
+						Practical Example:
+							$ mkdir ./destination
+							$ dar -wx ./archive  -R ./destination/
+
+						Note: <destination_path> must be created beforehand.
+
+
+					9.4 - EXTRACTING ALL CONTENTS FROM DAR ARCHIVE WITHOUT REPLACING NEWER EXISTENT FILES
+						The -r option can be used for specifying that existing files should only be replaced
+						or overwritten if they are older on the disk.
+
 							Syntax:
-								$ dar -x ./<archive_filename> -R <destination_path>
+								$ dar -x ./<archive_filename> -r -R <destination_path>
 									or
-								$ dar -w -x./<archive_filename> -R <destination_path>
+								$ dar -x ./<archive_filename> -r -R <destination_path> -g ./<existing_dir>
 
-							Practical Example:
-								$ mkdir ./destination
-								$ dar -wx ./archive  -R ./destination/
+							Note: The 2nd form extracts only <existing_dir> from the archive.
 
-							Note: <destination_path> must be created beforehand.
-
-					9.4 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
+					9.5 - EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 						NOTE: The <existing_dar_content> must exist within the DAR Archive passed as <filename>.dar .
 
 							Syntax:
@@ -36154,7 +36170,7 @@ when needed.
 							Practical Example:
 								$ dar -x ./archive -g ./existing_content
 
-					9.5 - EXTRACTING DAR ARCHIVE USING PASSWORD
+					9.6 - EXTRACTING DAR ARCHIVE USING PASSWORD
 						From 'man page': Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for
 						strong encryption and "scrambling" (alias "scram") for a very weak encryption.
 
@@ -36171,6 +36187,118 @@ when needed.
 							$ dar -x./archive -Kscram:asdf
 								or
 							$ dar -x./archive --key scram:asdf
+
+
+					10 - CREATING ARCHIVE DATABASE USING DAR_MANAGER
+						Since dar doesn't offers an option for concatenating different archives
+						without forcibly creating a complete new different archive, the
+						dar_manager is a nice alternative that allows managing different archives
+						and extracting them all at once in a given path.
+						
+						'dar_manager' stores the actual catalogue for each of the added archives
+						instead of the full data, therefore making data size small.
+
+						'dar_manager' also makes easy to keep track and managing
+						archives in different locations and different storage devices as well as 
+						extracting them.
+
+						
+						CREATING A DATABASE TO STORE USER ARCHIVES
+							$ dar_manager -C ./archive_user_database.dmd
+
+						INTERACTIVE DAR MANAGER MODE
+							$ dar_manager -B ./archive_user_database.dmd -i
+								or
+							$ dar_manager -iB ./archive_user_database.dmd
+
+						ADDING ARCHIVE TO DAR DATABASE
+							When adding a new archive to the database, 'dar_manager' will use
+							the path given in -A argument as a constant for finding 
+							archive location.
+
+								$ dar_manager -B ./arhive_user_database.dmd -A ~/archive_documents.1.dar
+
+							VERY IMPORTANT: When using relative paths instead of absolute paths,
+							dar_manager may consider the archive to be corrupted when the
+							dar database is moved to a different path.
+
+							Referenced Archives must actually exist on the disk.
+							When the archive changes, the new catalogue will have to be re-added the same way.
+							Using an old catalogue for a new archive will result in data
+							corruption/loss upon extraction.
+
+							ADDING BOTH ISOLATED CATALOGUE AND PATH TO ARCHIVE TO DAR DATABASE
+								It's possible to add an isolated catalogue that points to 
+								the archive.
+
+								Syntax:
+									$ dar_manager -B <database> -A <isolated-catalogue> <path-to-archive>
+
+								Example:
+									$ dar_manager -B ./database.dmd -A /path/to/catalogue /path/to/archive
+
+						LISTING ALL ARCHIVES STORED IN THE DATABASE
+							$ dar_manager -B ./database.dmd -l
+								or
+							$ dar_manager -lB ./database.dmd
+
+						LISTING ALL FILES FROM ARCHIVES STORED IN THE DATABASE
+							Simply pass '0' as value to <archive/catalogue index>
+
+							Syntax:
+								$ dar_manager -B ./database.dmd -u <archive-index/catalogue-index>
+
+							Example:
+								$ dar_manager -B ./database.dmd -u 0
+									or
+								$ dar_manager -B ./database.dmd -u0
+
+						EXTRACTING CONTENT FROM ALL ARCHIVES IN THE DATABASE INTO A GIVEN LOCATION
+							This will extract all Files/Dirs named Notes into ./tmp/:
+								$ dar_manager -B ~/.dar_database -e "-R tmp/" -r Notes
+
+							A) Note: Absolute paths can not be used when using '-e'.
+
+							B) Note: The 2nd form will pass extra arguments to dar using '-e'
+							-r will extract the 'Notes' directory from all archives in the database.
+
+							'-o' can be used to persistently use dar arguments across the database.
+							'-e' will temporarily use args. Discarding them from the database
+							and subsequent runs unless used again.
+
+							Listing persistent options is possible using '-l':
+								$ dar_manager -B ./database.dmd -l
+									or
+								$ dar_manager -lB ./database.dmd
+
+						EXTRACTING ALL ARCHIVES FROM DATABASE INTO A GIVEN LOCATION
+							The following command will extract all archives into the given path:
+								$ dar -aefd -x ./database.dmd -R ./path/to/extraction
+
+						EXTRACTING ONLY A SINGLE ARCHIVE FROM DAR DATABASE INTO A GIVEN LOCATION
+							Extraction has to be done manually using 'dar' after locating the desired
+							archive in the database:
+
+								1) Locating/Listing each Archive in the Database:
+									$ dar_manager -B ./database.dmd -l
+										or
+									$ dar_manager -lB ./database.dmd
+
+								2) Extracting manually
+									$ dar -x /path/to/archive.1.dar -R /path/to/extraction
+
+						RENAMING AN ARCHIVE INSIDE A DAR DATABASE
+							Syntax:
+								$ dar_manager -B <database>  -b <catalogue-index> <new-name>
+
+							$ dar_manager -B ./database -b 1 new_archive_name
+
+						RENAMING THE PATH OF AN ARCHIVE INSIDE A DAR DATABASE
+							Syntax:
+								$ dar_manager -B <database>  -p <catalogue-index> <new-path>
+
+							$ dar_manager -B ./database -p 1 /new/path/to/archive
+
 
 
 			SOME DAR LINKS:
