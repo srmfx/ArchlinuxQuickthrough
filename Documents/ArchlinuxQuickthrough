@@ -1235,6 +1235,7 @@ USE LICENSE:
 				MY CUSTOM TMUX CONFIGURATION
 		MOST USED TMUX HOTKEYS
 		TMUX HOTKEYS
+		TMUX TROUBLESHOOTING
 
 	FISH, A VERY MODERN COMMANDLINE SHELL
 		FISH CONFIGURATION FILE
@@ -7456,6 +7457,22 @@ TMUX - TERMINAL MULTIPLEXER
 
 		MISC
 			t		#Show a clock.
+
+	TMUX TROUBLESHOOTING
+		Sometimes tmux will get stuck when a commandline or TUI application requires user input straight
+		from the terminal. When this happens, use one of these methods from any window:
+
+			1 - Run 'stty sane':
+				$ stty sane
+
+			2 - Run 'reset':
+				$ reset
+
+			3 - Run 'tput rs1' after 'stty sane':
+				$ stty sane && tput rs1
+	
+		The issue can arise from using pager tools like 'less', 'moor' and 'lnav' that accidentally doesn't receives
+		any input through piping on the terminal.
 ------
 ------
 ------
