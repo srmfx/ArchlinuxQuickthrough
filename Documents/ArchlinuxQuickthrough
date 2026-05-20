@@ -367,8 +367,11 @@ USE LICENSE:
 							MERGING DIFFERENT DAR ARCHIVES
 								MERGING TWO DIFFERENT DAR ARCHIVES
 								MERGING A THIRD DAR ARCHIVE
-							CREATING INCREMENTAL BACKUPS USING DAR
-								EXTRACTING INCREMENTAL BACKUPS USING DAR
+							CREATING DIFFERENTIAL AND INCREMENTAL BACKUPS USING DAR
+								EXAMPLE #1 - CREATING INCREMENTAL BACKUP
+								EXAMPLE #2 - CREATING DIFFERENTIAL BACKUPS
+								MAIN ADVANTAGES OF USING DAR FOR BACKUP CREATION
+								EXTRACTING DIFFERENTIAL AND INCREMENTAL BACKUPS USING DAR
 							MAKING CHANGES TO AN EXISTING DAR ARCHIVE
 								CHANGING COMPRESSION ALGORITHM FROM EXISTING DAR ARCHIVE
 								CHANGING ENCRYPTION ALGORITHM AND PASSWORD FROM EXISTING DAR ARCHIVE
@@ -390,6 +393,7 @@ USE LICENSE:
 								EXTRACTING SINGLE CONTENT FROM DAR ARCHIVE INTO CURRENT FOLDER
 								EXTRACTING DAR ARCHIVE USING PASSWORD
 							CREATING ARCHIVE DATABASE USING DAR_MANAGER
+								HANDLING DIFFERENTIAL AND INCREMENTAL BACKUPS
 								CREATING A DATABASE TO STORE USER ARCHIVES
 								INTERACTIVE DAR MANAGER MODE
 								ADDING ARCHIVE TO DAR DATABASE
@@ -1236,6 +1240,8 @@ USE LICENSE:
 		MOST USED TMUX HOTKEYS
 		TMUX HOTKEYS
 		TMUX TROUBLESHOOTING
+			COMMANDLINE/TUI PROGRAMS FREEZING WHEN READING USER INPUT
+			COPY AND PASTING INTO CLIPBOARD
 
 	FISH, A VERY MODERN COMMANDLINE SHELL
 		FISH CONFIGURATION FILE
@@ -7459,20 +7465,29 @@ TMUX - TERMINAL MULTIPLEXER
 			t		#Show a clock.
 
 	TMUX TROUBLESHOOTING
-		Sometimes tmux will get stuck when a commandline or TUI application requires user input straight
-		from the terminal. When this happens, use one of these methods from any window:
+		COMMANDLINE/TUI PROGRAMS FREEZING WHEN READING USER INPUT
+			Sometimes tmux will get stuck when a commandline or TUI application requires user input straight
+			from the terminal. When this happens, use one of these methods from any window:
 
-			1 - Run 'stty sane':
-				$ stty sane
+				1 - Run 'stty sane':
+					$ stty sane
 
-			2 - Run 'reset':
-				$ reset
+				2 - Run 'reset':
+					$ reset
 
-			3 - Run 'tput rs1' after 'stty sane':
-				$ stty sane && tput rs1
-	
-		The issue can arise from using pager tools like 'less', 'moor' and 'lnav' that accidentally doesn't receives
-		any input through piping on the terminal.
+				3 - Run 'tput rs1' after 'stty sane':
+					$ stty sane && tput rs1
+		
+			The issue can arise from using pager tools like 'less', 'moor' and 'lnav' that accidentally doesn't receives
+			any input through piping on the terminal.
+
+		COPY AND PASTING INTO CLIPBOARD
+			'Tmux' will automatically go into copy/visual mode when using the mouse cursor for selecting content on the screen,
+			it'll automatically fetch the selection and copy it into clipboard then leave tmux's copy/visual mode.
+
+			However, some terminal emulators can have issues and not copy/paste from clipboard properly,
+			on these cases hold down the 'shift' key on your keyboard before doing content selection with your cursor,
+			then finally press 'ctrl+shift+c' after selection is completed for copying into clipboard.
 ------
 ------
 ------
@@ -35810,9 +35825,13 @@ when needed.
 							$ dar -c <archive_filename_without_extension> --key <algorithm>:<password/cipher> -g <data_to_archive>
 
 						Practical Example - Using SCRAMBLE Algorithm - :
+							$ dar -c ./data\ archive -K scram -g ./data\ folder/
+								or
 							$ dar -c ./data\ archive -K scram:asdf -g ./data\ folder/
 								or
 							$ dar -c./data\ archive -Kscram:asdf -g./data\ folder/
+								or
+							$ dar -c ./data\ archive -K scram:$(cat /tmp/passwd) -g ./data\ folder/
 
 						READ TOPIC:
 							EXTRACTING DAR ARCHIVE USING PASSWORD
@@ -35841,9 +35860,16 @@ when needed.
 							MANAGING GPG KEYS
 
 					1.7 - SPLITTING/SLICING ARCHIVE INTO SEVERAL FILES
-						From 'man page': If the number is appended by k (or K), M, G, T, P, E, Z, Y, R or Q 
-						the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes, yottabytes, ronnabytes 
-						or quettabytes respectively. 
+						From 'man page': 
+						If the number is appended by k (or K), M, G, T, P, E, Z, Y, R or Q 
+						the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes,
+						exabytes, zettabytes, yottabytes, ronnabytes or quettabytes respectively. 
+
+							Common Options:
+								-s		#Slice Size in bytes (k,M,G..)
+								-S		#Size of the first slice.
+										By default, first slice is the same size of
+										all other slices.
 
 						Syntax:
 							$ dar -c <archive_filename_without_extension> -s <slice_size> -g <data_to_archive>
@@ -35993,37 +36019,143 @@ when needed.
 								$ dar -+ ./merged\ archive -A ./merged\ archive -@ ./archive\ 3
 
 
-				4) CREATING INCREMENTAL BACKUPS USING DAR
-					Dar allows to create Incremental backups for saving time and disk space:
-						$ dar -c <incremental_backup> -g <path/to/backup> -A <original_archive>
+				4) CREATING DIFFERENTIAL AND INCREMENTAL BACKUPS USING DAR
+					Differential and Incremental backups can be create in the following ways:
 
-					VERY IMPORTANT: <path/to/backup> must exist within the <original_archive> or else
-					a complete new backup with no relation to the <original_archive> will be created.
+					EXAMPLE #1 - CREATING INCREMENTAL BACKUP
+						$ dar -c full_backup -g ./folder_A
+						$ dar -c inc_backup_day1 -A full_backup -g ./folder_A
+						$ dar -c inc_backup_day2 -A inc_backup_day1 -g ./folder_A
+						$ dar -c inc_backup_day3 -A inc_backup_day2 -g ./folder_A
+						
+						Explanation: 
+							day3 archive will only contain data changed after day2
+							backup archive has been created and will not contain any data
+							from previous backups unless data has been updated or removed.
 
-						A) Note: 'dar' will AUTOMATICALLY FIND files/dirs that have
-						been modified or created anew and only add the changes into the <incremental_backup>.
+						Main Disadvantages:
+							1) if one incremental archive gets damaged/corrupted, 
+							then recovering stored data in it will not be possible.
 
-						B) Note: The <original_archive> can still be extracted as is - when desired.
+							2) Extracting without proper manager tools like 'dar' and
+							'dar_manager' can become difficult, specially when too
+							many differential backups exist. 'dar' will automatically
+							handle deletion and updated data. 'dar_manager' can
+							completely manage all the archives(include/exclude/list/stats)
+							and ready them up for extraction in one single command.
 
-						C) Note: Incremental backups will considerably save time and disk space.
-						When using cloud storage, only the modified data will be uploaded.
+						Main Advantages of incremental backups:
+							1) Very Fast and Small Disk Size Backups.
+							2) Small Network Bandwidth Usage.
+							3) Reduced Disk I/O throughput
+							
+					EXAMPLE #2 - CREATING DIFFERENTIAL BACKUPS
+						$ dar -c full_backup -g ./folder_A
+						$ dar -c diff_backup_day1 -A full_backup -g ./folder_A
+						$ dar -c diff_backup_day2 -A full_backup -g ./folder_A
+						$ dar -c diff_backup_day3 -A full_backup -g ./folder_A
 
-					EXTRACTING INCREMENTAL BACKUPS USING DAR
-						Extracting incremental backups require extracting the <original_archive> first.
-						then after the <original_archive> is extracted, the <incremental_backup>
+						Explanation:
+							day2 differential backup will include all changes made since
+							the full_backup was created; day3 differential backup will 
+							also include all changes since full_backup was created.
+
+						Main Disadvantages:
+							1) Requires more Hard Disk Space
+							2) Slower when compared to Incremental Backups.
+						
+						Main Advantages of Differential Backups:
+							1) Safer against data loss/corruption in general, since several
+							backups exist alongside the full-backup data.
+
+							2) Easier management, extraction and restoration;
+							can be manualy handled by all kinds of users and
+							extraction/restoration tools.
+
+
+					MAIN ADVANTAGES OF USING DAR FOR BACKUP CREATION
+						1) SPEED
+							Unlike archiving tools like 'tar' which uses sequential
+							tape-like access, 'dar' provides random access to data.
+
+							Because of that, 'dar' provides much faster access and
+							extraction of data, even allowing multiple threads to take
+							care of data extraction.
+
+							When extracting only a single file(or folder), tools like
+							'tar' will search the entire archive before extraction;
+							'dar' in the other hand will simply fetch the given data
+							path and extract it on-the-fly without searching the
+							entire archive until the data is found.
+
+						2) SAFETY AGAINST DATA LOSS AND CORRUPTION
+							Since 'dar' provides random access to data, if one file
+							becomes unreadable due to data corruption, 'dar' can still safely
+							extract all other files in the archive that have not been 'lost'
+							regardless of how many have been actually lost.
+
+							popular tools like 'tar' will redeem all the remainning
+							archived data located right after the corrupted file as completely
+							unrecoverable and permanently lost unless another backup exist.
+
+						3) INDIVIDUAL FILE COMPRESSION
+							'dar' can compress files individually inside it's archive,
+							completely optimizing compression for each data.
+
+						4) BUILT-IN GPG KEY AND PASSWORD ENCRYPTION
+							'dar' offers both built-in GPG Key and password protection
+							to the archives created.
+
+							tools like 'dar' rely on 'gpgtar' and other 3rd party tools.
+							if you can not remember the tool used to encrypt your archives,
+							then you likely will not be able to decrypt it elsewhere.
+
+							If one of the 3rd party tools used for encryption is not
+							available in another operating system, then you can not
+							decrypt your archive(s) in that OS neither.
+
+							Same if the encryption tool gets updated and changes
+							it's default options, settings and/or data structs by
+							dropping support to older versions, then you'll have
+							completely lost any means of data recovery through password.
+
+							Same also happens if the chosen 3rd party encryption tool
+							becomes discontinued and dropped, older versions of the program
+							might not work on newer operating systems.
+
+						5) AUTOMATIC HANDLING OF DIFFERENTIAL AND INCREMENTAL BACKUPS
+							Both 'dar' and 'dar_manager' can automatically handle 
+							compression and extraction if such typés of backup.
+						
+					EXTRACTING DIFFERENTIAL AND INCREMENTAL BACKUPS USING DAR
+						Extracting differential and incremental backups require extracting
+						the <original_archive> first.
+
+						then after the <original_archive> is extracted, the <diff/inc backup>
 						can be extracted right afterwards.
 
-						When more than one incremental backup exist, they'll need to be extracted
-						in succession to preserve the updated data in the same order they arrived.
+						When more than one differential/incremental backup exist,
+						they'll need to be extracted in succession to preserve the updated data
+						in the same order they arrived.
 
-						EXAMPLE:
+						EXAMPLE: - EXTRACTING INCREMENTAL BACKUPS -
 							$ mkdir -p ./EXTRACTED\ DATA
-							$ dar -x <original_archive> -R ./EXTRACTED_DATA
-							$ dar -x incremental_backup-august.1.dar -R ./EXTRACTED\ DATA
-							$ dar -x incremental_backup-october.1.dar -R ./EXTRACTED\ DATA
-							$ dar -x incremental_backup-december.1.dar -R ./EXTRACTED\ DATA
+							$ dar -x full_backup -R ./EXTRACTED_DATA
+							$ dar -x inc_backup-august.1.dar -R ./EXTRACTED\ DATA
+							$ dar -x inc_backup-october.1.dar -R ./EXTRACTED\ DATA
+							$ dar -x inc_backup-december.1.dar -R ./EXTRACTED\ DATA
+
+						EXAMPLE: - EXTRACTING DIFFERENTIAL BACKUPS -
+							$ mkdir -p ./EXTRACTED\ DATA
+							$ dar -x full_backup -R ./EXTRACTED_DATA
+							$ dar -x diff_backup-december.1.dar -R ./EXTRACTED\ DATA
+
 						
-						
+						It's also possible to use 'dar_manager' for extracting all
+						backups(full and differential backups) in one command:
+						READ MORE ON:
+							HANDLING DIFFERENTIAL AND INCREMENTAL BACKUPS
+
 
 				5) MAKING CHANGES TO AN EXISTING DAR ARCHIVE
 					Common Options - VERY IMPORTANT -:
@@ -36136,8 +36268,10 @@ when needed.
 
 				9) EXTRACTING DATA FROM DAR ARCHIVE
 					Common Options to use when extracting (-x):
-						-w		#Supress all Interactive Warnings
+						-wa		#Supress all Interactive Warnings
 								Note: Useful for overwritting files when needed.
+								Note: Run extraction as administratio to surpress
+								permission warnings.
 
 						-k              #Do not remove files destroyed since the reference backup
 						-r              #Do not restore file older than those on filesystem
@@ -36217,6 +36351,13 @@ when needed.
 
 
 					10 - CREATING ARCHIVE DATABASE USING DAR_MANAGER
+						Common Options:
+							-wa		#Supress Warnings and skips
+									interactive user confirmation queries.
+
+									Note: Run extraction as administration
+									to surpress permission warnings.
+
 						Since dar doesn't offers an option for concatenating different archives
 						without forcibly creating a complete new different archive, the
 						dar_manager is a nice alternative that allows managing different archives
@@ -36228,8 +36369,17 @@ when needed.
 						'dar_manager' also makes easy to keep track and managing
 						archives in different locations and different storage devices as well as 
 						extracting them.
-
 						
+						HANDLING DIFFERENTIAL AND INCREMENTAL BACKUPS
+							'Dar_manager' can also be used to extract data
+							from differential and incremental backups stored in
+							multiple 'dar' archives.
+
+							For achieving this, add all incremental backups
+							to a dar_manager database and extract all contents
+							in one go, read more on:
+								EXTRACTING ALL ARCHIVES FROM DATABASE INTO A GIVEN LOCATION
+									
 						CREATING A DATABASE TO STORE USER ARCHIVES
 							$ dar_manager -C ./archive_user_database.dmd
 
@@ -36300,7 +36450,17 @@ when needed.
 
 						EXTRACTING ALL ARCHIVES FROM DATABASE INTO A GIVEN LOCATION
 							The following command will extract all archives into the given path:
-								$ dar -aefd -x ./database.dmd -R ./path/to/extraction
+								$ dar -aefd -wa -x ./database.dmd -R ./path/to/extraction
+
+							A) Note: Extract as root/admin to avoid permission warnings.
+
+							B) Note: When same data exists in two or more differential
+							backup, only the the more recent data will be extracted.
+
+							C) Note: When data is deleted in a more recent version,
+							then the extraction will also 'remove' it even when
+							it exists in an older differential backup. Extraction in
+							this case is still possible by manual means.
 
 						EXTRACTING ONLY A SINGLE ARCHIVE FROM DAR DATABASE INTO A GIVEN LOCATION
 							Extraction has to be done manually using 'dar' after locating the desired
