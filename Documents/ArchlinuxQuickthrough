@@ -1039,6 +1039,7 @@ USE LICENSE:
 		CHECKING IF WSL IS ACTUALLY USING HYPER-V
 	SOME WSL CONFIGURATION FILES | WSL SETTINGS
 	ACCESSING WSL LINUX DIRECTORIES FROM COMMANDLINE OR POWERSHELL
+		USING VIM MODE ON WINDOWS POWERSHELL
 		CREATING A SYMBOLIC LINK ON WINDOWS TO YOUR WSL LINUX DISTRIBUTION
 		CREATING A DRIVE LETTER FOR YOUR WSL LINUX DISTRIBUTION
 		RUNNING WSL PROCESSES ON WINDOWS VIA WSL NETWORK SHARE 
@@ -1074,7 +1075,7 @@ USE LICENSE:
 			WSL DEFAULT WINDOWS LOCATION FOR LINUX DISTROS
 			LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
 			LISTING ALL AVAILABLE BLOCK DEVICES FOR MOUNTING IN WSL
-			LISTING ALL CONNECTED USB DEVICES IN WINDOWS POWER SHELL
+			LISTING ALL CONNECTED USB DEVICES IN WINDOWS POWERSHELL
 			LISTING HYPER-V FIREWALL SETTINGS
 				LISTING WSL FIREWALLING RULES
 				CHANGING HYPER-V FIREWALL SETTINGS
@@ -1114,7 +1115,7 @@ USE LICENSE:
 		SETTING UP A FIREWALL WITH IPTABLES/NFTABLES IN WSL
 		ENABLING DBUS-BROKER IN WSL
 		MOUNTING DEVICES IN WSL
-			FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
+			FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWERSHELL
 			MOUNTING DEVICES ON WSL
 			UMOUNTING DEVICES ON WSL
 				UMOUNTING DEVICES MANUALLY ON WSL LINUX DISTRO
@@ -1150,10 +1151,10 @@ USE LICENSE:
 
 
 
-	---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
-		MANAGING ALIASES IN WINDOWS POWER SHELL
+	---SOME CMD(COMMAND PROMPT) AND WINDOWS POWERSHELL STUFF
+		MANAGING ALIASES IN WINDOWS POWERSHELL
 			LISTING ALL AVAILABLE ALIASES
-			CREATING AN ALIAS IN WINDOWS POWER SHELL
+			CREATING AN ALIAS IN WINDOWS POWERSHELL
 			CREATING ALIAS FOR A COMMAND
 			UPDATING ALIASES
 			HOW TO PERMANENTLY SET ALIASES
@@ -1933,7 +1934,7 @@ New Syntax(2023):
 		---SOME WINDOWS STUFF
 		---SOME INTRODUCTION TO WSL AND ARCHLINUX
 			CHANGING ZSH THEME | INSTALLING POWERLEVEL10K | PERFORMANCE
-		---SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
+		---SOME CMD(COMMAND PROMPT) AND WINDOWS POWERSHELL STUFF
 
 
 -007
@@ -9985,7 +9986,7 @@ $ sh file.sh
 
 
 Each Operating System has it's own Shell System;
-Windows has MSDOS and Windows Power Shell;
+Windows has MSDOS and Windows Powershell;
 Linux Default Shell Application is either Bash or C-Type;
 Others can be installed alongside it, like: 
 	1 - ZSH (Z Shell)
@@ -35635,7 +35636,30 @@ when needed.
 			BASIC DAR EXAMPLES:
 				1) ADDING DATA TO DAR ARCHIVE:
 					Common Options:
+					'-R' changes root path used; by default 'dar' uses current path as the 'root' path.
+					adding files using '-g' requires using relative path since absolute paths will not work.
+					By changing dar's root path it's possible to use a different relative path so that the contents are added to the archive
+					with a different base or parent directory. When -g is not used during archiving, dar will assume current folder
+					will be archived, but changing dar's root path through using '-R' will change that behavior.
+					Extraction will work similarly when '-R' is passed as argument:
+
+						Archiving /etc/environment file:
+							$ dar -c Archive\ 1 -R /etc/ -g ./environment 
+
+						Extracting Archive:
+							$ dar -x Archive\ 1 -R /etc/
+
+						Archiving with absolute paths:
+							$ dar -c Archive\ 2 -R / -g ./etc/environment
+
+						Extracting with absolute paths:
+							$ dar -x Archive\ 2 -R /
+								or
+							$ cd /; dar -x Archive\ 2; cd "${OLDPWD}"
+							
+
 					'-va' outputs verbose mode.
+					'-wa' suppresses warnings, useful for ignoring interactive dialogs.
 					'-b' turns on 'beep' on the terminal for noticing the end of a given task. Only works on beep capable/enabled terminals.
 					'-m <size>' data below the specified size will not be compressed - only works with '-z' - default value is 100.(size = 1K, 1M, 1G)
 					'-m 0' compresses all files.
@@ -37644,7 +37668,7 @@ SOME BROOT FILE EXPLORER
 	SOME WINDOWS UTILITIES
 		Most of these tools are located under C:\Windows\System32\
 		Furhterover, some commands are only available on Command Prompt and will not work under 
-		Windows Power Shell.
+		Windows Powershell.
 		You can auto-complete these commands with the tab-key.
 
 		NOTE: You can quick launch some of the available Graphical Tools using: system_key + 'r'.
@@ -37711,7 +37735,7 @@ SOME BROOT FILE EXPLORER
 		irprops.cpl			#Infrared Control Panel
 		bthprops.cpl  			#Bluetooth Control Panel
 
-		PowerShell.exe			#Windows Power Shell
+		PowerShell.exe			#Windows Powershell
 		cmd.exe				#Command Prompt Shell
 		chkdsk.exe			#Check Disk Utility
 		chkntfs.exe			#Can be used to set up automatic disk verification during boot
@@ -37837,7 +37861,7 @@ SOME BROOT FILE EXPLORER
 			SOURCE: https://www.avg.com/en/signal/how-to-use-chkdsk-windows
 
 			SCHEDULING FILESYSTEM CHECK DISK
-				In a power shell terminal, type:
+				In a powershell terminal, type:
 					chkdsk /f
 
 			1) chkdsk /f
@@ -38011,10 +38035,10 @@ SOME BROOT FILE EXPLORER
 
 			3) SHUTDOWN WSL
 				Virtual Disk needs to be umounted and unattached:
-				Launch a windows power shell session and type
+				Launch a windows powershell session and type
 					$ wsl --shutdown
 
-			4) AS ADMIN, LAUNCH A WINDOWS POWER SHELL SESSION AND TYPE:
+			4) AS ADMIN, LAUNCH A WINDOWS POWERSHELL SESSION AND TYPE:
 				# diskpart
 
 				4.1) SELECT VDISK FILE FROM WITHIN DISKPART:
@@ -38064,11 +38088,11 @@ SOME BROOT FILE EXPLORER
 
 	BASICS ON HYPERV
 		CHECKING IF HYPER-V IS ENABLED ON WINDOWS
-			1 - Open a Windows Power Shell terminal, type:
+			1 - Open a Windows Powershell terminal, type:
 				Get-WindowsOptionalFeature -Online -FeatureName *Hyper-V*
 
 		CHECKING IF WSL IS ACTUALLY USING HYPER-V
-			1 - Open a Windows Power Shell terminal, type:
+			1 - Open a Windows Powershell terminal, type:
 				Get-Process vmmemWSL
 					or
 				Get-Process vmmem
@@ -38245,6 +38269,22 @@ SOME BROOT FILE EXPLORER
 
 				1.2) Changing directory to c:
 					$ cd c:
+
+
+			USING VIM MODE ON WINDOWS POWERSHELL
+				The system-wide runtime configuration script for Windows Powershell can be located on:
+					C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1
+
+				The user runtime configuration script for Powershell is located on:
+					~\Documentos\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+						or
+					~\Documentos\OneDrive\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+
+
+				Add this to your Powershell runtime configuration file if you want VIM mode enabled:
+					[file: C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1]
+						Set-PSReadLineOption -EditMode Vi
+					[/file]
 
 			CREATING A SYMBOLIC LINK ON WINDOWS TO YOUR WSL LINUX DISTRIBUTION
 				On Windows, creating symbolink links requires administration privileges:
@@ -38558,18 +38598,18 @@ SOME BROOT FILE EXPLORER
 				BARE MOUNTS
 
 		LISTING ALL DISTRIBUTIONS INSTALLED IN WSL
-			Inside a windows power shell session, type: 
+			Inside a windows powershell session, type: 
 				$ Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
 
 		LISTING ALL AVAILABLE BLOCK DEVICES FOR MOUNTING IN WSL
-			Inside a windows power shell session, type: 
+			Inside a windows powershell session, type: 
 				$ GET-CimInstance -query "SELECT * from Win32_DiskDrive"     
 
 			READ MORE ON:
 				MOUNTING DEVICES ON WSL
 
-		LISTING ALL CONNECTED USB DEVICES IN WINDOWS POWER SHELL
-			Inside a windows power shell session, type: 
+		LISTING ALL CONNECTED USB DEVICES IN WINDOWS POWERSHELL
+			Inside a windows powershell session, type: 
 				$ Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' } | Select-Object Status,Present,Class,FriendlyName,Service,InstanceId | Format-Table -AutoSize -Wrap
 
 
@@ -38579,7 +38619,7 @@ SOME BROOT FILE EXPLORER
 				https://learn.microsoft.com/pt-br/windows/security/operating-system-security/network-security/windows-firewall/hyper-v-firewall
 				https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan
 
-			Inside a windows power shell session, type:
+			Inside a windows powershell session, type:
 				$ Get-NetFirewallHyperVVMSetting -PolicyStore ActiveStore
 					or
 				$ Get-NetFirewallHyperVVMSetting -PolicyStore ActiveStore -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}'
@@ -38884,7 +38924,7 @@ SOME BROOT FILE EXPLORER
 
 		4) restart your WSL Virtual Machine from scratch:
 			Save all your work before you progress with the following step.
-				From a Windows Power Shell session, type:
+				From a Windows Powershell session, type:
 					$ wsl --shutdown
 				
 
@@ -39214,7 +39254,7 @@ SOME BROOT FILE EXPLORER
 				
 				B) If you get errors related to permissions:
 					1) Start a new different session by using a windows 
-					power shell terminal (not linux):
+					powershell terminal (not linux):
 						NOTE: Don't close the session in Step #1
 
 						$ wsl -d <WSL_Distro>
@@ -39244,7 +39284,7 @@ SOME BROOT FILE EXPLORER
 
 					# pacman -S weston
 				
-				2) Start a new different session by using a windows power shell terminal (not linux):
+				2) Start a new different session by using a windows powershell terminal (not linux):
 					NOTE: Don't close the session in Step #1
 
 					$ wsl -d <WSL_Distro>
@@ -39306,7 +39346,7 @@ SOME BROOT FILE EXPLORER
 			SETTING UP NVIM CLIPBOARD FOR COPY AND PASTING IN 2025
 
 	MOUNTING DEVICES IN WSL
-		FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWER SHELL
+		FETCHING/LISTING ALL HARD DISKS AVAILABLE USING WINDOWS POWERSHELL
 			$ GET-CimInstance -query "SELECT * from Win32_DiskDrive"
 
 		MOUNTING DEVICES ON WSL
@@ -39387,13 +39427,13 @@ SOME BROOT FILE EXPLORER
 						note: the '#' and '$' are merely reference to root and user,
 						it's not necessary to type them in your windows shell/session.
 
-						1) Run a windows power shell session as administrator:
+						1) Run a windows powershell session as administrator:
 							You'll be unable to mount devices otherwise.
 
 						2) Fetch available devices using:
 							# GET-CimInstance -query "SELECT * from Win32_DiskDrive"
 
-						3) Inside a Windows Power Shell session, type: 
+						3) Inside a Windows Powershell session, type: 
 							VERY IMPORTANT:
 								MAKE SURE NO OTHER VM(Virtual Machine) OR WSL INSTANCE IS 
 								RUNNING THE DISK BEFORE MOUNTING!
@@ -39424,7 +39464,7 @@ SOME BROOT FILE EXPLORER
 				BARE MOUNTING WSL .VHDX IMAGES 
 					Mounting WSL .VHDX is useful for running 'fsck'.
 					
-					1) Run a windows power shell session as administrator:
+					1) Run a windows powershell session as administrator:
 						You'll be unable to mount devices otherwise.
 
 					2) Listing available WSL .VHDX Images on your system:
@@ -48329,8 +48369,8 @@ SOME BROOT FILE EXPLORER
 			$ uname -rv
 
 
----SOME CMD(COMMAND PROMPT) AND WINDOWS POWER SHELL STUFF
-	MANAGING ALIASES IN WINDOWS POWER SHELL
+---SOME CMD(COMMAND PROMPT) AND WINDOWS POWERSHELL STUFF
+	MANAGING ALIASES IN WINDOWS POWERSHELL
 		Source: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-alias?view=powershell-7.5
 
 		By default, aliases aren't permanently set when created.
@@ -48338,7 +48378,7 @@ SOME BROOT FILE EXPLORER
 		LISTING ALL AVAILABLE ALIASES
 			$ Get-Alias -Name *
 
-		CREATING AN ALIAS IN WINDOWS POWER SHELL
+		CREATING AN ALIAS IN WINDOWS POWERSHELL
 			This creates an alias called 'np':
 				$ Set-Alias -Name np -Value C:\Windows\notepad.exe
 
@@ -48435,8 +48475,8 @@ SOME BROOT FILE EXPLORER
 				go to the 'Power Management' tab, 
 				finally uncheck 'Allow the computer to turn off this device to save power'
 
-			3) (Optional) Make sure your device is connected by using Windows Power Shell:
-				Launch a Windows Power Shell session and then type:
+			3) (Optional) Make sure your device is connected by using Windows Powershell:
+				Launch a Windows Powershell session and then type:
 					$ Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -match '^USB' } | Select-Object Status,Present,Class,FriendlyName,Service,InstanceId | Format-Table -AutoSize -Wrap
 
 			Hint: you can rollback steps #1 and #2 if your device still doesn't shows up.
@@ -48950,7 +48990,10 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 			with the --deterministic-names option upon creation and mount.
 			
 			2D) Note: Backup both .conf and .diriv, the .diriv file needs to be backed up from time to 
-			time as new files and directories are created or updated.
+			time as new directories are created.
+			
+			2E) Note: .diriv files are never modified/updated and are only created as new directories
+			are also created.
 		
 	MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
 		$ gocryptfs --config "/etc/gocryptfs/gdrive_cougar_A.conf" ~/Encrypted.storage ~/Mount.point
