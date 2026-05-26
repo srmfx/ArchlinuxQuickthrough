@@ -1463,6 +1463,8 @@ USE LICENSE:
 				DIFFERENCES BETWEEN FSCRYPT AND GOCRYPTFS
 		INITIALIZING A GOCRYPTFS ENCRYPTED DIRECTORY
 		MOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
+		UMOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
+			KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
 		ALLOWING ACCESS TO USERS OTHER THAN ROOT
 		BACKING UP ALL .DIRIV FILES AT ONCE
 		CHANGING GOCRYPTFS PASSWORD TO AN ENCRYPTED DIRECTORY
@@ -34512,6 +34514,8 @@ VERY IMPORTANT:
 	https://gitlab.archlinux.org/groups/archlinux/packaging/packages/-/issues/?sort=created_date&state=opened&search=crash&first_page_size=20
 
 USEFUL LINKS TO CHECK:
+	https://pairdrop.net						#Web Service Cross-platform version of magic-wormhole
+	https://limewire.com						#Web Service for sharing temporary files anonymously(up to 4GB, 7days)
 	https://ntcore.com/4gb-patch/					#4GB Patcher for x86 programs
 									^ useful for 32bits software that require lots
 									of RAM and may end up crashing when going above
@@ -49002,6 +49006,16 @@ FILESYSTEM ENCRYPTION USING GOCRYPTFS
 
 		A) Note: Only specify --deterministic-names for mounting if you have initialized/created a 'gocryptfs' 
 		with it.
+
+	UMOUNTING GOCRYPTFS ENCRYPTED DIRECTORY
+		It's necessary to unmount an encrypted directory:
+			$ fusermount -u /path/to/mount
+				or
+			$ fusermount -u "Encrypted Directory Name"
+
+		KILLING ALL PROCESSES USING OR HOLDING DIRECTORY DATA
+			Killing processes that are holding on files might be necessary if umounting fails:
+				$ fuser --kill ~/path/to/mount/{*,.*}
 
 	ALLOWING ACCESS TO USERS OTHER THAN ROOT
 		By default, only the user who mounts has access to the decrypted, if you want to allow other users
