@@ -1169,6 +1169,25 @@ USE LICENSE:
 		ENABLING VOICE RECOGNITION ON WINDOWS
 
 --MISCALENEOUS A:
+	FISH - THE FRIENDLY INTERACTIVE SHELL
+		FISH HISTORY FILE
+		RUNTIME CONFIGURATION FILES FOR FISH
+		FUNCTION CONFIGURATION FILES FOR FISH
+		SCRIPT PRE-LOADING PATH FOR FISH
+		FISH SCRIPTING 
+			COMMAND SUBSTITUTION IN FISH
+			CREATING ENVIRONMENT VARIABLES IN FISH
+			FETCHING RETURN STATUS IN FISH
+			CONDITIONAL STATEMENTS IN FISH
+			CREATING AND ITERATING ARRAYS IN FISH
+				ITERATING THROUGH FILES ONLY USING COMMAND SUBSTITUTION
+			CREATING FUNCTIONS IN FISH
+			CREATING ALIASES IN FISH
+				PERSISTENTLY CREATING ALIASES FROM COMMANDLINE
+				CREATING A TEMPORARY ALIAS
+			CREATING ABBREVIATIONS IN FISH
+		ENABLING VI-MODE FOR FISH
+
 	SESH - TERMINAL MULTIPLEXER
 		CREATING A TMUX SESSION USING SESH
 		USING SESSION PICKER FOR SESH
@@ -1807,6 +1826,7 @@ New Syntax(2023):
 ====================================================================================================
 
 -014
+		FISH - THE FRIENDLY INTERACTIVE SHELL
 		GPU HARDWARE ACCELERATION CRASHES | WSL CRASHING INTERMITENTLY
 		FZF, FUZZY FINDER COMMAND -> minor update
 			TELEVISION, A VERY GOOD ALTERNATIVE TO 'FZF'
@@ -6582,6 +6602,161 @@ git reflog example:
 *				4(Optional) - Read more on GITHUB OAUTH AUTHENTICATION:
 *					read topic: GIT OAUTH TOKEN | VERY IMPORTANT 2023
 
+
+------
+------
+------
+------
+FISH - THE FRIENDLY INTERACTIVE SHELL
+	Fish is a fully-equipped command line shell (like bash or zsh) that is smart and
+	user-friendly. fish supports powerful features like syntax highlighting, autosuggestions,
+	and tab completions that just work out-of-box, with nothing to learn or setup.
+
+	FISH HISTORY FILE
+		~/.local/share/fish/fish_history
+
+	RUNTIME CONFIGURATION FILES FOR FISH
+		~/.config/fish/config.fish
+			or
+		/usr/share/fish/config.fish
+
+	FUNCTION CONFIGURATION FILES FOR FISH
+		Fish only loads functions when they're actually called, keeping the shell 'clean' from unused code.
+			~/.config/fish/functions/
+				or
+			/usr/share/fish/functions/
+
+	SCRIPT PRE-LOADING PATH FOR FISH
+		Scripts in this path are always loaded before config.fish file:
+			~/.config/fish/conf.d/
+	
+	FISH SCRIPTING 
+		COMMAND SUBSTITUTION IN FISH
+			$ echo (ls -la)
+				or
+			$ echo $(ls -la)
+		
+		CREATING ENVIRONMENT VARIABLES IN FISH
+			Syntax:
+				$ set <var-name> <value>
+
+			Practice - Using command substitution -:
+				$ set MyVar $(ls -la)
+
+		FETCHING RETURN STATUS IN FISH
+			$ echo $status
+
+			A) Note: this would be similar to 'echo $?' in bash for returning
+			status of a running command.
+
+		CONDITIONAL STATEMENTS IN FISH
+			Fish contains built-in conditional statements, however conditional evalutes the exit status
+			of the running programs using command substitution.
+				if test 4 -gt 3; 
+					echo "true";
+				end
+
+					--- OR ---
+
+				set dev_null " >/dev/null 2>&1";
+				if eval command -sq fish $dev_null; and eval grep fish /etc/shells $dev_null;
+				    echo "fish is installed and configured";
+				end
+
+		CREATING AND ITERATING ARRAYS IN FISH
+			set MyArr "A" "B" "C"
+			for count in $MyArr
+				echo "$count"
+			end
+
+			ITERATING THROUGH FILES ONLY USING COMMAND SUBSTITUTION
+				set files_arr $(find . -type f)
+				for files_v in $files_arr
+					echo "$files_v"
+				end
+
+					--- OR ---
+				
+				for files_v in $(find . -type f)
+					echo "$files_v"
+				end
+
+		CREATING FUNCTIONS IN FISH
+			Functions do not benefit from fish's shell auto-completion features
+			unless when fully replacing a given command like the examples below:
+
+				function ls
+					command ls --color=auto $argv
+				end
+
+				function eza
+					command eza --icons=always --color=always $argv
+				end
+
+			A) Note: If auto-completion feature is desired, use abbreviations or Persistent Aliases
+			instead.
+
+			B) Note: 'command' runs a given command while ignoring existing
+			shell functions and aliases.
+
+			C) Note: 'eval' runs a given string as command.
+
+		CREATING ALIASES IN FISH
+			Temporary aliases do not benefit from fish's shell auto-completion features.
+			Use abbreviations or presistent aliases whenever auto-completion feature is desired.
+
+			PERSISTENTLY CREATING ALIASES FROM COMMANDLINE
+				Fish allows creating persistent aliases straight from it's commandline:
+					$ alias -s gpg-reset "echo RELOADAGENT | gpg-connect-agent > /dev/null 2>&1";
+
+				A) Note: when creating a Persistent Alias, fish will automatically create a function
+				with it's name under ~/.config/fish/functions for lazy-loading.
+
+				B) Upon creating the lazy loading function, fish will fill the function 'header'
+				with meta-data for allowing auto-completion feature to work with the alias whenever
+				auto-completion exists for the given command. HOWEVER, when using a piped command
+				like the above, fish will only create auto-complete for the first command 'echo',
+				which will likely not work, using abbreviations would be the recommended method when
+				auto-completion is still desired.
+
+				C) Note: command above resets GPG password cache, forcing the user to re-type
+				password again when requesting the use of any GPG Key.
+				
+				D) Note: Upon -s usage, fish will save the given alias as an lazy-loaded function in
+				~/.config/fish/functions.
+
+			CREATING A TEMPORARY ALIAS
+				$ alias <alias_name> <command>
+
+		CREATING ABBREVIATIONS IN FISH
+			Abbreviations can expand using fish's auto-completion feature.
+				Syntax:
+					$ abbr --add <abbr_name> <command>
+
+				Practice - creating abbreviation for git status -:
+					$ abbr --add gits "git status"
+
+				A) Note: pressing 'ctrl+space' will prevent the fish from auto-expanding the abbreviation
+				into the full command. However, auto-expansion of abbreviation is still necessary for 
+				executing the given command. Only use ctrl+space if it conflicts with any command.
+
+				B) Note: the command 'gits' will not be recognized as alias, it's only when the shell
+				auto-expands upon either pressing 'enter' or 'space-bar' keys that the shell will
+				auto-expand. In turn this means that scripts trying to execute 'gits' directly will 
+				actually not work unless an alias or function is created.
+
+				C) Note: abbreviations should be used when auto-completion feature is more important.
+				some arguments may change depending on the previous argument used and neither functions
+				nor normal aliases allow the shell to auto-complete based on that criteria.
+
+	ENABLING VI-MODE FOR FISH
+		[file: ~/.config/fish/config.fish ]
+			if status is-interactive
+				# Commands to run in interactive sessions can go here
+				fish_vi_key_bindings
+
+			end
+		[/file]
 
 ------
 ------
@@ -11643,6 +11818,9 @@ Resident Evil on GOG Launcher;
 
 VRCHAT:
 	WINE_FULLSCREEN_FSR=1 WINE_FULLSCREEN_FSR_STRENGTH=5 PROTON_ENABLE_NVAPI=1 ENABLE_VKBASALT=1 gamescope --backend wayland --force-grab-cursor -w 1280 -h 1024 -W 1280 -H 1024 -S stretch -f -F nis --force-windows-fullscreen %command%
+
+	It's not possible to change the default maximum cache size from 30GB to less on Vrchat:
+		https://docs.vrchat.com/docs/configuration-file
 
 PHASMOPHOBIA:
 	PROTON_ENABLE_NVAPI=1 ENABLE_VKBASALT=1 SteamDeck=1 %command%
