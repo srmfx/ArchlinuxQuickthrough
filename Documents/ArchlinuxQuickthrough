@@ -1172,11 +1172,21 @@ USE LICENSE:
 	FISH - THE FRIENDLY INTERACTIVE SHELL
 		FISH HISTORY FILE
 		RUNTIME CONFIGURATION FILES FOR FISH
+			RE-LOADING RUNTIME CONFIGURATION FILE
+			MY CUSTOM RUNTIME CONFIGURATION FILE
 		FUNCTION CONFIGURATION FILES FOR FISH
 		SCRIPT PRE-LOADING PATH FOR FISH
 		FISH SCRIPTING 
 			COMMAND SUBSTITUTION IN FISH
 			CREATING ENVIRONMENT VARIABLES IN FISH
+				EXPORTING ENVIRONMENT VARIABLES IN FISH
+				REMOVING AN ENVIRONMENT VARIABLE
+				APPENDING NEW VALUE AT THE END OF AN EXISTING VARIABLE
+				PREPENDING THE VALUE TO THE BEGINNING OF AN EXISTING VARIABLE
+				TESTING A VARIABLE NAME EXIST
+				LISTING ALL VARIABLE NAMES
+				LISTING ALL VARIABLE VALUES AND NAMES
+				RUNNING A PROGRAM WITH A GIVEN ENVIRONMENT VAR
 			FETCHING RETURN STATUS IN FISH
 			CONDITIONAL STATEMENTS IN FISH
 			CREATING AND ITERATING ARRAYS IN FISH
@@ -6620,6 +6630,60 @@ FISH - THE FRIENDLY INTERACTIVE SHELL
 			or
 		/usr/share/fish/config.fish
 
+		A) Note: It's possible to create persistent environment variables,
+		abbreviations and aliases without editing the runtime configuration file.
+
+		RE-LOADING RUNTIME CONFIGURATION FILE
+			$ source ~/.config/fish/config.fish
+
+		MY CUSTOM RUNTIME CONFIGURATION FILE
+			[file: ~/.config/fish/config.fish ]
+				function set_gdk_theme
+					if test -z $GDK_SCALE
+						set -Ux GDK_SCALE 0.9;
+						set -Ux GDK_DPI_SCALE 0.9;
+						set -Ux GTK_THEME Adwaita:dark;
+					end
+				end
+
+				function dbus_launcher_function
+					set -gx dbus_realpath $(realpath /proc/$DBUS_SESSION_BUS_PID/exe >/dev/null 2>&1)
+
+					if not test "/usr/bin/dbus-daemon" = "$dbus_realpath"
+						set -Ux dbus_global_var $(dbus-launch);
+						set -Ux DBUS_SESSION_BUS_ADDRESS "$(echo $dbus_global_var[1] | cut -d '=' -f 2-100)"
+						set -Ux DBUS_SESSION_BUS_PID "$(echo $dbus_global_var[2] | cut -d '=' -f 2-100)"
+					end
+				end
+
+				function create_abbreviations
+					if not abbr --query created_abbreviations
+						abbr --add eza "eza --icons=always --color=always";
+						abbr --add yay "yay --color=always";
+						abbr --add pass-clear "echo RELOADAGENT | gpg-connect-agent > /dev/null 2>&1";
+						abbr --add pass-get "pass -c";
+						abbr --add chromium "chromium --disable-gpu";
+						abbr --add firefox "MOZ_WEBRENDER=0 firefox";
+						abbr --add created_abbreviations "1";
+					end
+				end
+
+				function zi
+					cd "$(zoxide query -i $argv)";
+				end
+
+				function z
+					cd "$(zoxide query $argv)";
+				end
+
+				if status is-interactive
+					fish_vi_key_bindings;
+					set_gdk_theme;
+					dbus_launcher_function;
+					create_abbreviations;
+				end
+			[/file]
+
 	FUNCTION CONFIGURATION FILES FOR FISH
 		Fish only loads functions when they're actually called, keeping the shell 'clean' from unused code.
 			~/.config/fish/functions/
@@ -6640,8 +6704,73 @@ FISH - THE FRIENDLY INTERACTIVE SHELL
 			Syntax:
 				$ set <var-name> <value>
 
-			Practice - Using command substitution -:
+			Practice - Using command substitution - :
 				$ set MyVar $(ls -la)
+
+			EXPORTING ENVIRONMENT VARIABLES IN FISH
+				This allows child processes to access the variable.
+					$ set -x <var-name> <value>
+
+			CREATING A PERSISTENT ENVIRONMENT VARIABLE IN FISH
+				This persistently create an environmnet variable without the user
+				having to edit the runtime configuration file:
+					$ set -Ux <var-name> <value>
+
+				A) Note: The variable will be immediately available to all fish's instance for
+				the current running user.
+
+				B) Note: Variable will also be made persistent across system reboots.
+
+			REMOVING AN ENVIRONMENT VARIABLE
+				$ set -e <var-name>
+
+			APPENDING NEW VALUE AT THE END OF AN EXISTING VARIABLE
+				This treats the variable as an array:
+					$ set -a <var-name> <value>
+						or
+					$ set -Ua <var-name> <value>
+
+			PREPENDING THE VALUE TO THE BEGINNING OF AN EXISTING VARIABLE
+				This treats the variable as an array:
+					$ set -p <var-name> <value>
+						or
+					$ set -Up <var-name> <value>
+
+			TESTING A VARIABLE NAME EXIST
+				$ set --query <var-name>
+
+			LISTING ALL VARIABLE NAMES
+				This will list all variables names without their values:
+					$ set -n
+						or
+					$ set -Un
+						or
+					$ set -gn
+						or
+					$ set -ln
+
+				A) Note:
+					-n will list all variable names.
+					-Un will list only variable names from the Universal Scope.
+					-gn will list variable from global scope.
+					-ln will list varaible from local scope.
+			
+			LISTING ALL VARIABLE VALUES AND NAMES
+					$ set -S
+						or
+					$ set -U
+						or
+					$ set -g
+						or
+					$ set -l
+
+					A Note: -S displays all env. vars in full detail; 
+						-U displays universal scope vars along with their values.
+						-l displays local scope vars and their values.
+						-g displays global scope vars and their values.
+
+			RUNNING A PROGRAM WITH A GIVEN ENVIRONMENT VAR
+				$ LD_PRELOAD="libpthread.so.0 libGL.so.1" ENABLE_VKBASALT=1 gamescope
 
 		FETCHING RETURN STATUS IN FISH
 			$ echo $status
@@ -7506,6 +7635,8 @@ TMUX - TERMINAL MULTIPLEXER
 				f		#Choose a window by typing it's name
 				w		#Choose a Window from a List
 						Note: this will also list sessions alongside the windows list.
+				n		#Next window
+				p		#Previous window
 
 				c		#Create a new window.
 				'		#Prompt Window Select / Interactive Window Selection.
